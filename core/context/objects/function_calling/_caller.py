@@ -5,7 +5,15 @@ import asyncio
 import inspect
 
 from datetime import datetime
-from typing import Any, Literal, Type, Awaitable, Callable, TypeVar
+from typing import (
+    Any,
+    Literal,
+    Type,
+    Awaitable,
+    Callable,
+    TypeVar,
+    Generator,
+)
 from pydantic import BaseModel, ValidationError
 from loguru import logger
 
@@ -28,15 +36,18 @@ class FunctionCaller:
     def __init__(self):
         self._functions: dict[str, Function] = {}
         self._already_force_function: bool = False
-    
-    def to_request(self, available_tool_calls: set[str]) -> list[dict[str, Any]]:
-        request: list[dict[str, Any]] = []
+
+    def allowed_func(self, available_tool_calls: set[str]) -> Generator[Function, None, None]:
         for name in self._functions:
             function = self._functions.get(name)
             if function is None:
                 continue
             if function.name in available_tool_calls:
-                request.append(function.struct().model_dump(exclude_none=True))
+                yield function
+    
+    def to_request(self, available_tool_calls: set[str]) -> list[dict[str, Any]]:
+        functions: Generator[Function, None, None] = self.allowed_func(available_tool_calls)
+        request: list[dict[str, Any]] = [function.struct().model_dump(exclude_none = True) for function in functions]
         return request
     
     def to_choice(self, choice_mode: ToolChoice = ToolChoice.AUTO) -> dict[str, str | dict[str, str]] | Literal["none"] | Literal["auto"] | Literal["required"]:
