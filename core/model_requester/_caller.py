@@ -169,6 +169,13 @@ class ModelRequester:
             submit_context = request.context
         request.context = submit_context
         if available_tool_calls and max_generated_times > 1:
+            logger.info(
+                "Using tools: {tools}",
+                user_id = user_id,
+                tools = ", ".join(
+                    func.name for func in self._tools_caller.allowed_func(available_tool_calls)
+                )
+            )
             request.tools = self._tools_caller.to_request(available_tool_calls)
             request.tool_choice = self._tools_caller.to_choice(tool_choice_model)
         try:
