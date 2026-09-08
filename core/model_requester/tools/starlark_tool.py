@@ -24,6 +24,7 @@ class Starlark(ToolCallPacakage):
     name = "starlark"
     description = "Execute Starlark code and return results."
     call_mode = CallMode.ASYNC
+    json_result = True
 
     @staticmethod
     def program_eval(
