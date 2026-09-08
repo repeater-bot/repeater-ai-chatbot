@@ -21,8 +21,14 @@ def check_package_list(strict_mode: bool = False):
 
         if hasattr(module, "__version__"):
             module_version = module.__version__
-        else:
+        elif requirement.name:
             module_version = importlib.metadata.version(requirement.name)
+        else:
+            logger.error(
+                "Package {package_name} version is not founded.",
+                package_name = requirement.name
+            )
+            continue
         
         if version.parse(module_version) in specifier:
             logger.info(

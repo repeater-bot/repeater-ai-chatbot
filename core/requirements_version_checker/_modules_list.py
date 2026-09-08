@@ -21,6 +21,8 @@ import pip_requirements_parser
 import jsonpatch
 import pythonping
 import cachetools
+import packaging
+import starlark
 
 modules_list = [
     aiofiles,
@@ -46,12 +48,14 @@ modules_list = [
     jsonpatch,
     pythonping,
     cachetools,
+    packaging,
+    starlark,
 ]
 
-name_map = {
-    module.__name__: module for module in modules_list
+from types import ModuleType
+from packaging.utils import canonicalize_name
+name_map: dict[str, ModuleType] = {
+    canonicalize_name(module.__name__): module for module in modules_list
 }
-name_map["python-multipart"] = python_multipart
-name_map["pip-requirements-parser"] = pip_requirements_parser
 name_map["python-box"] = box
 name_map["pyyaml"] = yaml
