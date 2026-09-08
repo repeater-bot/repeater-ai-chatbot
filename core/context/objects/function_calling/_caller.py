@@ -91,7 +91,7 @@ class FunctionCaller:
                 parameters = package_instance.Params
             function: Function[T, BaseModel] = Function(
                 name = package_instance.name,
-                description = package_instance.document_method(),
+                description = package_instance.get_description(),
                 enabled = package_instance.enabled,
                 force_choice = package_instance.force_choice,
                 callable = package_instance.call, # type: ignore

@@ -11,7 +11,7 @@ class Demo(ToolCallPacakage):
     
     name = "demo"
     enabled = False # Debug Only
-    document = "Demo Tool"
+    description = "Demo Tool"
 
     def call(self, args: Params):
         if args.raise_error:

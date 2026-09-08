@@ -9,7 +9,7 @@ from ...clients.model_info import SafeModelInfo
 class GetModels(ToolCallPacakage):
     prompt_manager: PromptManager = PromptManager()
     name = "get_models"
-    document = "Gets a list of all available models."
+    description = "Gets a list of all available models."
     call_mode = CallMode.ASYNC
 
     class Params(BaseModel):

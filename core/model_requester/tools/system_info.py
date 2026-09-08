@@ -16,7 +16,7 @@ class SystemInfo(ToolCallPacakage):
         pass
     
     name = "system_info"
-    document = "Get the system information."
+    description = "Get the system information."
 
     def base_info(self):
         return {

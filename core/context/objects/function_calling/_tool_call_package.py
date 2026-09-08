@@ -29,7 +29,7 @@ class ToolCallPacakage(ABC, Generic[T]):
     enabled: ClassVar[bool] = True
     """Enable the tool"""
 
-    document: ClassVar[str] = ""
+    description: ClassVar[str] = ""
     """The document of the tool"""
 
     force_choice: ClassVar[bool] = False
@@ -52,11 +52,11 @@ class ToolCallPacakage(ABC, Generic[T]):
     def __post_init__(self):
         pass
 
-    def document_method(self) -> str:
+    def get_description(self) -> str:
         """
         Override the method to customize more complex description rules.
         """
-        return self.document or self.__doc__ or ""
+        return self.description or self.__doc__ or ""
 
     @abstractmethod
     def call(self, args: Params) -> T:

@@ -10,7 +10,7 @@ class SetPrompt(ToolCallPacakage):
 
     prompt_manager: PromptManager = PromptManager()
     name = "set_prompt"
-    document = "Overrides the current system prompt."
+    description = "Overrides the current system prompt."
     call_mode = CallMode.ASYNC
 
     async def call(self, args: Params):

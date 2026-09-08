@@ -37,7 +37,7 @@ class HTTPRequests(ToolCallPacakage):
     name = "http_requests"
     call_mode = CallMode.ASYNC
     json_result = True
-    document = "send a any method HTTP request to a URL and return the response."
+    description = "send a any method HTTP request to a URL and return the response."
     robots_cache: ClassVar[TTLCache[str, str, float] | None] = None
     
     def validation_method(self, method: HTTPMethods) -> bool:
