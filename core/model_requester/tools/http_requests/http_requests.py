@@ -239,13 +239,15 @@ class HTTPRequests(ToolCallPacakage):
             )
 
     async def call(self, args: Params):
-        client = httpx.AsyncClient(
+        client = await asyncio.to_thread(
+            httpx.AsyncClient,
             base_url = args.base_url,
             headers = args.base_headers,
             cookies = args.base_cookies,
             auth = args.base_auth,
             timeout = args.base_timeout,
-            transport = PublicIPOnlyTransport(
+            transport = await asyncio.to_thread(
+                PublicIPOnlyTransport,
                 verify = get_ssl_context(),
                 proxy = args.base_proxy
             ),
