@@ -42,33 +42,10 @@
 
 ### 依赖项:
 
-| Name              | Version  | License                              | License Link                                                                        | Where it is used                    | Reasons                               |
-|-------------------|----------|--------------------------------------|-------------------------------------------------------------------------------------|-------------------------------------|---------------------------------------|
-| Markdown          | 3.10.2   | BSD 3-Clause License                 | [BSD-3-Clause](https://github.com/Python-Markdown/markdown/blob/master/LICENSE.md)  | `core.markdown`                     | Parses Markdown text into HTML        |
-| pyyaml            | 6.0.3    | MIT License                          | [MIT](https://github.com/yaml/pyyaml/blob/main/LICENSE)                             | `core.api` & `core.global_config_manager` | Read configuration file         |
-| aiofiles          | 25.1.0   | Apache Software License              | [Apache-2.0](https://github.com/Tinche/aiofiles/blob/main/LICENSE)                  | `core.data_manager`                 | Asynchronous file support             |
-| environs          | 14.5.0   | MIT License                          | [MIT](https://github.com/sloria/environs/blob/main/LICENSE)                         | `run_repeater.py` & `core.global_config_manager` | Support for environment variables |
-| fastapi           | 0.129.0  | MIT License                          | [MIT](https://github.com/fastapi/fastapi/blob/master/LICENSE)                       | `core.api`                          | Build API                             |
-| httpx             | 0.28.1   | BSD License                          | [BSD-3-Clause](https://github.com/encode/httpx/blob/master/LICENSE.md)              | *Entire Project*                    | Asynchronous HTTP client              |
-| loguru            | 0.7.3    | MIT License                          | [MIT](https://github.com/Delgan/loguru/blob/master/LICENSE)                         | *Entire Project*                    | Logging                               |
-| openai            | 2.21.0   | Apache Software License              | [Apache-2.0](https://github.com/openai/openai-python/blob/main/LICENSE)             | `core.call_api`                     | Call the OpenAI API                   |
-| orjson            | 3.11.7   | MPL-2.0 AND (Apache-2.0 OR MIT)      | [Apache-2.0](https://github.com/ijl/orjson/blob/master/LICENSE-APACHE) / [MIT](https://github.com/ijl/orjson/blob/master/LICENSE-MIT) / [MPL-2.0](https://github.com/ijl/orjson/blob/master/LICENSE-MPL-2.0) | `core.DataManager` & `API`        | High-performance JSON  resolution |
-| pydantic          | 2.11.7   | MIT License                          | [MIT](https://github.com/pydantic/pydantic/blob/main/LICENSE)                       | `core.global_config_manager` & `core.api` | Simple and convenient data validation |
-| python-multipart  | 0.0.22   | Apache-2.0                           | [Apache-2.0](https://github.com/Kludex/python-multipart/blob/master/LICENSE.txt)    | `core.data_manager` & `core.api`    | Support for form data                 |
-| uvicorn           | 0.40.0   | BSD License                          | [BSD-3-Clause](https://github.com/Kludex/uvicorn/blob/main/LICENSE.md)              | `run_repeater.py`                   | Run FastAPI                           |
-| numpy             | 2.4.2    | BSD License                          | [BSD-3-Clause](https://github.com/numpy/numpy/blob/main/LICENSE.txt)                | *Entire Project*                    | Speed up batch computing of data      |
-| python-box        | 7.3.2    | MIT License                          | [MIT](https://github.com/cdgriffith/Box/blob/master/LICENSE)                        | `core.global_config_manager`        | Mixed configuration files             |
-| jinja2            | 3.1.6    | BSD-3-Clause license                 | [BSD-3-Clause](https://github.com/pallets/jinja/blob/main/LICENSE.txt)              | `core.text_template_processer`      | Render text templates                 |
-| tzdata            | 2025.3   | Apache-2.0                           | [Apache-2.0](https://github.com/python/tzdata/blob/master/LICENSE)                  | `core.text_template_processer`      | Get timezone information              |
-| yarl              | 1.23.0   | MIT License                          | [MIT](https://github.com/aio-libs/yarl/blob/master/LICENSE)                         | *Entire Project*                    | URL parsing                           |
-| bleach            | 6.3.0    | Apache-2.0                           | [Apache-2.0](https://github.com/mozilla/bleach/blob/main/LICENSE)                   | `core.markdown_render`              | Clean HTML                            |
-| asteval           | 1.0.8    | MIT License                          | [MIT](https://github.com/newville/asteval/blob/main/LICENSE)                        | `core.model_requester.tools`        | Assist AI in performing mathematical calculations. |
-| pip-requirements-parser | 32.0.1 | MIT License                      | [MIT](https://github.com/jazzband/pip-requirements-parser/blob/main/LICENSE)        | `core.requirements_version_checker` | Parse requirements.txt files.         |
-| jsonpatch         | 1.33     | BSD-3-Clause license                 | [BSD-3-Clause license](https://github.com/stefankoegl/python-json-patch/blob/master/LICENSE) | `core.data_manager`        | JSON Diff & Patch                     |
-| pythonping        | 1.1.4    | MIT License                          | [MIT](https://github.com/alessandromaggio/pythonping/blob/main/LICENSE)             | `core.api`                          | Checking network connectivity         |
-| cachetools        | 7.1.4    | MIT License                          | [MIT](https://github.com/tkem/cachetools/blob/master/LICENSE)                       | *Entire Project*                    | Cachetools is a caching library for Python |
-
-具体依赖的License请查看[LICENSES](./LICENSES/index.md)
+众所周知，现代软件通常建立在巨人的肩膀上
+所以，这个项目也同样需要依赖一些第三方库
+请访问 [LICENSES](./LICENSES/index.md)
+查看该项目所依赖的第三方库
 
 ---
 
