@@ -3,6 +3,7 @@ import importlib.metadata
 
 from packaging import version
 from ._requirements_loader import load_requirements
+from packaging.utils import canonicalize_name
 from ._modules_list import name_map
 from loguru import logger
 
@@ -10,8 +11,14 @@ def check_package_list(strict_mode: bool = False):
     requirements_file = load_requirements()
     for requirement in requirements_file.requirements:
         specifier = requirement.specifier
+        if not requirement.name:
+            logger.warning(
+                f"{requirement.name} has no name"
+            )
+            continue
+        
         try:
-            module = name_map[requirement.name]
+            module = name_map[canonicalize_name(requirement.name)]
         except KeyError:
             logger.error(
                 "Package {package_name} is not founded.",
