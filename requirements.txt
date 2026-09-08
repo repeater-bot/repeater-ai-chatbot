@@ -21,3 +21,5 @@ pip_requirements_parser==32.0.1
 jsonpatch==1.33
 pythonping==1.1.4
 cachetools==7.1.4
+packaging==26.1
+starlark==0.6.0
