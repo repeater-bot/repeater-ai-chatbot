@@ -8,6 +8,11 @@ from .call_model import CallModel
 from .token_count import TokenCount
 from .system_info import SystemInfo
 from .starlark_tool import Starlark
+from .horizontal import (
+    GetHorizontalIds,
+    HorizontalAccess,
+    DeleteHorizontalContext
+)
 
 __all__ = [
     "HTTPRequests",
@@ -19,4 +24,7 @@ __all__ = [
     "TokenCount",
     "SystemInfo",
     "Starlark",
+    "GetHorizontalIds",
+    "HorizontalAccess",
+    "DeleteHorizontalContext",
 ]
