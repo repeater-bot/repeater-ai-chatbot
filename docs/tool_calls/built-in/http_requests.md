@@ -2,6 +2,7 @@
 
 该工具用于发送 HTTP 请求
 如需访问内网需要配置 `tool_calls.allow_private_network_requests` 为 `true`
+如需支持使用所有 HTTP 方法需要配置 `tool_calls.tools_configs.http_requests.allowed_http_methods` 为 `ALL` 或手动写出所有方法
 
 注册名：`http_requests`
 
@@ -18,8 +19,8 @@
     [
       {
         "type": "request", // The type of request.
-        "method": "", // The HTTP method to use for the request.
-        "id": "", // The ID of the request.
+        "method": "GET", // The HTTP method to use for the request.
+        "id": "parallel_request", // The ID of the request, used to locate which Request returned the Response.
         "url": "", // The target URL of the request.
         "fail_to_retry": null, // Whether to retry the request if it fails.
         "query_params": null, // Query parameters to include in the request URL.
@@ -43,8 +44,9 @@
       "sleep_seconds": 10.0 // Sleep on the outside suspends requests on the back end.
     },
     {
-      "type": "request",
       // If the batch had only one request, it could be written like this.
+      "type": "request",
+      "id": "serial_request",
       "method": "GET",
       "url": "https://example.com",
       "fail_to_retry": {
