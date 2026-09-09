@@ -574,6 +574,48 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                 
                 // 系统信息的拓展内容
                 "extra_info": {}
+            },
+
+            // 水平访问配置
+            "horizontal": {
+
+                // 水平实例的服务器列表
+                // 键为访问的 ID
+                // 值为访问的 URL
+                "servers": {
+                    "repeater": "http://localhost:7645",
+                    "nightlight": "http://localhost:8345",
+                    "laurel": "http://localhost:7452",
+                    "mimosa": "http://localhost:8652",
+                    "viburnum": "http://localhost:9635"
+                },
+
+                // 访问时所使用的用户 ID
+                "user_id": "repeater_horizontal",
+
+                // 是否结合当前用户 ID
+                // 如果为 true，则当前访客的 user_id 会和本机的 user_id 组合成为新的 user_id
+                // 如果为 false，则只使用本机的 user_id
+                "with_now_user_id": true,
+
+                // 用户信息配置
+                "user_info": {
+                    // 用户名
+                    "username": "Repeater",
+
+                    // 用户昵称
+                    "nickname": "复读机",
+
+                    // 年龄
+                    // 可以选择数字
+                    // 或者一个浮点数
+                    "age": 18,
+
+                    // 性别
+                    // 无可选值，单纯字符串
+                    // 可以按照自己的偏好填写
+                    "gender": "girl",
+                }
             }
         }
     },
@@ -1054,3 +1096,10 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
     }
 }
 ```
+
+主配置可以被拆分为多个文件
+只要处于同一个目录下
+系统就能自动按照名字或给定的加载顺序
+将配置文件进行组合
+你可以以你自己喜欢的方式去编排这些文件
+并最终得到一个完整的配置
