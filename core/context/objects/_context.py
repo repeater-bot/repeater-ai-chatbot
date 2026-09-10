@@ -222,6 +222,22 @@ class Context(BaseModel):
             remove_created = True,
             reduce_to_text = False
         )
+
+    def split_to_pairs(self) -> list[list[ContentUnit]]:
+        """
+        拆分上下文为对话对
+        """
+        context = self.context_list
+        pairs: list[list[ContentUnit]] = []
+        for content in context:
+            if content.role == ContentRole.USER:
+                pairs.append([content])
+            elif content.role != ContentRole.USER:
+                if not pairs:
+                    pairs.append([])
+                
+                pairs[-1].append(content)
+        return pairs
     
     def withdraw(self, length: int | None = None):
         """
