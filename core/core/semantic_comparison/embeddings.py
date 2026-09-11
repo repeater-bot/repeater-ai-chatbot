@@ -7,6 +7,7 @@ from ...call_api.embeddings import (
 from .get_model import get_model
 from ...runtime_container import RuntimeContainer
 from ...global_config_manager import ConfigManager
+from loguru import logger
 
 async def embedding(
     user_id: str,
@@ -25,6 +26,11 @@ async def embedding(
 
     if not model_info.api_key:
         raise ValueError("API key is required for semantic comparison")
+
+    logger.info(
+        "Usage Embedding Model: {model}",
+        model = model_info.uid
+    )
 
     request = EmbeddingsRequest(
         url = model_info.get_base_url(),
