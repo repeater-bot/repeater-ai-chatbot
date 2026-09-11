@@ -25,15 +25,14 @@ class OutputFormat(StrEnum):
 
 @ModelRequester.reg_global_package
 class GenerateImage(ToolCallPacakage):
-    prompt_manager: PromptManager = PromptManager()
     name = "generate_image"
     description = "Send a request to generate an image."
     call_mode = CallMode.ASYNC
     
     class Params(BaseModel):
-        model_id: str = Field(
-            default="", 
-            description="Unique identifier used to locate and load the target model."
+        model_id: str | None = Field(
+            default=None, 
+            description="Unique identifier used to locate and load the target model, if not specified, the model will be selected based on the user's preferences."
         )
         brief_summary: str = Field(
             default="", 
