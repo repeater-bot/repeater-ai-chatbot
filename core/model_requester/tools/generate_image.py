@@ -44,7 +44,7 @@ class GenerateImage(ToolCallPacakage):
         )
         images: list[UrlFile] | None = Field(
             default=None,
-            description="The generated images."
+            description="The images to use as a reference for the generation."
         )
     
     class Result(BaseModel):
