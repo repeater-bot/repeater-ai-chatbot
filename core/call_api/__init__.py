@@ -45,6 +45,7 @@ from .image import (
     Image,
     ImageTokenUsage,
     ImageUsageTokensDetails,
+    FILE_TYPES,
 
     ImageGenerateClient
 )
@@ -95,6 +96,7 @@ __all__ = [
     "Image",
     "ImageTokenUsage",
     "ImageUsageTokensDetails",
+    "FILE_TYPES",
 
     "ImageGenerateClient"
 ]
