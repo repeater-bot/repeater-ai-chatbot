@@ -17,3 +17,4 @@
 11. [Horizontal Access](./built-in/horizontal_access.md)
 12. [Delete Horizontal Context](./built-in/delete_horizontal_context.md)
 13. [Starlark](./built-in/starlark.md)
+14. [Generate Image](./built-in/generate_image.md)
