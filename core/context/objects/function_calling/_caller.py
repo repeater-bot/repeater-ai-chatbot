@@ -1,10 +1,9 @@
 import time
-import json
 import orjson
 import asyncio
 import inspect
 
-from datetime import datetime
+from fastapi import Request as FastAPI_Request
 from typing import (
     Any,
     Literal,
@@ -85,7 +84,15 @@ class FunctionCaller:
             self._already_force_function = True
         self._functions[function.name] = function
     
-    def register_packages(self, user_id: str, packages: list[Type[ToolCallPacakage[T]]], user_configs: UserConfigs, *args, **kwargs):
+    def register_packages(
+            self,
+            user_id: str,
+            packages: list[Type[ToolCallPacakage[T]]],
+            user_configs: UserConfigs,
+            fastapi_request: FastAPI_Request,
+            *args,
+            **kwargs
+        ):
         for package in packages:
             if not issubclass(package, ToolCallPacakage):
                 raise ValueError("Package must be a subclass of ToolCallPacakage")
@@ -93,6 +100,7 @@ class FunctionCaller:
                 user_id = user_id,
                 user_configs = user_configs,
                 global_configs = ConfigManager.get_configs(),
+                fastapi_request = fastapi_request,
                 *args,
                 **kwargs
             )
