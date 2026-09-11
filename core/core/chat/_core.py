@@ -6,16 +6,14 @@ import traceback
 from pathlib import Path
 from typing import (
     AsyncGenerator,
-    AsyncIterator,
     Any,
-    overload,
-    Literal,
 )
 
 # ==== 第三方库 ==== #
 import orjson
 import aiofiles
 from loguru import logger
+from fastapi import Request as FastAPI_Request
 
 # ==== 自定义库 ==== #
 from ...call_api.completions_api import (
@@ -37,7 +35,6 @@ from ...user_config_manager import (
     UserConfigs
 )
 from ...pools.lock_pool import AsyncLockPool
-from ...text_buffer import ContentBuffer
 from ...global_config_manager import (
     ConfigManager,
     GlobalConfigs
@@ -259,6 +256,7 @@ class Core:
     # region > Chat
     async def chat(
             self,
+            fastapi_request: FastAPI_Request,
             message: str | None,
             user_id: str,
             task_id: str | uuid.UUID | None = None,
@@ -287,6 +285,7 @@ class Core:
         """
         与模型对话
 
+        :param fastapi_request: FastAPI 原始请求对象
         :param message: 用户输入的消息
         :param user_id: 用户ID
         :param task_id: 任务ID
@@ -574,6 +573,7 @@ class Core:
                             user_id = user_id,
                             user_configs = configs,
                             global_configs = global_configs,
+                            fastapi_request = fastapi_request,
                             model_info_client = self.runtime.model_info_client,
                             max_concurrency = (
                                 global_configs.callapi.max_concurrency
