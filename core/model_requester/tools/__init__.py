@@ -13,6 +13,7 @@ from .horizontal import (
     HorizontalAccess,
     DeleteHorizontalContext
 )
+from .generate_image import GenerateImage
 
 __all__ = [
     "HTTPRequests",
@@ -27,4 +28,5 @@ __all__ = [
     "GetHorizontalIds",
     "HorizontalAccess",
     "DeleteHorizontalContext",
+    "GenerateImage",
 ]
