@@ -2,7 +2,7 @@
 
 计算两个文本的相似度
 
-- **`/generate/image/similarity/{user_id:str}`**
+- **`/generate/similarity/{user_id:str}`**
   - **Requset**
     - **method:** `POST`
     - **type:** `JSON`
