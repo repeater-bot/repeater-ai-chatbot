@@ -5,7 +5,7 @@ from pydantic import (
     field_serializer,
     Field,
 )
-from ..global_config_manager import ReasoningEffort
+from ..global_config_manager import ReasoningEffort, UserIdStrategies
 from zoneinfo import ZoneInfo, available_timezones
 from typing import Any
 
@@ -55,14 +55,17 @@ class UserConfigs(BaseModel):
 
     # Context
     context_shrink_limit: int | None = None
-    tool_calling_remove_reasoning: bool | None = None
     remove_reasoning_prompt: bool | None = None
     request_statistics_template: str | None = None
-    allowed_tool_calls: set[str] | None = None
     save_context: bool | None = None
     save_new_only: bool | None = None
     save_text_only: bool | None = None
     make_multimodal_message: bool | None = None
+
+    # Tools
+    tool_calling_remove_reasoning: bool | None = None
+    allowed_tool_calls: set[str] | None = None
+    horizontal_access_user_id_strategy: UserIdStrategies | None = None
 
     # User Profile
     user_name: str | None = None
