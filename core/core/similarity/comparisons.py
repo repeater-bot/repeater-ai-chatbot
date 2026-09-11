@@ -22,9 +22,11 @@ async def comparison(
     )
 
     logger.info(
-        "Similarity: \nFirst Text: {text1}\nSecond Text: {text2}\nResult: {result}",
+        "Similarity: \nFirst Text: {text1}\nSecond Text: {text2}\nResult: {result}\nPrompt Tokens: {prompt_usage}\nToken Tokens: {token_usage}",
         text1 = json.dumps(first_text, ensure_ascii = False),
         text2 = json.dumps(secend_text, ensure_ascii = False),
+        prompt_usage = response.prompt_tokens,
+        token_usage = response.total_tokens,
         result = result,
     )
 
