@@ -5,6 +5,7 @@ from .request_body import ChatRequest
 from .....assist_struct import Response, RequestUserInfo
 from ..client import horizontal_client
 from urllib.parse import urljoin
+from .gen_user_id import get_user_id
 
 @ModelRequester.reg_global_package
 class HorizontalAccess(ToolCallPacakage):
@@ -21,9 +22,15 @@ class HorizontalAccess(ToolCallPacakage):
 
     async def call(self, args: Params):
         configs = self.global_configs.tool_calls.tools_configs.horizontal
-        user_id = configs.user_id
-        if configs.with_now_user_id:
-            user_id = f"{user_id}_{self.user_id}"
+        strategies = self.user_configs.horizontal_access_user_id_strategy
+        if strategies is None:
+            strategies = configs.user_id_strategy
+        
+        user_id = get_user_id(
+            strategy = strategies,
+            local_id = configs.local_id,
+            user_id = self.user_id
+        )
         url = configs.servers.get(args.instance_id)
         if not url:
             raise ValueError("Invalid instance ID")
@@ -36,6 +43,7 @@ class HorizontalAccess(ToolCallPacakage):
             json = ChatRequest(
                 message = args.message,
                 thinking = args.thinking,
+                role_name = configs.role_name,
                 user_info = RequestUserInfo(
                     **configs.user_info.model_dump(exclude_none = True)
                 )
