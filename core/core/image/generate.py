@@ -19,7 +19,7 @@ from ...runtime_container import RuntimeContainer
 from .request import Request
 from fastapi import Request as FastAPI_Request
 from .make_request import make_request
-from ..assists.model_id_to_model import get_model
+from .get_model import get_model
 from .parse_response import parse_response
 from loguru import logger
 
