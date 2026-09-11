@@ -593,10 +593,17 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                 // 访问时所使用的用户 ID
                 "user_id": "repeater_horizontal",
 
-                // 是否结合当前用户 ID
-                // 如果为 true，则当前访客的 user_id 会和本机的 user_id 组合成为新的 user_id
-                // 如果为 false，则只使用本机的 user_id
-                "with_now_user_id": true,
+                // 横向访问时使用的用户ID策略
+                // 允许的值有：
+                // - "local_instance"：仅传递本机 user_id
+                // - "separate"：每个访客传递不同的 user_id
+                // - "users"：使用用户的 user_id
+                "user_id_strategy": "separate",
+
+                // 当模型支持在上下文中标记发言人时
+                // 可以使用该值区分上下文中的发言者
+                // 以确保不会干扰正常的上下文
+                "role_name": null,
 
                 // 用户信息配置
                 "user_info": {
