@@ -1,9 +1,15 @@
 from .http_requests import HTTPRequests
 from .system_info import SystemInfo
-from .horizontal import HorizontalToolConfig
+from .horizontal import (
+    HorizontalToolConfig,
+    UserIdStrategies,
+    UserInfo,
+)
 
 __all__ = [
     "HTTPRequests",
     "SystemInfo",
     "HorizontalToolConfig",
+    "UserIdStrategies",
+    "UserInfo",
 ]
