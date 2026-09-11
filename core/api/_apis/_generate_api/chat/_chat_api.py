@@ -5,12 +5,14 @@ import asyncio
 from typing import (
     Any,
     AsyncGenerator,
-    AsyncIterator,
     Coroutine
 )
 from fastapi.responses import (
     ORJSONResponse,
     StreamingResponse
+)
+from fastapi import (
+    Request,
 )
 
 from core.context.objects._content_unit import ContentUnit
@@ -28,7 +30,8 @@ from ._requests import (
 @chat_router.post("/completion/{user_id}")
 async def chat_endpoint(
     user_id: str,
-    request: ChatRequest
+    request: ChatRequest,
+    fastapi_request: Request
 ):
     """
     Endpoint for chat
@@ -36,6 +39,7 @@ async def chat_endpoint(
     server = RepeaterMain.get_now_server()
     task_id = request.task_id or uuid.uuid4()
     chat_coroutine: Coroutine[Any, Any, Response | AsyncGenerator[Delta | ContentUnit, None]] = server.core.chat(
+        fastapi_request = fastapi_request,
         user_id = user_id,
         task_id = task_id,
         message = request.message,
