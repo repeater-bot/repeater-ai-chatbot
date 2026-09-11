@@ -1,7 +1,7 @@
 from .request import SimilarityRequest
 from .response import SimilarityResponse
 from .._router import generate_router
-from .....core.semantic_comparison import comparison
+from .....core.similarity import comparison
 
 @generate_router.post("/similarity/{user_id}")
 async def similarity(request: SimilarityRequest, user_id: str):
