@@ -1,4 +1,4 @@
-from .....global_config_manager import UserIdStrategies
+from ....global_config_manager import UserIdStrategies
 
 def get_user_id(strategy: UserIdStrategies, local_id: str, user_id: str) -> str:
     match strategy:

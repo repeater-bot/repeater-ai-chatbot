@@ -5,7 +5,7 @@ from .request_body import ChatRequest
 from .....assist_struct import Response, RequestUserInfo
 from ..client import horizontal_client
 from urllib.parse import urljoin
-from .gen_user_id import get_user_id
+from ..gen_user_id import get_user_id
 
 @ModelRequester.reg_global_package
 class HorizontalAccess(ToolCallPacakage):
