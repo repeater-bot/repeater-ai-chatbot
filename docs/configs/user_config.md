@@ -24,6 +24,11 @@
     // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
     "image_model_id": null,
 
+    // (str | list[str]) 嵌入模型 ID
+    // 用于指定嵌入模型
+    // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
+    "embedding_model_id": null,
+
     // (bool) 是否在 FIM 模式下启用回显
     "fim_echo": null,
 

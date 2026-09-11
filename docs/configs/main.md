@@ -448,6 +448,14 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
         // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
         "default_model_id": "chat",
 
+        // 默认图像模型 ID
+        // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
+        "default_image_model_id": "image",
+
+        // 默认嵌入模型 ID
+        // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
+        "default_embedding_model_id": "embedding",
+
         // 随机选择模型 ID 的概率衰减指数
         "random_decay_index": 0.5,
 
