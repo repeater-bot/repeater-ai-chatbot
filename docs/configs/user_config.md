@@ -19,6 +19,17 @@
     // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
     "model_id": null,
 
+    // (str | list[str]) 图片模型 ID
+    // 用于指定图片生成与编辑模型
+    // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
+    "image_model_id": null,
+
+    // (bool) 是否在 FIM 模式下启用回显
+    "fim_echo": null,
+
+    // (int) 随机数种子
+    "seed": null,
+
     // (float) 模型温度参数
     // 温度越高模型输出的随机性就越高
     "temperature": null,
@@ -81,10 +92,22 @@
     // 模型越倾向于讨论新话题
     "presence_penalty": null,
 
+    // (str) 模型推理强度
+    // 允许的值有：
+    // - "low"
+    // - "medium"
+    // - "high"
+    // - "xhigh"
+    // - "max"
+    "reasoning_effort": null,
+
     // (bool) 是否发送用户 ID 到服务端
     // 如果为 true，则 Repeater 会讲 user_id 进行 sha256 后填充到 `user_id` 字段中
     // 需要服务端明确支持 `user_id` 字段
     "send_user_id": null,
+
+    // (dict[str, Any]) 额外请求参数
+    "extra_bodys": null,
 
     // Generate Loop ----------------------------------------------
 
@@ -93,10 +116,6 @@
     "max_generate_times": null,
 
     // Render ----------------------------------------------
-
-    // (str) Request Statistics Message 模板
-    // 用于生成一段自定义的统计文本
-    "request_statistics_template": null,
 
     // (str) 渲染风格
     // 用于指定文本转图片时的CSS样式文件
@@ -131,6 +150,20 @@
 
     // Context ----------------------------------------------
 
+    // (int) 定义上下文问的极限字数
+    // Repeater会以一对消息为单位去删除过多的部分。
+    "context_shrink_limit": null,
+
+    // (bool) 删除上下文里的推理内容
+    // 大部分 API 会拒绝我们回传推理内容
+    // 你可以设置为 false 来关闭此功能
+    // 但某些 API 可能会因此调用失败
+    "remove_reasoning_prompt": null,
+
+    // (str) Request Statistics Message 模板
+    // 用于生成一段自定义的统计文本
+    "request_statistics_template": null,
+
     // (bool) 是否保存上下文
     // 此选项会被API接口中传入的 save_context 参数覆盖
     "save_context": null,
@@ -146,28 +179,20 @@
     // 如果为 false 则多模态内容将以文本的形式发送
     "make_multimodal_message": null,
 
-    // (int) 定义上下文问的极限字数
-    // Repeater会以一对消息为单位去删除过多的部分。
-    "context_shrink_limit": null,
+    // Tools --------------------------------------------------------
 
-    // (str) 控制模型的推理强度
-    // 允许的值有：
-    // - "low"
-    // - "medium"
-    // - "high"
-    // - "xhigh"
-    // - "max"
-    // - null
-    "reasoning_effort": null,
-
-    // (bool) 删除上下文里的推理内容
-    // 大部分 API 会拒绝我们回传推理内容
-    // 你可以设置为 false 来关闭此功能
-    // 但某些 API 可能会因此调用失败
-    "remove_reasoning_prompt": null,
+    // (bool) 是否在工具调用时删除推理链数据
+    "tool_calling_remove_reasoning": null,
 
     // (list[str]) 允许调用的工具列表
     "allowed_tool_calls": null,
+
+    // (str) 横向访问时使用的用户ID策略
+    // 允许的值有：
+    // - "local_instance"：仅传递本机 user_id
+    // - "separate"：每个访客传递不同的 user_id
+    // - "users"：使用用户的 user_id
+    "horizontal_access_user_id_strategy": null,
 
     // User Profile -------------------------------------------------
 
