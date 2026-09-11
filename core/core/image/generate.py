@@ -27,7 +27,7 @@ async def generate_image(
     user_id: str,
     request: Request,
     fastapi_request: FastAPI_Request
-):
+) -> ImagesResponse | AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]:
     """
     Generate image from prompt.
     """

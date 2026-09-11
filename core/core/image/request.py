@@ -10,6 +10,7 @@ from ...call_api.image import (
     FILE_TYPES
 )
 
+
 class Request(BaseModel):
     model_config = ConfigDict(
         validate_assignment = True
