@@ -6,7 +6,6 @@ from ...call_api.completions_api import (
 )
 from ...context import ToolCallPacakage, CallMode, Context, ContentRole
 from ...global_config_manager import ReasoningEffort
-from ...data_manager import PromptManager
 from .._caller import ModelRequester
 from ...runtime_container import RuntimeContainer
 from ...text_buffer import ContentBuffer, TextBuffer
@@ -24,7 +23,6 @@ class OutputFormat(StrEnum):
 
 @ModelRequester.reg_global_package
 class CallModel(ToolCallPacakage):
-    prompt_manager: PromptManager = PromptManager()
     name = "call_model"
     description = "Send a request to an llm and get the generated results."
     call_mode = CallMode.ASYNC
