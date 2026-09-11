@@ -39,6 +39,7 @@ from ..objects import (
     PartialImageEvent,
     CompletedImageEvent,
 )
+from ...assists import none_to_omit
 
 class ImageGenerateClient:
     def __init__(
@@ -54,11 +55,6 @@ class ImageGenerateClient:
         self.file_name_prefix = file_name_prefix
         self.base_dir = base_dir
         self.save_file_suffix = save_file_suffix
-    
-    def none_to_omit(self, value: Any):
-        if value is None:
-            return omit
-        return value
     
     @staticmethod
     def _get_client(request: ImagesRequest, runtime: ImagesRuntime) -> tuple[AsyncOpenAI, httpx.AsyncClient]:
@@ -118,19 +114,19 @@ class ImageGenerateClient:
         ) -> AsyncGenerator[PartialImageEvent | CompletedImageEvent, None] | ImagesResponse:
         response: OpenAIImagesResponse | AsyncStream[OpenAIImageGenStreamEvent] = await client.images.generate(
             prompt = request.prompt,
-            background = self.none_to_omit(request.background),
-            model = self.none_to_omit(request.model),
-            moderation = self.none_to_omit(request.moderation),
-            n = self.none_to_omit(request.n),
-            output_compression = self.none_to_omit(request.output_compression),
-            output_format = self.none_to_omit(request.output_format),
-            partial_images = self.none_to_omit(request.partial_images),
-            quality = self.none_to_omit(request.quality),
-            response_format = self.none_to_omit(request.response_format),
-            size = self.none_to_omit(request.size),
+            background = none_to_omit(request.background, lambda x: x.value),
+            model = none_to_omit(request.model),
+            moderation = none_to_omit(request.moderation, lambda x: x.value),
+            n = none_to_omit(request.n),
+            output_compression = none_to_omit(request.output_compression),
+            output_format = none_to_omit(request.output_format, lambda x: x.value),
+            partial_images = none_to_omit(request.partial_images),
+            quality = none_to_omit(request.quality, lambda x: x.value),
+            response_format = none_to_omit(request.response_format, lambda x: x.value),
+            size = none_to_omit(request.size, lambda x: x if isinstance(x, str) else x.value), # type: ignore
             stream = request.stream,
-            style = self.none_to_omit(request.style),
-            user = self.none_to_omit(request.user),
+            style = none_to_omit(request.style, lambda x: x.value),
+            user = none_to_omit(request.user),
             timeout = request.timeout.model_dump() if isinstance(request.timeout, ClientTimeout) else request.timeout # type: ignore
         )
 
@@ -159,17 +155,17 @@ class ImageGenerateClient:
         response: OpenAIImagesResponse | AsyncStream[OpenAIImageGenStreamEvent] = await client.images.edit(
             image = files,
             prompt = request.prompt,
-            background = self.none_to_omit(request.background),
-            model = self.none_to_omit(request.model),
-            n = self.none_to_omit(request.n),
-            output_compression = self.none_to_omit(request.output_compression),
-            output_format = self.none_to_omit(request.output_format),
-            partial_images = self.none_to_omit(request.partial_images),
-            quality = self.none_to_omit(request.quality),
-            response_format = self.none_to_omit(request.response_format),
-            size = self.none_to_omit(request.size),
+            background = none_to_omit(request.background, lambda x: x.value),
+            model = none_to_omit(request.model),
+            n = none_to_omit(request.n),
+            output_compression = none_to_omit(request.output_compression),
+            output_format = none_to_omit(request.output_format, lambda x: x.value),
+            partial_images = none_to_omit(request.partial_images),
+            quality = none_to_omit(request.quality, lambda x: x.value),
+            response_format = none_to_omit(request.response_format, lambda x: x.value),
+            size = none_to_omit(request.size, lambda x: x if isinstance(x, str) else x.value), # type: ignore
             stream = request.stream,
-            user = self.none_to_omit(request.user),
+            user = none_to_omit(request.user),
             timeout = request.timeout.model_dump() if isinstance(request.timeout, ClientTimeout) else request.timeout # type: ignore
         )
 
