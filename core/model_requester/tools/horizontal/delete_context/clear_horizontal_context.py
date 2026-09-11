@@ -3,6 +3,7 @@ from ...._caller import ModelRequester
 from pydantic import BaseModel, Field
 from ..client import horizontal_client
 from urllib.parse import urljoin
+from ..gen_user_id import get_user_id
 
 @ModelRequester.reg_global_package
 class DeleteHorizontalContext(ToolCallPacakage):
@@ -16,7 +17,11 @@ class DeleteHorizontalContext(ToolCallPacakage):
 
     async def call(self, args: Params):
         configs = self.global_configs.tool_calls.tools_configs.horizontal
-        user_id = configs.user_id
+        user_id = get_user_id(
+            strategy = configs.user_id_strategy,
+            local_id = configs.local_id,
+            user_id = self.user_id
+        )
         url = configs.servers.get(args.instance_id)
         if not url:
             raise ValueError("Invalid instance ID")
