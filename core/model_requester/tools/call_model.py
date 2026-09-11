@@ -194,6 +194,7 @@ class CallModel(ToolCallPacakage):
             user_id = self.user_id,
             user_configs = self.user_configs,
             global_configs = self.global_configs,
+            fastapi_request = self.fastapi_request,
             model_info_client = runtime.model_info_client,
             max_concurrency = self.global_configs.callapi.max_concurrency
         )
