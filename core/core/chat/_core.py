@@ -61,6 +61,7 @@ from ._make_context import make_context
 from ._post_treatment import post_treatment
 from ._check_rul import check_rul
 from ._task_lifespan import TaskLifespan
+from ._get_model import get_model
 
 class Core:
     # region > init
@@ -396,13 +397,11 @@ class Core:
                         
                         # region [Getting model]
                         with task_status_stack.enter("Getting model"):
-                            # 获取默认模型uid
-                            if not model_id:
-                                model_id = configs.model_id
-                                if not model_id:
-                                    model_id = global_configs.model_api.default_model_id
-                            model = await self.runtime.model_info_client.get_random_model(
-                                model_id = model_id
+                            model_id, model = await get_model(
+                                model_id = model_id,
+                                model_client = self.runtime.model_info_client,
+                                user_configs = configs,
+                                global_configs = global_configs
                             )
                         # endregion
 
