@@ -238,19 +238,24 @@ class HTTPRequests(ToolCallPacakage):
                 reason = "No response"
             )
 
-    async def call(self, args: Params):
-        client = await asyncio.to_thread(
-            httpx.AsyncClient,
+    def init_client(self, args: Params):
+        client = httpx.AsyncClient(
             base_url = args.base_url,
             headers = args.base_headers,
             cookies = args.base_cookies,
             auth = args.base_auth,
             timeout = args.base_timeout,
-            transport = await asyncio.to_thread(
-                PublicIPOnlyTransport,
+            transport = PublicIPOnlyTransport(
                 verify = get_ssl_context(),
                 proxy = args.base_proxy
-            ),
+            )
+        )
+        return client
+
+    async def call(self, args: Params):
+        client = await asyncio.to_thread(
+            self.init_client,
+            args
         )
 
         responses: list[list[Response | None]] = []
