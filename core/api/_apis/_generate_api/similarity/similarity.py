@@ -13,7 +13,7 @@ async def similarity(request: SimilarityRequest, user_id: str):
     similarity = await comparison(
         user_id = user_id,
         first_text = request.first_text,
-        secend_text = request.second_text,
+        second_text = request.second_text,
         model_id = request.model
     )
     return SimilarityResponse(
