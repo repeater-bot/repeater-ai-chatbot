@@ -55,7 +55,7 @@ class Starlark(ToolCallPacakage):
         max_steps: int | None = None,
         max_allocs: int | None = None,
     ) -> Any:
-        cls.program_eval(
+        return cls.program_eval(
             program=starlark.compile(
                 source = source,
                 filename = filename,
