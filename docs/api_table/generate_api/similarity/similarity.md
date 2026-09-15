@@ -7,7 +7,7 @@
     - **method:** `POST`
     - **type:** `JSON`
     - **Content:**
-      - `model_id` (str | list[str]): 模型 ID
+      - `model` (str | list[str]): 模型 ID (可选)
       - `first_text` (str): 第一个提示词
       - `second_text` (str): 第二个提示词
   - **Response**
