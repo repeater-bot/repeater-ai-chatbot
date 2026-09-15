@@ -94,7 +94,9 @@ class Starlark(ToolCallPacakage):
             ).model_dump(exclude_none = True)
         except asyncio.TimeoutError:
             task.cancel()
-            return "Expression execution timed out."
+            return self.Result(
+                error = "Expression execution timed out."
+            ).model_dump(exclude_none = True)
         return self.Result(
             result = repr(result)
         ).model_dump(exclude_none = True)
