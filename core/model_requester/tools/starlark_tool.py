@@ -65,6 +65,10 @@ class Starlark(ToolCallPacakage):
         )
 
     async def call(self, args: Params) -> Any:
+        configs = self.global_configs.tool_calls.tools_configs.starlark
+        max_steps = max(args.max_steps or configs.default_max_steps, configs.force_max_steps)
+        max_allocs = max(args.max_allocs or configs.default_max_allocs, configs.force_max_allocs)
+        
         task = asyncio.create_task(
             asyncio.to_thread(
                 self.run_code,
@@ -72,8 +76,8 @@ class Starlark(ToolCallPacakage):
                 filename = args.root_stack_frame_name,
                 predeclared = args.predeclared,
                 universal = args.universal,
-                max_steps = args.max_steps,
-                max_allocs = args.max_allocs
+                max_steps = max_steps,
+                max_allocs = max_allocs
             )
         )
 
