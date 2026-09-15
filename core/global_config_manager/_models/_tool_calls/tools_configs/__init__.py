@@ -5,6 +5,7 @@ from .horizontal import (
     UserIdStrategies,
     UserInfo,
 )
+from .starlark import StarlarkToolConfig
 
 __all__ = [
     "HTTPRequests",
@@ -12,4 +13,5 @@ __all__ = [
     "HorizontalToolConfig",
     "UserIdStrategies",
     "UserInfo",
+    "StarlarkToolConfig",
 ]

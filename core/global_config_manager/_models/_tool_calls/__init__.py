@@ -6,6 +6,7 @@ from .tools_configs import (
     HorizontalToolConfig,
     UserIdStrategies,
     UserInfo,
+    StarlarkToolConfig,
 )
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "HorizontalToolConfig",
     "UserIdStrategies",
     "UserInfo",
+    "StarlarkToolConfig",
 ]
