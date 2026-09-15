@@ -34,15 +34,12 @@ class Starlark(ToolCallPacakage):
         max_steps: int | None = None,
         max_allocs: int | None = None,
     ) -> Any:
-        try:
-            return program.eval(
-                predeclared = predeclared,
-                universal = universal,
-                max_steps = max_steps,
-                max_allocs = max_allocs,
-            )
-        except Exception as e:
-            return e
+        return program.eval(
+            predeclared = predeclared,
+            universal = universal,
+            max_steps = max_steps,
+            max_allocs = max_allocs,
+        )
 
     @classmethod
     def run_code(
