@@ -17,8 +17,13 @@ class DeleteHorizontalContext(ToolCallPacakage):
 
     async def call(self, args: Params):
         configs = self.global_configs.tool_calls.tools_configs.horizontal
+        
+        strategies = self.user_configs.horizontal_access_user_id_strategy
+        if strategies is None:
+            strategies = configs.user_id_strategy
+        
         user_id = get_user_id(
-            strategy = configs.user_id_strategy,
+            strategy = strategies,
             local_id = configs.local_id,
             user_id = self.user_id
         )
