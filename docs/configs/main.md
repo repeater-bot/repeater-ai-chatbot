@@ -599,7 +599,7 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                 },
 
                 // 访问时所使用的用户 ID
-                "user_id": "repeater_horizontal",
+                "local_id": "repeater_horizontal",
 
                 // 横向访问时使用的用户ID策略
                 // 允许的值有：
