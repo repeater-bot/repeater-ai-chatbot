@@ -30,7 +30,7 @@ async def get_context_pairs(user_id: str):
     # 返回JSON格式的上下文
     return ORJSONResponse(
         {
-            "context_pairs": [[pair.to_content() for pair in context_pairs] for context_pairs in context_pairs],
+            "context_pairs": [[pair.to_content() for pair in context_pair] for context_pair in context_pairs],
             "length": len(context_pairs),
             "context_length": len(context),
             "total_character_length": context.total_length
