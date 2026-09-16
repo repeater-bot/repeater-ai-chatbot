@@ -591,11 +591,9 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                 // 键为访问的 ID
                 // 值为访问的 URL
                 "servers": {
-                    "repeater": "http://localhost:7645",
-                    "nightlight": "http://localhost:8345",
-                    "laurel": "http://localhost:7452",
-                    "mimosa": "http://localhost:8652",
-                    "viburnum": "http://localhost:9635"
+                    "repeater-1": "http://localhost:8080",
+                    "repeater-2": "http://localhost:8081",
+                    "repeater-3": "http://localhost:8082"
                 },
 
                 // 访问时所使用的用户 ID
