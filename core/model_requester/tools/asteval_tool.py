@@ -20,7 +20,7 @@ class Asteval(ToolCallPacakage):
         stderr: str = Field("", description="The standard error of the evaluation.")
     
     name = "asteval"
-    document = "Execute Python code safely and return results."
+    description = "Execute Python code safely and return results."
     call_mode = CallMode.ASYNC
 
     @staticmethod

@@ -4,3 +4,4 @@
 
 - [Chat](./chat_api/index.md)
 - [Image](./image_api/index.md)
+- [Similarity](./similarity/index.md)

@@ -10,13 +10,12 @@ from ...call_api.image import (
 )
 from ...clients.model_info import ModelInfo
 from fastapi import Request as FastAPI_Request
-from fastapi.responses import ORJSONResponse, StreamingResponse
 from ...global_config_manager import GlobalConfigs
 from ...runtime_container import RepeaterRuntime
 from .delete_file import delete_file
 from .create_request_log import create_request_log
 from .request import Request
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Generator
 from .image_fast_statistics import log_statistics
 
 async def parse_response(
@@ -31,7 +30,7 @@ async def parse_response(
     runtime: RepeaterRuntime,
     result: AsyncGenerator[PartialImageEvent | CompletedImageEvent, None] | ImagesResponse,
     downloader: ImageDownloader
-) -> ORJSONResponse | StreamingResponse:
+) -> ImagesResponse | AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]:
     if isinstance(result, ImagesResponse):
         images: list[Image] = []
         async for response, path in downloader.download():
@@ -66,12 +65,9 @@ async def parse_response(
 
         log_statistics(request, request_log)
         
-        return ORJSONResponse(
-            result.model_dump(exclude_none = True),
-            status_code = 200
-        )
+        return result
     else:
-        async def stream(result: AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]):
+        async def stream(result: AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]) -> AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]:
             create_at: list[int] = []
             async for event, path in downloader.download_stream():
                 # url = fastapi_request.url_for("files.generated_image", image_name = path.name)
@@ -84,7 +80,7 @@ async def parse_response(
                     )
                 if event.created_at:
                     create_at.append(event.created_at)
-                yield orjson.dumps(event.model_dump(exclude_none = True)) + b"\n"
+                yield event
                 
                 if isinstance(event, CompletedImageEvent):
                     request_log = create_request_log(
@@ -95,8 +91,8 @@ async def parse_response(
                         image_token_usage = event.usage,
                     )
         
-        return StreamingResponse(
-            stream(result),
-            status_code = 200
-        )
+                    await runtime.request_log.add_request_log(
+                        request_log
+                    )
         
+        return stream(result)

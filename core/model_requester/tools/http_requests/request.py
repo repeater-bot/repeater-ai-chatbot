@@ -5,7 +5,7 @@ from .retry import Retry
 
 class Request(BaseModel):
     type: Literal["request"] = "request"
-    id: str = Field(..., description="The ID of the request.")
+    id: str = Field(..., description="The ID of the request, used to locate which Request returned the Response.")
     method: HTTPMethods = Field(HTTPMethods.GET, description="The HTTP method to use for the request.")
     url: str = Field("", description="The target URL of the request.")
     fail_to_retry: Retry | None = Field(None, description="Whether to retry the request if it fails.")

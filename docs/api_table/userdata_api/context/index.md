@@ -2,6 +2,7 @@
 
 ## 获取上下文
   - [Get Context API](./get/get.md)
+  - [Get Context Pairs API](./get/pairs.md)
   - [Get Context Length API](./get/length.md)
   - [Get Part Of Context API](./get/part_of.md)
 

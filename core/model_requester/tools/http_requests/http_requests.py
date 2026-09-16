@@ -37,7 +37,7 @@ class HTTPRequests(ToolCallPacakage):
     name = "http_requests"
     call_mode = CallMode.ASYNC
     json_result = True
-    document = "send a any method HTTP request to a URL and return the response."
+    description = "send a any method HTTP request to a URL and return the response."
     robots_cache: ClassVar[TTLCache[str, str, float] | None] = None
     
     def validation_method(self, method: HTTPMethods) -> bool:
@@ -238,7 +238,7 @@ class HTTPRequests(ToolCallPacakage):
                 reason = "No response"
             )
 
-    async def call(self, args: Params):
+    def init_client(self, args: Params):
         client = httpx.AsyncClient(
             base_url = args.base_url,
             headers = args.base_headers,
@@ -248,7 +248,14 @@ class HTTPRequests(ToolCallPacakage):
             transport = PublicIPOnlyTransport(
                 verify = get_ssl_context(),
                 proxy = args.base_proxy
-            ),
+            )
+        )
+        return client
+
+    async def call(self, args: Params):
+        client = await asyncio.to_thread(
+            self.init_client,
+            args
         )
 
         responses: list[list[Response | None]] = []

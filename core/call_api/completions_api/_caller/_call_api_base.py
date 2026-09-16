@@ -32,6 +32,7 @@ from .._objects import (
     InterfaceType
 )
 from .._exceptions import *
+from ...assists import none_to_omit
 from ....pools.client_pool import ClientInfo
 from loguru import logger
 
@@ -64,22 +65,6 @@ class BaseCallAPI(ABC, Generic[T]):
         )
         return client
     
-    @staticmethod
-    @overload
-    def none_to_omit(value: None) -> openai.Omit:
-        ...
-    
-    @staticmethod
-    @overload
-    def none_to_omit(value: T_Value) -> T_Value:
-        ...
-    
-    @staticmethod
-    def none_to_omit(value: T_Value | None) -> T_Value | openai.Omit:
-        if value is None:
-            return openai.omit
-        return value
-
     async def call(self, user_id: str, request: Request, runtime: Runtime) -> T:
         """
         调用API
@@ -232,17 +217,17 @@ class BaseCallAPI(ABC, Generic[T]):
             response = await client.completions.create(
                 model = request.model,
                 prompt = request.prompt,
-                echo = self.none_to_omit(request.echo),
-                suffix = self.none_to_omit(request.suffix),
-                temperature = self.none_to_omit(request.temperature),
-                top_p = self.none_to_omit(request.top_p),
-                frequency_penalty = self.none_to_omit(request.frequency_penalty),
-                presence_penalty = self.none_to_omit(request.presence_penalty),
-                max_tokens = self.none_to_omit(request.max_tokens),
-                logprobs = self.none_to_omit(request.top_logprobs if request.logprobs else None),
+                echo = none_to_omit(request.echo),
+                suffix = none_to_omit(request.suffix),
+                temperature = none_to_omit(request.temperature),
+                top_p = none_to_omit(request.top_p),
+                frequency_penalty = none_to_omit(request.frequency_penalty),
+                presence_penalty = none_to_omit(request.presence_penalty),
+                max_tokens = none_to_omit(request.max_tokens),
+                logprobs = none_to_omit(request.top_logprobs if request.logprobs else None),
                 stream = stream,
-                seed = self.none_to_omit(request.seed),
-                stop = self.none_to_omit(request.stop), 
+                seed = none_to_omit(request.seed),
+                stop = none_to_omit(request.stop), 
                 extra_body = extra_body,
             )
         else:
@@ -257,28 +242,28 @@ class BaseCallAPI(ABC, Generic[T]):
             
             response = await client.chat.completions.create(
                 model = request.model,
-                temperature = self.none_to_omit(request.temperature),
-                top_p = self.none_to_omit(request.top_p),
-                frequency_penalty = self.none_to_omit(request.frequency_penalty),
-                presence_penalty = self.none_to_omit(request.presence_penalty),
-                max_tokens = self.none_to_omit(request.max_tokens),
-                max_completion_tokens = self.none_to_omit(request.max_completion_tokens),
-                stop = self.none_to_omit(request.stop),
+                temperature = none_to_omit(request.temperature),
+                top_p = none_to_omit(request.top_p),
+                frequency_penalty = none_to_omit(request.frequency_penalty),
+                presence_penalty = none_to_omit(request.presence_penalty),
+                max_tokens = none_to_omit(request.max_tokens),
+                max_completion_tokens = none_to_omit(request.max_completion_tokens),
+                stop = none_to_omit(request.stop),
                 stream = stream,
                 messages = context,
-                seed = self.none_to_omit(request.seed),
+                seed = none_to_omit(request.seed),
 
                 # 唉...
                 # 不想搞这些东西
                 # 特别麻烦不说还可能跑不起来
                 # 先这样吧
                 # 反正这样也能跑
-                tools = self.none_to_omit(request.tools), # type: ignore
-                tool_choice = self.none_to_omit(request.tool_choice), # type: ignore
-                stream_options = self.none_to_omit(request.stream_options.model_dump()), # type: ignore
+                tools = none_to_omit(request.tools), # type: ignore
+                tool_choice = none_to_omit(request.tool_choice), # type: ignore
+                stream_options = none_to_omit(request.stream_options.model_dump()), # type: ignore
                 
-                logprobs = self.none_to_omit(request.logprobs),
-                top_logprobs = self.none_to_omit(request.top_logprobs if request.top_logprobs else None),
+                logprobs = none_to_omit(request.logprobs),
+                top_logprobs = none_to_omit(request.top_logprobs if request.top_logprobs else None),
                 extra_body = extra_body
             )
         return response

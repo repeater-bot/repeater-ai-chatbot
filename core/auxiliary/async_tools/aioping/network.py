@@ -45,14 +45,14 @@ class AioSocket(Socket):
         async with self.static_lock:
             self._close()
     
-    async def _close(self):
-        await self.socket.close()
+    def _close(self):
+        self.socket.close()
     
     async def __aenter__(self):
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        self.aclose()
+        await self.aclose()
     
     def __del__(self):
         """

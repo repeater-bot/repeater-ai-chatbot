@@ -1,7 +1,5 @@
-from email import message
-
 import orjson
-import traceback
+from fastapi import Request as FastAPI_Request
 
 from abc import ABC, abstractmethod
 from typing import ClassVar, TypeVar, Any, Generic
@@ -29,7 +27,7 @@ class ToolCallPacakage(ABC, Generic[T]):
     enabled: ClassVar[bool] = True
     """Enable the tool"""
 
-    document: ClassVar[str] = ""
+    description: ClassVar[str] = ""
     """The document of the tool"""
 
     force_choice: ClassVar[bool] = False
@@ -41,22 +39,31 @@ class ToolCallPacakage(ABC, Generic[T]):
     call_mode: ClassVar[CallMode] = CallMode.SYNC
     """The call mode of the tool"""
 
-    def __init__(self, user_id: str, user_configs: UserConfigs, global_configs: GlobalConfigs, *args, **kwargs):
+    def __init__(
+            self,
+            user_id: str,
+            user_configs: UserConfigs,
+            global_configs: GlobalConfigs,
+            fastapi_request: FastAPI_Request,
+            *args,
+            **kwargs
+        ):
         self.user_id = user_id
-        self.user_configs = user_configs
-        self.global_configs = global_configs
-        self.extra_positional_args = args
-        self.extra_keyword_args = kwargs
+        self.user_configs: UserConfigs = user_configs
+        self.global_configs: GlobalConfigs = global_configs
+        self.fastapi_request: FastAPI_Request = fastapi_request
+        self.extra_positional_args: tuple[Any, ...] = args
+        self.extra_keyword_args: dict[str, Any] = kwargs
         self.__post_init__()
     
     def __post_init__(self):
         pass
 
-    def document_method(self) -> str:
+    def get_description(self) -> str:
         """
         Override the method to customize more complex description rules.
         """
-        return self.document or self.__doc__ or ""
+        return self.description or self.__doc__ or ""
 
     @abstractmethod
     def call(self, args: Params) -> T:

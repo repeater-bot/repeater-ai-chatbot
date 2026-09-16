@@ -222,6 +222,22 @@ class Context(BaseModel):
             remove_created = True,
             reduce_to_text = False
         )
+
+    def split_to_pairs(self) -> list[list[ContentUnit]]:
+        """
+        拆分上下文为对话对
+        """
+        context = self.context_list
+        pairs: list[list[ContentUnit]] = []
+        for content in context:
+            if content.role == ContentRole.USER:
+                pairs.append([content])
+            elif content.role != ContentRole.USER:
+                if not pairs:
+                    pairs.append([])
+                
+                pairs[-1].append(content)
+        return pairs
     
     def withdraw(self, length: int | None = None):
         """
@@ -355,39 +371,6 @@ class Context(BaseModel):
             self.context_list.extend(content)
         else:
             raise TypeError("content must be a list of ContentUnit or ContextObject")
-    
-    def append_content(
-        self,
-        reasoning_content:str = "",
-        content: str | list[ContentBlock] = "",
-        role: ContentRole = ContentRole.USER,
-        role_name: str |  None = None,
-        created: datetime | None = None,
-        is_prefix: bool | None = None,
-        tool_call_id: str = "",
-    ):
-        """
-        添加上下文内容
-
-        :param reasoning_content: Reasoning 内容
-        :param content: 内容
-        :param role: 角色
-        :param role_name: 角色名称
-        :param is_prefix: 是否为前缀(用于提交给模型用于续写)
-        :param funcResponse: 函数响应
-        :param tool_call_id: 工具调用ID
-        """
-        self.append(
-            ContentUnit(
-                reasoning_content = reasoning_content,
-                content = content,
-                role = role,
-                role_name = role_name,
-                created = created if created is not None else datetime.now(),
-                prefix = is_prefix,
-                tool_call_id = tool_call_id,
-            )
-        )
     
     def pop(self, index: int = -1) -> ContentUnit:
         """

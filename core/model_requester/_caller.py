@@ -31,6 +31,7 @@ from typing import (
     Type
 )
 from loguru import logger
+from fastapi import Request as FastAPI_Request
 from ._exceptions import *
 from ..special_exception import HTTPException
 from ._multi_response import MultiResponse
@@ -42,6 +43,7 @@ class ModelRequester:
             user_id: str,
             user_configs: UserConfigs,
             global_configs: GlobalConfigs,
+            fastapi_request: FastAPI_Request,
             model_info_client: ModelsClient,
             max_concurrency: int | None = None,
             *args, **kwargs
@@ -51,6 +53,7 @@ class ModelRequester:
             user_id = user_id,
             packages = self._global_package,
             user_configs = user_configs,
+            fastapi_request = fastapi_request,
             *args,
             **kwargs
         )
@@ -78,11 +81,18 @@ class ModelRequester:
     def reg_func(self, function: Function):
         self._tools_caller.register_function(function)
     
-    def reg_packages(self, user_id: str, packages: list[Type[ToolCallPacakage]], user_configs: UserConfigs):
+    def reg_packages(
+            self,
+            user_id: str,
+            packages: list[Type[ToolCallPacakage]],
+            user_configs: UserConfigs,
+            fastapi_request: FastAPI_Request
+        ):
         self._tools_caller.register_packages(
             user_id = user_id,
             packages = packages,
-            user_configs = user_configs
+            user_configs = user_configs,
+            fastapi_request = fastapi_request
         )
     
     def unreg_func(self, func_name: str):
@@ -169,6 +179,13 @@ class ModelRequester:
             submit_context = request.context
         request.context = submit_context
         if available_tool_calls and max_generated_times > 1:
+            logger.info(
+                "Using tools: {tools}",
+                user_id = user_id,
+                tools = ", ".join(
+                    func.name for func in self._tools_caller.allowed_func(available_tool_calls)
+                )
+            )
             request.tools = self._tools_caller.to_request(available_tool_calls)
             request.tool_choice = self._tools_caller.to_choice(tool_choice_model)
         try:

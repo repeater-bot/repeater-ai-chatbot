@@ -448,6 +448,14 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
         // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
         "default_model_id": "chat",
 
+        // 默认图像模型 ID
+        // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
+        "default_image_model_id": "image",
+
+        // 默认嵌入模型 ID
+        // 如果填写为列表，则顺序尝试直到找到第一个有匹配的 ID
+        "default_embedding_model_id": "embedding",
+
         // 随机选择模型 ID 的概率衰减指数
         "random_decay_index": 0.5,
 
@@ -574,6 +582,53 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                 
                 // 系统信息的拓展内容
                 "extra_info": {}
+            },
+
+            // 水平访问配置
+            "horizontal": {
+
+                // 水平实例的服务器列表
+                // 键为访问的 ID
+                // 值为访问的 URL
+                "servers": {
+                    "repeater-1": "http://localhost:8080",
+                    "repeater-2": "http://localhost:8081",
+                    "repeater-3": "http://localhost:8082"
+                },
+
+                // 访问时所使用的用户 ID
+                "local_id": "repeater_horizontal",
+
+                // 横向访问时使用的用户ID策略
+                // 允许的值有：
+                // - "local_instance"：仅传递本机 user_id
+                // - "separate"：每个访客传递不同的 user_id
+                // - "users"：使用用户的 user_id
+                "user_id_strategy": "separate",
+
+                // 当模型支持在上下文中标记发言人时
+                // 可以使用该值区分上下文中的发言者
+                // 以确保不会干扰正常的上下文
+                "role_name": null,
+
+                // 用户信息配置
+                "user_info": {
+                    // 用户名
+                    "username": "Repeater",
+
+                    // 用户昵称
+                    "nickname": "复读机",
+
+                    // 年龄
+                    // 可以选择数字
+                    // 或者一个浮点数
+                    "age": 18,
+
+                    // 性别
+                    // 无可选值，单纯字符串
+                    // 可以按照自己的偏好填写
+                    "gender": "girl",
+                }
             }
         }
     },
@@ -1054,3 +1109,10 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
     }
 }
 ```
+
+主配置可以被拆分为多个文件
+只要处于同一个目录下
+系统就能自动按照名字或给定的加载顺序
+将配置文件进行组合
+你可以以你自己喜欢的方式去编排这些文件
+并最终得到一个完整的配置

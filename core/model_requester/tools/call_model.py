@@ -6,7 +6,6 @@ from ...call_api.completions_api import (
 )
 from ...context import ToolCallPacakage, CallMode, Context, ContentRole
 from ...global_config_manager import ReasoningEffort
-from ...data_manager import PromptManager
 from .._caller import ModelRequester
 from ...runtime_container import RuntimeContainer
 from ...text_buffer import ContentBuffer, TextBuffer
@@ -24,9 +23,8 @@ class OutputFormat(StrEnum):
 
 @ModelRequester.reg_global_package
 class CallModel(ToolCallPacakage):
-    prompt_manager: PromptManager = PromptManager()
     name = "call_model"
-    document = "Send a request to an llm and get the generated results."
+    description = "Send a request to an llm and get the generated results."
     call_mode = CallMode.ASYNC
     
     class Params(BaseModel):
@@ -194,6 +192,7 @@ class CallModel(ToolCallPacakage):
             user_id = self.user_id,
             user_configs = self.user_configs,
             global_configs = self.global_configs,
+            fastapi_request = self.fastapi_request,
             model_info_client = runtime.model_info_client,
             max_concurrency = self.global_configs.callapi.max_concurrency
         )
