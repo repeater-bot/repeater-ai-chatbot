@@ -1,7 +1,8 @@
 from .models import *
 from .responses import (
     ModelInfoResponse,
-    DisableResponse
+    DisableResponse,
+    RefreshResponse
 )
 from ._models import SafeModelInfo, ModelInfo
 from ._client import ModelsClient
@@ -18,6 +19,7 @@ __all__ = [
     "TopProvider",
     "ModelInfoResponse",
     "DisableResponse",
+    "RefreshResponse",
     "SafeModelInfo",
     "ModelInfo",
     "ModelsClient",

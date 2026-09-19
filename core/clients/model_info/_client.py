@@ -5,7 +5,8 @@ import random
 from urllib.parse import quote
 from .responses import (
     ModelInfoResponse,
-    DisableResponse
+    DisableResponse,
+    RefreshResponse
 )
 from ...global_config_manager import ConfigManager
 from ._models import ModelInfo
@@ -144,4 +145,21 @@ class ModelsClient:
             model = DisableResponse
         )
 
+        return response
+
+    async def refresh(self, provider_id: str | None = None) -> Response[RefreshResponse]:
+        url = "/refresh"
+        if provider_id:
+            url += f"/{quote(provider_id)}"
+
+        try:
+            http_response = await self._client.post(url)
+        except httpx.RequestError as e:
+            raise HTTPException(detail = f"Refresh Model Info API Failed: {e}") from e
+
+        response = Response(
+            response = http_response,
+            model = RefreshResponse
+        )
+        
         return response
