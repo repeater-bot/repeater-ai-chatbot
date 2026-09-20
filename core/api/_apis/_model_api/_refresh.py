@@ -13,7 +13,7 @@ async def refresh(provider_id: str | None = None):
         return ORJSONResponse(
             content = {
                 "status": "success",
-                "Message": "Models refreshed successfully"
+                "message": "Models refreshed successfully"
             }
         )
     else:
