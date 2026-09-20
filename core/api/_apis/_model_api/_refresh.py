@@ -3,6 +3,7 @@ from ._router import refresh_router
 from fastapi.responses import ORJSONResponse
 from ....special_exception import HTTPException
 
+@refresh_router.post("")
 @refresh_router.post("/")
 @refresh_router.post("/{provider_id:path}")
 async def refresh(provider_id: str | None = None):
