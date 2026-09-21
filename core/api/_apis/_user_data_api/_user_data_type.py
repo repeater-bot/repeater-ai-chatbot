@@ -6,6 +6,7 @@ class UserDataType(StrEnum):
     CONTEXT = "context"
     PROMPT = "prompt"
     CONFIG = "config"
+    PROGRAM = "program"
 
 def get_manager(data_type: UserDataType) -> UserDataManager:
     server = RepeaterMain.get_now_server()
@@ -18,5 +19,7 @@ def get_manager(data_type: UserDataType) -> UserDataManager:
             return runtime.prompt_manager
         case UserDataType.CONFIG:
             return runtime.user_config_manager
+        case UserDataType.PROGRAM:
+            return runtime.program_data_manager
     
     raise ValueError(f"Invalid data type: {data_type}")

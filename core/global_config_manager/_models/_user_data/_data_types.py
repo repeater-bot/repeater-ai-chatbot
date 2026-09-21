@@ -7,3 +7,4 @@ class DataTypes(BaseModel, Generic[T]):
     context: T | None = None
     prompt: T | None = None
     config: T | None = None
+    program: T | None = None

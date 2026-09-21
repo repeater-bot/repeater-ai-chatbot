@@ -27,4 +27,7 @@ class ConfigManager(UserConfigManager):
         await super().save(
             user_id = user_id,
             branch_id = branch_id,
-            data = data.model_dump(exclude_none = True))
+            data = data.model_dump(
+                exclude_none = True
+            )
+        )

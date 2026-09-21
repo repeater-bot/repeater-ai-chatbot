@@ -45,7 +45,7 @@ async def bind_branch_from(user_data_type: UserDataType, user_id: str, src_branc
     manager = get_manager(user_data_type)
     await manager.bind(
         user_id = user_id,
-        src_branch_id = src_branch_id,
+        branch_id = src_branch_id,
         dst_branch_id = await manager.get_active_branch_id(user_id),
     )
 

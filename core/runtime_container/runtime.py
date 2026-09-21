@@ -16,6 +16,9 @@ from ..data_manager import (
 from ..user_config_manager import (
     ConfigManager as UserConfigManager
 )
+from ..program_data_manager import (
+    ProgramDataManager
+)
 from ..pools.resource_pool import ResourcePool
 from ..text_buffer import ContentBuffer
 from ..auxiliary.regex_checker import RegexChecker
@@ -65,6 +68,7 @@ class RepeaterRuntime:
         self.context_manager = ContextManager()
         self.prompt_manager = PromptManager()
         self.user_config_manager: UserConfigManager = UserConfigManager()
+        self.program_data_manager: ProgramDataManager = ProgramDataManager()
 
     @init_list.append
     @print_init_runtime("Models Manager")

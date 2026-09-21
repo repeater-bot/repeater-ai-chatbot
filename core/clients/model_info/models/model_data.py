@@ -20,7 +20,7 @@ class ModelAPIData(BaseModel):
     per_request_limits: None = None
     supported_parameters: list[SupportedParameters | str] | None = None
     knowledge_cutoff: str | None = None
-    expiration_date: str | None = None
+    expiration_date: str | int | None = None
     links: Links | None = None
     disable_to: int | None = None
 
