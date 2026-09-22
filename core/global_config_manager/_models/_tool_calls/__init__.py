@@ -7,6 +7,7 @@ from .tools_configs import (
     UserIdStrategies,
     UserInfo,
     StarlarkToolConfig,
+    DispatchTriggerConfig,
 )
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     "UserIdStrategies",
     "UserInfo",
     "StarlarkToolConfig",
+    "DispatchTriggerConfig",
 ]

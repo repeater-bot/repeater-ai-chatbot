@@ -14,6 +14,10 @@ from .horizontal import (
     DeleteHorizontalContext
 )
 from .generate_image import GenerateImage
+from .dispatch_trigger import (
+    DispatchTrigger,
+    GetDispatchBots
+)
 
 __all__ = [
     "HTTPRequests",
@@ -29,4 +33,6 @@ __all__ = [
     "HorizontalAccess",
     "DeleteHorizontalContext",
     "GenerateImage",
+    "DispatchTrigger",
+    "GetDispatchBots",
 ]

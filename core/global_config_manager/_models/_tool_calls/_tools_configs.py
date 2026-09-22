@@ -3,7 +3,8 @@ from .tools_configs import (
     HTTPRequests,
     SystemInfo,
     HorizontalToolConfig,
-    StarlarkToolConfig
+    StarlarkToolConfig,
+    DispatchTriggerConfig
 )
 
 class ToolsConfigs(BaseModel):
@@ -11,3 +12,4 @@ class ToolsConfigs(BaseModel):
     system_info: SystemInfo = Field(default_factory=SystemInfo)
     horizontal: HorizontalToolConfig = Field(default_factory=HorizontalToolConfig)
     starlark: StarlarkToolConfig = Field(default_factory=StarlarkToolConfig)
+    dispatch_trigger: DispatchTriggerConfig = Field(default_factory=DispatchTriggerConfig)
