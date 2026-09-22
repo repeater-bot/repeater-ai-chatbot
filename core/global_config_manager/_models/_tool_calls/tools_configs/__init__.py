@@ -6,6 +6,7 @@ from .horizontal import (
     UserInfo,
 )
 from .starlark import StarlarkToolConfig
+from .dispatch_trigger import DispatchTriggerConfig
 
 __all__ = [
     "HTTPRequests",
@@ -14,4 +15,5 @@ __all__ = [
     "UserIdStrategies",
     "UserInfo",
     "StarlarkToolConfig",
+    "DispatchTriggerConfig",
 ]
