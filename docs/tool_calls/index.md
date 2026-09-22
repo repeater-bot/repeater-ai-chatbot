@@ -18,3 +18,5 @@
 12. [Delete Horizontal Context](./built-in/delete_horizontal_context.md)
 13. [Starlark](./built-in/starlark.md)
 14. [Generate Image](./built-in/generate_image.md)
+15. [Get Dispatch Bots](./built-in/get_dispatch_bots.md)
+16. [Dispatch Trigger](./built-in/dispatch_trigger.md)

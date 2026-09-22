@@ -629,6 +629,13 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                     // 可以按照自己的偏好填写
                     "gender": "girl",
                 }
+            },
+
+            // 调度触发器配置
+            "dispatch_trigger": {
+
+                // 调度触发器服务的 URL
+                "server_base_url": "http://localhost:5000",
             }
         }
     },
