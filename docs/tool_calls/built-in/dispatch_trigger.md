@@ -15,6 +15,7 @@
   "message_id": 0, // Message ID, which identifies the ID of the current message.
   "timeout": 2400, // Timeout for the request.
 }
+```
 
 返回结果
 ``` json
