@@ -1,11 +1,11 @@
-from ...context import ToolCallPacakage, CallMode
+from ...context import ToolCallPackage, CallMode
 from ...runtime_container import RuntimeContainer
 from .._caller import ModelRequester
 from ...request_log import RequestLog
 from pydantic import BaseModel
 
 @ModelRequester.reg_global_package
-class TokenCount(ToolCallPacakage):
+class TokenCount(ToolCallPackage):
     class Params(BaseModel):
         pass
 

@@ -11,7 +11,7 @@ from loguru import logger
 
 T = TypeVar("T")
 
-class ToolCallPacakage(ABC, Generic[T]):
+class ToolCallPackage(ABC, Generic[T]):
     """
     Abstract class for tool calling package
     """

@@ -1,4 +1,4 @@
-from ....context import ToolCallPacakage, CallMode
+from ....context import ToolCallPackage, CallMode
 from ..._caller import ModelRequester
 from pydantic import BaseModel, Field
 from .request import DispatchTriggerRequest
@@ -7,7 +7,7 @@ from .client import dispatch_trigger_client
 from urllib.parse import urljoin
 
 @ModelRequester.reg_global_package
-class DispatchTrigger(ToolCallPacakage):
+class DispatchTrigger(ToolCallPackage):
     class Params(BaseModel):
         bot_id: str = Field(default=..., description="The Bot id.")
         handler: str = Field(default=..., description="The target Handler that needs to be executed uses a Trigger match if it starts with a slash and a component ID match if it starts without a slash.")

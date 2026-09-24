@@ -1,4 +1,4 @@
-from .....context import ToolCallPacakage, CallMode
+from .....context import ToolCallPackage, CallMode
 from ...._caller import ModelRequester
 from pydantic import BaseModel, Field
 from .request_body import ChatRequest
@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 from ..gen_user_id import get_user_id
 
 @ModelRequester.reg_global_package
-class HorizontalAccess(ToolCallPacakage):
+class HorizontalAccess(ToolCallPackage):
     class Params(BaseModel):
         instance_id: str = Field(default="", description="The instance ID to access.")
         message: str = Field(default="", description="The message to send to the instance.")

@@ -1,7 +1,7 @@
 from ._caller import FunctionCaller
 from ._choice import ToolChoice
 from ._value_types import ValueTypes
-from ._tool_call_package import ToolCallPacakage
+from ._tool_call_package import ToolCallPackage
 from ._exceptions import (
     FunctionCallError,
     JSONDecodeError,
@@ -18,7 +18,7 @@ __all__ = [
     "FunctionCaller",
     "ToolChoice",
     "ValueTypes",
-    "ToolCallPacakage",
+    "ToolCallPackage",
     "FunctionCallError",
     "JSONDecodeError",
     "ArgumentError",

@@ -1,5 +1,5 @@
 import sys
-from ...context import ToolCallPacakage
+from ...context import ToolCallPackage
 from .._caller import ModelRequester
 from pydantic import BaseModel
 from ..._info import (
@@ -11,7 +11,7 @@ from ..._info import (
 )
 
 @ModelRequester.reg_global_package
-class SystemInfo(ToolCallPacakage):
+class SystemInfo(ToolCallPackage):
     class Params(BaseModel):
         pass
     

@@ -1,10 +1,10 @@
-from ...context import ToolCallPacakage, CallMode
+from ...context import ToolCallPackage, CallMode
 from ...data_manager import PromptManager
 from .._caller import ModelRequester
 from pydantic import BaseModel, Field
 
 @ModelRequester.reg_global_package
-class SetPrompt(ToolCallPacakage):
+class SetPrompt(ToolCallPackage):
     class Params(BaseModel):
         prompt: str = Field(..., description="The new prompt to set.")
 

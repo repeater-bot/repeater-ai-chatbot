@@ -27,7 +27,7 @@ from ....user_config_manager import UserConfigs
 from ....global_config_manager import ConfigManager
 from ._exceptions import JSONDecodeError, ArgumentError
 from ._choice import ToolChoice
-from ._tool_call_package import ToolCallPacakage
+from ._tool_call_package import ToolCallPackage
 
 T = TypeVar("T")
 
@@ -87,16 +87,16 @@ class FunctionCaller:
     def register_packages(
             self,
             user_id: str,
-            packages: list[Type[ToolCallPacakage[T]]],
+            packages: list[Type[ToolCallPackage[T]]],
             user_configs: UserConfigs,
             fastapi_request: FastAPI_Request,
             *args,
             **kwargs
         ):
         for package in packages:
-            if not issubclass(package, ToolCallPacakage):
+            if not issubclass(package, ToolCallPackage):
                 raise ValueError("Package must be a subclass of ToolCallPacakage")
-            package_instance: ToolCallPacakage[T] = package(
+            package_instance: ToolCallPackage[T] = package(
                 user_id = user_id,
                 user_configs = user_configs,
                 global_configs = ConfigManager.get_configs(),

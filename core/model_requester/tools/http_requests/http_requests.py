@@ -5,7 +5,7 @@ import random
 import asyncio
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
-from ....context import ToolCallPacakage, CallMode
+from ....context import ToolCallPackage, CallMode
 from ....global_config_manager import HTTPMethods, ConfigManager
 from ..._caller import ModelRequester
 from ....auxiliary.http import get_ssl_context
@@ -20,7 +20,7 @@ from .public_ip_only_transport import PublicIPOnlyTransport
 from .backoff import exponential_backoff_with_jitter
 
 @ModelRequester.reg_global_package
-class HTTPRequests(ToolCallPacakage):
+class HTTPRequests(ToolCallPackage):
 
     class Params(BaseModel):
         base_url: str = Field("", description="The base URL shared by all requests.")
