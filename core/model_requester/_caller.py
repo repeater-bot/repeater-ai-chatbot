@@ -17,6 +17,12 @@ from ..call_api.completions_api import (
     Runtime,
     Delta,
     APIConnectionError,
+    AuthenticationError,
+    PermissionDeniedError,
+    NotFoundError,
+    ConflictError,
+    UnprocessableEntityError,
+    RateLimitError,
     InternalServerError
 )
 from ..clients.model_info import (
@@ -265,7 +271,16 @@ class ModelRequester:
                 )
 
             return response
-        except (APIConnectionError, InternalServerError) as e:
+        except (
+            APIConnectionError,
+            AuthenticationError,
+            PermissionDeniedError,
+            NotFoundError,
+            ConflictError,
+            UnprocessableEntityError,
+            RateLimitError,
+            InternalServerError
+        ) as e:
             logger.error(
                 "{error_type}: {error_message}",
                 error_type = type(e).__name__,
