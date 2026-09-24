@@ -28,24 +28,25 @@ class DispatchAskQuestions(ToolCallPackage):
             raise ValueError("Invalid base URL")
 
         # Send Prompt
-        raw_response = await dispatch_trigger_client.post(
-            url = urljoin(
-                base = base_url,
-                url = f"/repeater/api/external_trigger/call"
-            ),
-            json = DispatchTriggerRequest(
-                bot_id = args.bot_id,
-                handler = "/echo",
-                namespace = self.user_id,
-                message = args.ask_prompt,
-                args = None,
-                message_id = random.getrandbits(32),
-            ).model_dump(exclude_none = True),
-            timeout = args.timeout
-        )
+        if args.ask_prompt:
+            raw_response = await dispatch_trigger_client.post(
+                url = urljoin(
+                    base = base_url,
+                    url = f"/repeater/api/external_trigger/call"
+                ),
+                json = DispatchTriggerRequest(
+                    bot_id = args.bot_id,
+                    handler = "/echo",
+                    namespace = self.user_id,
+                    message = args.ask_prompt,
+                    args = None,
+                    message_id = random.getrandbits(32),
+                ).model_dump(exclude_none = True),
+                timeout = args.timeout
+            )
 
-        if raw_response.status_code != 200:
-            raise ValueError("Not sending prompt.")
+            if raw_response.status_code != 200:
+                raise ValueError("Not sending prompt.")
 
         # Get Answer
         raw_response = await dispatch_trigger_client.post(
