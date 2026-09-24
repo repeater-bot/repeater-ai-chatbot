@@ -95,7 +95,7 @@ class FunctionCaller:
         ):
         for package in packages:
             if not issubclass(package, ToolCallPackage):
-                raise ValueError("Package must be a subclass of ToolCallPacakage")
+                raise ValueError("Package must be a subclass of ToolCallPackage")
             package_instance: ToolCallPackage[T] = package(
                 user_id = user_id,
                 user_configs = user_configs,

@@ -74,7 +74,7 @@ class ModelRequester:
     @classmethod
     def reg_global_package(cls, package: Type[ToolCallPackage]):
         if not issubclass(package, ToolCallPackage):
-            raise TypeError("package must be a subclass of ToolCallPacakage")
+            raise TypeError("package must be a subclass of ToolCallPackage")
         cls._global_package.append(package)
         return package
     
