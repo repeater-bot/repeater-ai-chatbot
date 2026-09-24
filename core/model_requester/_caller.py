@@ -16,14 +16,7 @@ from ..call_api.completions_api import (
     Response,
     Runtime,
     Delta,
-    APIConnectionError,
-    AuthenticationError,
-    PermissionDeniedError,
-    NotFoundError,
-    ConflictError,
-    UnprocessableEntityError,
-    RateLimitError,
-    InternalServerError
+    APIStatusError
 )
 from ..clients.model_info import (
     ModelsClient,
@@ -272,15 +265,11 @@ class ModelRequester:
 
             return response
         except (
-            APIConnectionError,
-            AuthenticationError,
-            PermissionDeniedError,
-            NotFoundError,
-            ConflictError,
-            UnprocessableEntityError,
-            RateLimitError,
-            InternalServerError
+            APIStatusError
         ) as e:
+            if e.code == 400:
+                raise
+            
             logger.error(
                 "{error_type}: {error_message}",
                 error_type = type(e).__name__,
