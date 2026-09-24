@@ -1,9 +1,9 @@
-from ...context import ToolCallPacakage
+from ...context import ToolCallPackage
 from .._caller import ModelRequester
 from pydantic import BaseModel
 
 @ModelRequester.reg_global_package
-class Demo(ToolCallPacakage):
+class Demo(ToolCallPackage):
     class Params(BaseModel):
         name: str
         data: str

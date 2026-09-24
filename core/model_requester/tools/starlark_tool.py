@@ -1,12 +1,12 @@
 import asyncio
 import starlark
 from typing import Any
-from ...context import ToolCallPacakage, CallMode
+from ...context import ToolCallPackage, CallMode
 from .._caller import ModelRequester
 from pydantic import BaseModel, Field
 
 @ModelRequester.reg_global_package
-class Starlark(ToolCallPacakage):
+class Starlark(ToolCallPackage):
     class Params(BaseModel):
         source: str = Field(..., description="The starlark code source.")
         root_stack_frame_name: str = Field(default="<repeater_starlark_interpreter>", description="The name of the root stack frame.")

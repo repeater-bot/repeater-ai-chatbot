@@ -1,11 +1,11 @@
-from ....context import ToolCallPacakage, CallMode
+from ....context import ToolCallPackage, CallMode
 from ..._caller import ModelRequester
 from pydantic import BaseModel, Field
 from .client import dispatch_trigger_client
 from urllib.parse import urljoin
 
 @ModelRequester.reg_global_package
-class GetDispatchBots(ToolCallPacakage):
+class GetDispatchBots(ToolCallPackage):
     class Params(BaseModel):
         timeout: int = Field(60, description="Request timeout")
     

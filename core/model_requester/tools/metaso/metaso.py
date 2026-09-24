@@ -3,13 +3,13 @@ import json
 import httpx
 from environs import Env
 from pydantic import BaseModel, Field
-from ....context import ToolCallPacakage, CallMode
+from ....context import ToolCallPackage, CallMode
 from ....auxiliary.http import get_ssl_context
 from ..._caller import ModelRequester
 from .scope import Scope
 
 @ModelRequester.reg_global_package
-class Metaso(ToolCallPacakage):
+class Metaso(ToolCallPackage):
 
     class Params(BaseModel):
         q: str = Field(..., description="The query to search for")

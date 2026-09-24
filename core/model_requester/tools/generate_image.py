@@ -1,5 +1,5 @@
 from typing import Any
-from ...context import ToolCallPacakage, CallMode
+from ...context import ToolCallPackage, CallMode
 from ...data_manager import PromptManager
 from .._caller import ModelRequester
 from ...clients.model_info import ModelInfo, SafeModelInfo
@@ -24,7 +24,7 @@ class OutputFormat(StrEnum):
     NEW_REASONING_ONLY = "new_reasoning_only"
 
 @ModelRequester.reg_global_package
-class GenerateImage(ToolCallPacakage):
+class GenerateImage(ToolCallPackage):
     name = "generate_image"
     description = "Send a request to generate an image."
     call_mode = CallMode.ASYNC

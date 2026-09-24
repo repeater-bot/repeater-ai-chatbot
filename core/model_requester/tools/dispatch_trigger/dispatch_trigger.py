@@ -1,4 +1,4 @@
-from ....context import ToolCallPacakage, CallMode
+from ....context import ToolCallPackage, CallMode
 from ..._caller import ModelRequester
 from pydantic import BaseModel, Field
 from .request import DispatchTriggerRequest
@@ -7,7 +7,7 @@ from .client import dispatch_trigger_client
 from urllib.parse import urljoin
 
 @ModelRequester.reg_global_package
-class DispatchTrigger(ToolCallPacakage):
+class DispatchTrigger(ToolCallPackage):
     class Params(BaseModel):
         bot_id: str = Field(default=..., description="The Bot id.")
         handler: str = Field(default=..., description="The target Handler that needs to be executed uses a Trigger match if it starts with a slash and a component ID match if it starts without a slash.")
@@ -17,7 +17,7 @@ class DispatchTrigger(ToolCallPacakage):
         timeout: int = Field(default=2400, description="Timeout for the request.")
     
     name = "dispatch_trigger"
-    description = "Make a request to the client based on the Repeater client communication protocol."
+    description = "Make a request to the client based on the Repeater client communication protocol. (In some cases, the tool may not capture all of the returned content, depending on user feedback.)"
     call_mode = CallMode.ASYNC
 
     async def call(self, args: Params):

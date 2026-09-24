@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field
-from ...context import ToolCallPacakage, CallMode
+from ...context import ToolCallPackage, CallMode
 from ...data_manager import PromptManager
 from .._caller import ModelRequester
 from ...runtime_container import RuntimeContainer
 from ...clients.model_info import SafeModelInfo
 
 @ModelRequester.reg_global_package
-class GetModels(ToolCallPacakage):
+class GetModels(ToolCallPackage):
     prompt_manager: PromptManager = PromptManager()
     name = "get_models"
     description = "Gets a list of all available models."

@@ -7,7 +7,7 @@ from ..context import (
     CallingRequest,
     ContentUnit,
     ToolChoice,
-    ToolCallPacakage
+    ToolCallPackage
 )
 from ..call_api.completions_api import (
     StreamClient,
@@ -37,7 +37,7 @@ from ..special_exception import HTTPException
 from ._multi_response import MultiResponse
 
 class ModelRequester:
-    _global_package: ClassVar[list[Type[ToolCallPacakage]]] = []
+    _global_package: ClassVar[list[Type[ToolCallPackage]]] = []
     def __init__(
             self,
             user_id: str,
@@ -72,9 +72,9 @@ class ModelRequester:
         self._tool_responses: list[list[ContentUnit]] = []
     
     @classmethod
-    def reg_global_package(cls, package: Type[ToolCallPacakage]):
-        if not issubclass(package, ToolCallPacakage):
-            raise TypeError("package must be a subclass of ToolCallPacakage")
+    def reg_global_package(cls, package: Type[ToolCallPackage]):
+        if not issubclass(package, ToolCallPackage):
+            raise TypeError("package must be a subclass of ToolCallPackage")
         cls._global_package.append(package)
         return package
     
@@ -84,7 +84,7 @@ class ModelRequester:
     def reg_packages(
             self,
             user_id: str,
-            packages: list[Type[ToolCallPacakage]],
+            packages: list[Type[ToolCallPackage]],
             user_configs: UserConfigs,
             fastapi_request: FastAPI_Request
         ):

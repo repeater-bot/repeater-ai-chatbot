@@ -4,7 +4,7 @@ from ...call_api.completions_api import (
     Runtime,
     StreamOptions
 )
-from ...context import ToolCallPacakage, CallMode, Context, ContentRole
+from ...context import ToolCallPackage, CallMode, Context, ContentRole
 from ...global_config_manager import ReasoningEffort
 from .._caller import ModelRequester
 from ...runtime_container import RuntimeContainer
@@ -22,7 +22,7 @@ class OutputFormat(StrEnum):
     NEW_REASONING_ONLY = "new_reasoning_only"
 
 @ModelRequester.reg_global_package
-class CallModel(ToolCallPacakage):
+class CallModel(ToolCallPackage):
     name = "call_model"
     description = "Send a request to an llm and get the generated results."
     call_mode = CallMode.ASYNC

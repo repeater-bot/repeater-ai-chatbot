@@ -2,13 +2,13 @@ import sys
 import asyncio
 from io import StringIO
 from typing import Any, TextIO
-from ...context import ToolCallPacakage, CallMode
+from ...context import ToolCallPackage, CallMode
 from .._caller import ModelRequester
 from asteval import Interpreter
 from pydantic import BaseModel, Field
 
 @ModelRequester.reg_global_package
-class Asteval(ToolCallPacakage):
+class Asteval(ToolCallPackage):
     class Params(BaseModel):
         expression: str | list[str] = Field(..., description="The Python expression to evaluate. (Ban high-risk functions.)")
         symbols: dict[str, Any] | None = Field(None, description="The symbols to use in the evaluation. ")
