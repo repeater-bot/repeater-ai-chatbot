@@ -5,5 +5,4 @@ class Quality(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
-    MAX = "max"
     AUTO = "auto"
