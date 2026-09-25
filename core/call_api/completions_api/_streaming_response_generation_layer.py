@@ -208,7 +208,7 @@ class StreamingResponseGenerationLayer:
         if delta_data.tool_calls:
             for index, tool_call in enumerate(delta_data.tool_calls):
                 if self.request.print_chunk:
-                    if not self._content_buffer.tool_calls_arguments_buffer:
+                    if index not in self._content_buffer.tool_calls_arguments_buffer:
                         self._print_file.write("\n\n")
                         if tool_call.name:
                             self._print_file.write(f"\033[104m[Call Tool] {tool_call.name}:\n\033[0m")
