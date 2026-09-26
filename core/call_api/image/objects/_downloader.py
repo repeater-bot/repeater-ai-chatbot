@@ -80,7 +80,7 @@ class ImageDownloader:
         return file_path
 
     async def _download(self, base_dir: Path, response: ImagesResponse) -> AsyncGenerator[Path, None]:
-        save_file_suffix = response.output_format.value if response.output_format is not None else self.save_file_suffix
+        save_file_suffix = response.output_format if response.output_format is not None else self.save_file_suffix
         if response.data:
             for image in response.data:
                 if image.b64_json:

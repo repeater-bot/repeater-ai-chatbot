@@ -16,7 +16,7 @@ class ImagesResponse(BaseModel):
     created: int = 0
     background: Background | str | None = None
     data: list[Image] | None = None
-    output_format: OutputFormat | str | None = None
-    quality: Quality | str | None = None
-    size: ImageSize | str | None = None
+    output_format: str | None = None
+    quality: str | None = None
+    size: str | None = None
     usage: ImageTokenUsage | None = None
