@@ -1,10 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from .auxiliary import (
     Image,
-    Background,
-    OutputFormat,
-    Quality,
-    ImageSize,
     ImageTokenUsage,
 )
 

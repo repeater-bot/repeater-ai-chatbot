@@ -103,7 +103,7 @@ class ImageDownloader:
     async def _download_stream(self, base_dir: Path, response: AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]) -> AsyncGenerator[tuple[PartialImageEvent | CompletedImageEvent, Path], None]:
         async for event in response:
             if isinstance(event, (PartialImageEvent, CompletedImageEvent)):
-                save_file_suffix = event.output_format.value if event.output_format is not None else self.save_file_suffix
+                save_file_suffix = event.output_format if event.output_format is not None else self.save_file_suffix
                 if event.b64_json:
                     yield event, await self._download_image_from_base64(
                         image_base64 = event.b64_json,
