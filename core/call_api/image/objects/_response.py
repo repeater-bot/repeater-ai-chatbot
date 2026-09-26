@@ -14,7 +14,7 @@ class ImagesResponse(BaseModel):
     )
 
     created: int = 0
-    background: Background | str | None = None
+    background: str | None = None
     data: list[Image] | None = None
     output_format: str | None = None
     quality: str | None = None
