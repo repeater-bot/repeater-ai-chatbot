@@ -2,7 +2,10 @@ import orjson
 import numpy as np
 
 from datetime import datetime, timezone
-from typing import Generator, Callable, ClassVar, Self
+from typing import Generator
+from .....auxiliary.token import (
+    format_token
+)
 from ..._objects import (
     Request,
     Response,
@@ -11,8 +14,7 @@ from ..chunk import ChunkStatistics
 from ..format import (
     format_title,
     format_special_values,
-    format_timedelta,
-    format_token
+    format_timedelta
 )
 from .running_time import RunningTime
 from .runtimer import Runtimer
