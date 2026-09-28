@@ -1,50 +1,56 @@
-from ..text import format_carry_duration
+from ..text import format_carry_duration, Preset, Level, FinalLevel
 
-NS_TIME_LEVELS: list[tuple[str, str, int]] = [
-    ("nanosecond", "ns", 1000),
-    ("microsecond", "μs", 1000),
-    ("millisecond", "ms", 1000),
-    ("second", "s", 60),
-    ("minute", "min", 60),
-    ("hour", "h", 24),
-    ("day", "day", 30),
-    ("month", "mon", 12),
-    ("year", "y", 10),
-    ("decade", "dec", 10),
-    ("century", "cent", 10),
-]
+NS_TIME_PRESET = Preset(
+    levels = [
+        Level("nanosecond", "ns", 1000),
+        Level("microsecond", "μs", 1000),
+        Level("millisecond", "ms", 1000),
+        Level("second", "s", 60),
+        Level("minute", "min", 60),
+        Level("hour", "h", 24),
+        Level("day", "day", 30),
+        Level("month", "mon", 12),
+        Level("year", "y", 10),
+        Level("decade", "dec", 10),
+    ],
+    final_level = FinalLevel(
+        name = "century",
+        abbr = "c"
+    )
+)
 
-TIME_LEVELS: list[tuple[str, str, int]] = [
-    ("second", "s", 60),
-    ("minute", "min", 60),
-    ("hour", "h", 24),
-    ("day", "day", 30),
-    ("month", "mon", 12),
-    ("year", "y", 100),
-]
+TIME_PRESET = Preset(
+    levels =  [
+        Level("second", "s", 60),
+        Level("minute", "min", 60),
+        Level("hour", "h", 24),
+        Level("day", "day", 30),
+        Level("month", "mon", 12),
+        Level("year", "y", 100),
+        Level("decade", "dec", 10),
+    ],
+    final_level = FinalLevel(
+        name = "century",
+        abbr = "c"
+    )
+)
 
-def format_time_duration_ns(duration: int | float, start_with: int = 0, use_abbreviation: bool = False, delimiter: str = ", ") -> str:
+def format_time_duration_ns(duration: int | float, use_abbreviation: bool = False) -> str:
     """
     Format time duration in nanoseconds to a human-readable string.
     """
     return format_carry_duration(
-        value=duration,
-        levels=NS_TIME_LEVELS,
-        start_with=start_with,
-        use_abbreviation=use_abbreviation,
-        delimiter=delimiter,
-        final_level=("century", "cent")
+        value = duration,
+        preset = NS_TIME_PRESET,
+        use_abbreviation = use_abbreviation,
     )
 
-def format_time_duration(duration: int | float, start_with: int = 0, use_abbreviation: bool = False, delimiter: str = ", ") -> str:
+def format_time_duration(duration: int | float, use_abbreviation: bool = False) -> str:
     """
     Format time duration in seconds to a human-readable string.
     """
     return format_carry_duration(
-        value=duration,
-        levels=TIME_LEVELS,
-        start_with=start_with,
-        use_abbreviation=use_abbreviation,
-        delimiter=delimiter,
-        final_level=("millennium", "mill")
+        value = duration,
+        preset = TIME_PRESET,
+        use_abbreviation = use_abbreviation,
     )
