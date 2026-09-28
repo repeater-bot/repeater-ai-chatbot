@@ -14,11 +14,9 @@ from ._partial_image_event import (
 from ._response import (
     ImagesResponse
 )
-from .auxiliary import (
-    OutputFormat,
-)
 from typing import AsyncGenerator
 from pathlib import Path
+from loguru import logger
 
 class ImageDownloader:
     def __init__(
@@ -47,12 +45,19 @@ class ImageDownloader:
         if self.client is None:
             raise ValueError("Client is not set")
 
+        file_id = self.gen_file_uuid()
+
         file_path = base_dir / self._gen_file_name(
-            self.gen_file_uuid(),
+            file_id,
             suffix = image_suffix
         )
 
         file_path.parent.mkdir(parents = True, exist_ok = True)
+
+        logger.info(
+            "Saving image {image_id}",
+            image_id = file_id
+        )
         
         async with self.client.stream("GET", image_url) as response:
             async with aiofiles.open(file_path, "wb") as file:
@@ -67,12 +72,19 @@ class ImageDownloader:
         else:
             image_bytes = base64.b64decode(image_base64)
 
+        file_id = self.gen_file_uuid()
+
         file_path = base_dir / self._gen_file_name(
-            self.gen_file_uuid(),
+            file_id,
             suffix = image_suffix
         )
 
         file_path.parent.mkdir(parents = True, exist_ok = True)
+
+        logger.info(
+            "Saving image {image_id}",
+            image_id = file_id
+        )
         
         async with aiofiles.open(file_path, "wb") as file:
             await file.write(image_bytes)
