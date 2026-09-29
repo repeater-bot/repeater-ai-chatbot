@@ -16,8 +16,9 @@ from ..call_api.completions_api import (
     Response,
     Runtime,
     Delta,
-    APIConnectionError,
-    InternalServerError
+    APIError,
+    APIStatusError,
+    APIConnectionError
 )
 from ..clients.model_info import (
     ModelsClient,
@@ -265,21 +266,45 @@ class ModelRequester:
                 )
 
             return response
-        except (APIConnectionError, InternalServerError) as e:
-            logger.error(
-                "{error_type}: {error_message}",
-                error_type = type(e).__name__,
-                error_message = e.message,
+        except APIStatusError as e:
+            if e.status_code == 400:
+                raise
+            await self._parse_request_error(
+                error = e,
+                user_id = user_id,
+                request = request,
             )
-            await self._model_info_client.disable(
-                model_id = request.model_uid,
-                timeout = int(self._global_configs.callapi.failed_disable_timeout * 1e9)
+        except APIConnectionError as e:
+            await self._parse_request_error(
+                error = e,
+                user_id = user_id,
+                request = request,
             )
-            model = await self._model_info_client.get_random_model(
-                model_id = request.model_id
-            )
-            self.update_request_model(request, model)
-            raise Regenerate(request) from e
+
+    async def _parse_request_error(
+        self,
+        error: APIError,
+        user_id: str,
+        request: Request
+    ):
+        logger.error(
+            "{error_type}: {error_message}",
+            user_id = user_id,
+            error_type = type(error).__name__,
+            error_message = error.message,
+        )
+
+        await self._model_info_client.disable(
+            model_id = request.model_uid,
+            timeout = int(self._global_configs.callapi.failed_disable_timeout * 1e9)
+        )
+
+        model = await self._model_info_client.get_random_model(
+            model_id = request.model_id
+        )
+
+        self.update_request_model(request, model)
+        raise Regenerate(request) from error
 
     def update_request_model(self, request: Request, model: ModelInfo) -> None:
         request.url = model.get_base_url()

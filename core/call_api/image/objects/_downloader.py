@@ -14,11 +14,9 @@ from ._partial_image_event import (
 from ._response import (
     ImagesResponse
 )
-from .auxiliary import (
-    OutputFormat,
-)
 from typing import AsyncGenerator
 from pathlib import Path
+from loguru import logger
 
 class ImageDownloader:
     def __init__(
@@ -47,12 +45,19 @@ class ImageDownloader:
         if self.client is None:
             raise ValueError("Client is not set")
 
+        file_id = self.gen_file_uuid()
+
         file_path = base_dir / self._gen_file_name(
-            self.gen_file_uuid(),
+            file_id,
             suffix = image_suffix
         )
 
         file_path.parent.mkdir(parents = True, exist_ok = True)
+
+        logger.info(
+            "Saving image {image_id}",
+            image_id = file_id
+        )
         
         async with self.client.stream("GET", image_url) as response:
             async with aiofiles.open(file_path, "wb") as file:
@@ -67,12 +72,19 @@ class ImageDownloader:
         else:
             image_bytes = base64.b64decode(image_base64)
 
+        file_id = self.gen_file_uuid()
+
         file_path = base_dir / self._gen_file_name(
-            self.gen_file_uuid(),
+            file_id,
             suffix = image_suffix
         )
 
         file_path.parent.mkdir(parents = True, exist_ok = True)
+
+        logger.info(
+            "Saving image {image_id}",
+            image_id = file_id
+        )
         
         async with aiofiles.open(file_path, "wb") as file:
             await file.write(image_bytes)
@@ -80,7 +92,7 @@ class ImageDownloader:
         return file_path
 
     async def _download(self, base_dir: Path, response: ImagesResponse) -> AsyncGenerator[Path, None]:
-        save_file_suffix = response.output_format.value if response.output_format is not None else self.save_file_suffix
+        save_file_suffix = response.output_format if response.output_format is not None else self.save_file_suffix
         if response.data:
             for image in response.data:
                 if image.b64_json:
@@ -103,7 +115,7 @@ class ImageDownloader:
     async def _download_stream(self, base_dir: Path, response: AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]) -> AsyncGenerator[tuple[PartialImageEvent | CompletedImageEvent, Path], None]:
         async for event in response:
             if isinstance(event, (PartialImageEvent, CompletedImageEvent)):
-                save_file_suffix = event.output_format.value if event.output_format is not None else self.save_file_suffix
+                save_file_suffix = event.output_format if event.output_format is not None else self.save_file_suffix
                 if event.b64_json:
                     yield event, await self._download_image_from_base64(
                         image_base64 = event.b64_json,

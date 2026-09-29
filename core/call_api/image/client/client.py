@@ -197,7 +197,7 @@ class ImageGenerateClient:
         if response.created:
             image_response.created = response.created
         if response.background:
-            image_response.background = Background(response.background)
+            image_response.background = response.background
         if response.data:
             image_response.data = []
             for image in response.data:
@@ -210,14 +210,11 @@ class ImageGenerateClient:
                     response_image.url = image.url
                 image_response.data.append(response_image)
         if response.output_format:
-            image_response.output_format = OutputFormat(response.output_format)
+            image_response.output_format = response.output_format
         if response.quality:
-            image_response.quality = Quality(response.quality)
+            image_response.quality = response.quality
         if response.size:
-            try:
-                image_response.size = ImageSize(response.size)
-            except ValueError:
-                image_response.size = response.size
+            image_response.size = response.size
         if response.usage:
             image_response.usage = ImageTokenUsage(
                 input_tokens = response.usage.input_tokens,

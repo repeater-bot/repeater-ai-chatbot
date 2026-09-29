@@ -17,7 +17,11 @@ class DispatchTrigger(ToolCallPackage):
         timeout: int = Field(default=2400, description="Timeout for the request.")
     
     name = "dispatch_trigger"
-    description = "Make a request to the client based on the Repeater client communication protocol. (In some cases, the tool may not capture all of the returned content, depending on user feedback.)"
+    description = (
+        "Make a request to the client based on the Repeater client communication protocol. \n"
+        "The returned text may be incomplete: the client's handler can deliver messages \n"
+        "directly to users instead of returning them."
+    )
     call_mode = CallMode.ASYNC
 
     async def call(self, args: Params):
