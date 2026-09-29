@@ -267,7 +267,7 @@ class ModelRequester:
 
             return response
         except APIStatusError as e:
-            if e.code == 400:
+            if e.status_code == 400:
                 raise
             await self._parse_request_error(
                 error = e,
