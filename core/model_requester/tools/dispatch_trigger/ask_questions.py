@@ -32,7 +32,7 @@ class DispatchAskQuestions(ToolCallPackage):
             raw_response = await dispatch_trigger_client.post(
                 url = urljoin(
                     base = base_url,
-                    url = f"/repeater/api/external_trigger/call"
+                    url = "/repeater/api/external_trigger/call"
                 ),
                 json = DispatchTriggerRequest(
                     bot_id = args.bot_id,
@@ -52,7 +52,7 @@ class DispatchAskQuestions(ToolCallPackage):
         raw_response = await dispatch_trigger_client.post(
             url = urljoin(
                 base = base_url,
-                url = f"/repeater/api/external_trigger/get_response/{raw_response.json()['message_id']}"
+                url = "/repeater/api/external_trigger/call"
             ),
             json = DispatchTriggerRequest(
                 bot_id = args.bot_id,
