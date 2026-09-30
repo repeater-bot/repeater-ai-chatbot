@@ -1,11 +1,11 @@
 from ...context import ToolCallPackage, ImageBlock, ImageUrlBlock, ContentResult
 from .._caller import ModelRequester
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 @ModelRequester.reg_global_package
 class URLToImage(ToolCallPackage):
     class Params(BaseModel):
-        url: list[str]
+        urls: list[str] = Field(..., description="The URLs of the images to read")
     
     name = "url_to_image"
     array_result = True
