@@ -4,7 +4,7 @@
 
 注册名：`generate_image`
 
-接受参数:
+接受四个参数:
 ``` json
 {
   "model_id": null, // Unique identifier used to locate and load the target model, if not specified, the model will be selected based on the user's preferences.

@@ -5,7 +5,7 @@ Repeater 的 Starlark 适配器
 
 注册名：`starlark`
 
-接受一个参数
+接受参数
 ``` json
 {
 
