@@ -5,7 +5,7 @@ from pydantic import BaseModel
 @ModelRequester.reg_global_package
 class URLToImage(ToolCallPackage):
     class Params(BaseModel):
-        url: str
+        url: list[str]
     
     name = "url_to_image"
     array_result = True
@@ -16,8 +16,9 @@ class URLToImage(ToolCallPackage):
             content = [
                 ImageBlock(
                     image_url = ImageUrlBlock(
-                        url = args.url
+                        url = url
                     )
                 )
+                for url in args.url
             ]
         )
