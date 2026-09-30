@@ -19,6 +19,6 @@ class URLToImage(ToolCallPackage):
                         url = url
                     )
                 )
-                for url in args.url
+                for url in args.urls
             ]
         )
