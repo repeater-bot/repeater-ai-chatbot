@@ -34,3 +34,5 @@ class PublicIPOnlyTransport(httpx.AsyncHTTPTransport):
             
             response: httpx.Response = await super().handle_async_request(request)
             return response
+        else:
+            return await super().handle_async_request(request)
