@@ -5,7 +5,7 @@ Metaso 用于快速进行互联网搜索并进行 AI 总结
 
 注册名：`metaso`
 
-接受参数：
+接受六个参数：
 ``` json
 {
   "q": "", // The query to search for

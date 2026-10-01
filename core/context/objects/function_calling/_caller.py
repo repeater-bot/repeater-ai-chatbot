@@ -23,11 +23,13 @@ from .function import (
 from .._function_calling_response import CallingRequest
 from .._content_unit import ContentUnit
 from .._content_role import ContentRole
+from .._content_block import ContentBlock
 from ....user_config_manager import UserConfigs
 from ....global_config_manager import ConfigManager
 from ._exceptions import JSONDecodeError, ArgumentError
 from ._choice import ToolChoice
 from ._tool_call_package import ToolCallPackage
+from ._content_result import ContentResult
 
 T = TypeVar("T")
 
@@ -195,7 +197,14 @@ class FunctionCaller:
         return ContentUnit(
             role = ContentRole.TOOL,
             tool_call_id = tool_call_id,
-            content = str(content)
+            content = content
+        )
+
+    def _create_array_tool_content_unit(self, tool_call_id: str, content: list[ContentBlock]) -> ContentUnit:
+        return ContentUnit(
+            role = ContentRole.TOOL,
+            tool_call_id = tool_call_id,
+            content = content
         )
     
     async def call_function(
@@ -204,6 +213,9 @@ class FunctionCaller:
             calling_request: CallingRequest,
             available_tool_calls: set[str]
         ) -> ContentUnit:
+        configs = ConfigManager.get_configs().tool_calls
+
+
         if calling_request.function.name not in available_tool_calls:
             return self._create_tool_content_unit(
                 tool_call_id = calling_request.id,
@@ -224,9 +236,11 @@ class FunctionCaller:
                 if function.on_args_json_decode_error:
                     return self._create_tool_content_unit(
                         tool_call_id = calling_request.id,
-                        content = await self._any_call(
-                            function.on_args_json_decode_error,
-                            error
+                        content = str(
+                            await self._any_call(
+                                function.on_args_json_decode_error,
+                                error
+                            )
                         )
                     )
                 else:
@@ -235,9 +249,11 @@ class FunctionCaller:
                 if function.on_args_validation_error:
                     return self._create_tool_content_unit(
                         tool_call_id = calling_request.id,
-                        content = await self._any_call(
-                            function.on_args_validation_error,
-                            error
+                        content = str(
+                            await self._any_call(
+                                function.on_args_validation_error,
+                                error
+                            )
                         )
                     )
                 else:
@@ -280,9 +296,10 @@ class FunctionCaller:
                 user_id = user_id,
                 time = (end_time - start_time) / 1e6
             )
-
         if isinstance(raw_result, str):
             result = raw_result
+        elif isinstance(raw_result, ContentResult):
+            result = raw_result.content
         elif isinstance(raw_result, BaseModel):
             result = orjson.dumps(raw_result.model_dump()).decode("utf-8")
         elif function.json_result:
@@ -292,16 +309,20 @@ class FunctionCaller:
                 try:
                     result = bin_result.decode("utf-8")
                 except UnicodeEncodeError as error:
-                    result = await self._any_call(
-                        function.on_json_result_string_encode_error,
-                        bin_result,
-                        error
+                    result = str(
+                        await self._any_call(
+                            function.on_json_result_string_encode_error,
+                            bin_result,
+                            error
+                        )
                     )
                 
             except orjson.JSONEncodeError as error:
-                result = await self._any_call(
-                    function.on_result_json_encode_error,
-                    error
+                result = str(
+                    await self._any_call(
+                        function.on_result_json_encode_error,
+                        error
+                    )
                 )
         else:
             result = str(raw_result)
@@ -310,7 +331,7 @@ class FunctionCaller:
             "Tool {name} Result:\n{result}",
             user_id = user_id,
             name = function.name,
-            result = text_content_cutter(str(result), ConfigManager.get_configs().tool_calls.result_max_length_for_logs)
+            result = text_content_cutter(str(result), configs.result_max_length_for_logs)
         )
         
         return self._create_tool_content_unit(

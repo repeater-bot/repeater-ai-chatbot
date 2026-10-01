@@ -18,6 +18,7 @@ from .dispatch_trigger import (
     DispatchTrigger,
     GetDispatchBots
 )
+from .url_to_image import URLToImage
 
 __all__ = [
     "HTTPRequests",
@@ -35,4 +36,5 @@ __all__ = [
     "GenerateImage",
     "DispatchTrigger",
     "GetDispatchBots",
+    "URLToImage"
 ]
