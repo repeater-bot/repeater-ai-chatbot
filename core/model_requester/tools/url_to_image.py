@@ -9,7 +9,7 @@ class URLToImage(ToolCallPackage):
     
     name = "url_to_image"
     array_result = True
-    description = "Read the image content in the URL (requires the model to support passing in images in tool calls) ."
+    description = "Read the image content in the URL (requires the model to support passing in images in tool calls and only public urls can be passed) ."
 
     def call(self, args: Params):
         return ContentResult(
