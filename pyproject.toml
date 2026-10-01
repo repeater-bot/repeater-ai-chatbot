@@ -1,0 +1,41 @@
+[project]
+name = "Repeater_Backend"
+version = "4.9.11.0"
+description = "Repeater series LLM context state management middleware master server"
+authors = [
+    {name = "Qeggs",email = "get_boot@outlook.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11, <4.0"
+dependencies = [
+    "aiofiles (>=25.1.0,<26.0.0)",
+    "environs (>=15.2.0,<16.0.0)",
+    "fastapi (==0.129.0)",
+    "loguru (>=0.7.3,<0.8.0)",
+    "openai (==2.21.0)",
+    "orjson (==3.11.7)",
+    "uvicorn (>=0.54.0,<0.55.0)",
+    "markdown (>=3.11,<4.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "numpy (<=2.5.3)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "python-box (>=7.4.1,<8.0.0)",
+    "tzdata",
+    "jinja2 (>=3.1.6,<4.0.0)",
+    "yarl (>=1.25.1,<2.0.0)",
+    "bleach (>=6.4.0,<7.0.0)",
+    "asteval (>=1.0.10,<2.0.0)",
+    "jsonpatch (>=1.33,<2.0)",
+    "pythonping (>=1.1.4,<2.0.0)",
+    "cachetools (>=7.2.0,<8.0.0)",
+    "starlark (>=0.6.0,<0.7.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
