@@ -1,1 +1,0 @@
-from ._checker import check_package_list

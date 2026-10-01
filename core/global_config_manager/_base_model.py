@@ -16,7 +16,6 @@ class GlobalConfigs(BaseModel):
     tool_calls: ToolCallsConfigs = Field(default_factory=ToolCallsConfigs)
     prompt: PromptConfig = Field(default_factory=PromptConfig)
     render: RenderConfig = Field(default_factory=RenderConfig)
-    requirements: RequirementsConfig = Field(default_factory=RequirementsConfig)
     request_log: RequestLogConfig = Field(default_factory=RequestLogConfig)
     server: ServerConfig = Field(default_factory=ServerConfig)
     static: StaticConfig = Field(default_factory=StaticConfig)
