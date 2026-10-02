@@ -23,7 +23,6 @@ from .function import (
 from .._function_calling_response import CallingRequest
 from .._content_unit import ContentUnit
 from .._content_role import ContentRole
-from .._content_block import ContentBlock
 from ....user_config_manager import UserConfigs
 from ....global_config_manager import ConfigManager
 from ._exceptions import JSONDecodeError, ArgumentError
@@ -200,13 +199,6 @@ class FunctionCaller:
             content = content
         )
 
-    def _create_array_tool_content_unit(self, tool_call_id: str, content: list[ContentBlock]) -> ContentUnit:
-        return ContentUnit(
-            role = ContentRole.TOOL,
-            tool_call_id = tool_call_id,
-            content = content
-        )
-    
     async def call_function(
             self,
             user_id: str,
