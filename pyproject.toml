@@ -27,7 +27,7 @@ dependencies = [
     "bleach (>=6.4.0,<7.0.0)",
     "asteval (>=1.0.10,<2.0.0)",
     "jsonpatch (>=1.33,<2.0)",
-    "pythonping (>=1.1.4,<2.0.0)",
+    "pythonping (==1.1.4)",
     "cachetools (>=7.2.0,<8.0.0)",
     "starlark (>=0.6.0,<0.7.0)"
 ]
