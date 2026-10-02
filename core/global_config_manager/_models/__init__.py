@@ -12,7 +12,6 @@ from ._text_template import *
 from ._tool_calls import *
 from ._prompt._prompt import *
 from ._render import *
-from ._requirements import *
 from ._request_log import *
 from ._server import *
 from ._static import *

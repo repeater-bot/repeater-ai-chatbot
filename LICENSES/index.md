@@ -29,11 +29,9 @@ This project includes the following third-party software components, licensed un
 | yarl                    | 1.23.0   | MIT License                     | [yarl](https://github.com/aio-libs/yarl)                                       | *Entire Project*                    | URL parsing                                        |
 | bleach                  | 6.3.0    | Apache-2.0                      | [bleach](https://github.com/mozilla/bleach)                                    | `core.markdown_render`              | Clean HTML                                         |
 | asteval                 | 1.0.8    | MIT License                     | [asteval](https://github.com/newville/asteval)                                 | `core.model_requester.tools`        | Assist AI in performing mathematical calculations. |
-| pip-requirements-parser | 32.0.1   | MIT License                     | [pip-requirements-parser](https://github.com/jazzband/pip-requirements-parser) | `core.requirements_version_checker` | Parse requirements.txt files.                      |
 | jsonpatch               | 1.33     | BSD-3-Clause license            | [jsonpatch](https://github.com/stefankoegl/python-json-patch)                  | `core.data_manager`                 | JSON Diff & Patch                                  |
 | pythonping              | 1.1.4    | MIT License                     | [pythonping](https://github.com/alessandromaggio/pythonping)                   | `core.api`                          | Checking network connectivity                      |
 | cachetools              | 7.1.4    | MIT License                     | [cachetools](https://github.com/tkem/cachetools)                               | *Entire Project*                    | Cachetools is a caching library for Python         |
-| packaging               | 26.1     | Apache-2.0 AND BSD-3-Clause     | [packaging](https://github.com/pypa/packaging)                                 | `core.requirements_version_checker` | Format the Something pypi standard package name.   |
 | starlark                | 0.6.0    | Apache-2.0                      | [starlark](https://github.com/dbohdan/starlark-python)                         | `core.model_requester.tools`        | Starlark is a language for configuration.          |
 | sloves_starter          | 0.5.0    | MIT License                     | [sloves_starter](https://github.com/qeggs-dev/Sloves_Starter)                  | `run.py`                            | Starter for Repeater                               |
 
@@ -60,10 +58,8 @@ This project includes the following third-party software components, licensed un
 - [Yarl](./yarl/index.md)
 - [Bleach](./bleach/index.md)
 - [Asteval](./asteval/index.md)
-- [Pip-requirements-parser](./pip-requirements-parser/index.md)
 - [JSONPatch](./jsonpatch/index.md)
 - [PythonPing](./pythonping/index.md)
 - [Cachetools](./cachetools/index.md)
-- [Packaging](./packaging/index.md)
 - [Starlark](./starlark/index.md)
 - [Sloves_Starter](./sloves_starter/index.md)

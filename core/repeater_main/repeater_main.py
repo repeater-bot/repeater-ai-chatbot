@@ -16,7 +16,6 @@ from ..server import (
 )
 from pathlib import Path
 from .._info import __version__
-from ..requirements_version_checker import check_package_list
 from loguru import logger
 from .config_force_load_list import is_config_force_load_list
 
@@ -114,25 +113,6 @@ class RepeaterMain:
 
         self.server_initer.init_middleware()
     
-    def check_package(self, configs: GlobalConfigs) -> None:
-        """
-        Check that the package meets the requirements
-        
-        **Warning: it will be discarded**
-
-        :param configs: GlobalConfigs
-        """
-        logger.info("Checking Packages...")
-        start_check_packages_time = time.perf_counter_ns()
-        check_package_list(
-            strict_mode = configs.requirements.strict_mode
-        )
-        end_check_packages_time = time.perf_counter_ns()
-        logger.info(
-            "Check Packages Time: {check_packages_time:.2f}ms",
-            check_packages_time = (end_check_packages_time - start_check_packages_time) / 1e6
-        )
-    
     def init_logger(self):
         self.server_initer.init_logger()
     
@@ -152,9 +132,6 @@ class RepeaterMain:
             "Repeater Version: {version}",
             version = __version__
         )
-
-        if configs.requirements.enable_check:
-            self.check_package(configs)
 
         start_init_resource_time = time.perf_counter_ns()
         self.server_initer.init_all()
