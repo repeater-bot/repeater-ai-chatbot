@@ -26,7 +26,7 @@ TIME_PRESET = Preset(
         Level("hour", "h", 24),
         Level("day", "day", 30),
         Level("month", "mon", 12),
-        Level("year", "y", 100),
+        Level("year", "y", 10),
         Level("decade", "dec", 10),
     ],
     final_level = FinalLevel(
