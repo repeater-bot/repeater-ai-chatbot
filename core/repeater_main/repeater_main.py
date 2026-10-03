@@ -21,7 +21,6 @@ from .config_force_load_list import is_config_force_load_list
 
 class RepeaterMain:
     env = Env()
-    env.read_env()
     _now_server: ClassVar[Server | None] = None
 
     def __init__(self):
