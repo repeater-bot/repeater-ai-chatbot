@@ -42,7 +42,8 @@ Repeater 提供了许多接口，
   - [Status API](./status_api.md)
 
 ## Alived API
-  - [Alived API](./alived.md)
+  - [Alived API](./alived_api/alived.md)
+  - [Alived Time API](./alived_api/alived_time.md)
 
 ## Alived Users API
   - [Alived Users API](./alived_users.md)
