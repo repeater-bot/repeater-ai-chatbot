@@ -1,3 +1,4 @@
+from . import start_time as _start_time # Initialization time.
 from .core.chat import Core
 from ._info import (
     __version__,
