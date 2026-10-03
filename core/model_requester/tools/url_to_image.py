@@ -26,7 +26,7 @@ class URLToImage(ToolCallPackage):
         if not cls.client:
             cls.client = httpx.AsyncClient()
 
-    def __init__(self):
+    def __post_init__(self):
         self.init_client()
 
     @staticmethod
