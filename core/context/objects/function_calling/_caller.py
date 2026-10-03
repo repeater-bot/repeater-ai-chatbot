@@ -23,6 +23,7 @@ from .function import (
 from .._function_calling_response import CallingRequest
 from .._content_unit import ContentUnit
 from .._content_role import ContentRole
+from .._content_block import TextBlock, ContentBlock
 from ....user_config_manager import UserConfigs
 from ....global_config_manager import ConfigManager
 from ._exceptions import JSONDecodeError, ArgumentError
@@ -154,7 +155,9 @@ class FunctionCaller:
             user_id: str,
             calling_requests: list[CallingRequest],
             available_tool_calls: set[str],
-            max_concurrent: int = 10
+            max_concurrent: int = 10,
+            loop_times: int | None = None,
+            max_loop_times: int | None = None
         ) -> list[ContentUnit]:
         results: asyncio.Queue = asyncio.Queue()
         tasks: set[asyncio.Task] = set()
@@ -165,7 +168,9 @@ class FunctionCaller:
                 result = await self.call_function(
                     user_id = user_id,
                     calling_request = calling_request,
-                    available_tool_calls = available_tool_calls
+                    available_tool_calls = available_tool_calls,
+                    loop_times = loop_times,
+                    max_loop_times = max_loop_times
                 )
                 await results.put(result)
         
@@ -192,18 +197,74 @@ class FunctionCaller:
         
         return results_list
     
-    def _create_tool_content_unit(self, tool_call_id: str, content: Any) -> ContentUnit:
-        return ContentUnit(
-            role = ContentRole.TOOL,
-            tool_call_id = tool_call_id,
-            content = content
-        )
+    def _create_tool_content_unit(
+            self,
+            tool_call_id: str,
+            content: str | list[ContentBlock],
+            loop_times: int | None = None,
+            max_loop_times: int | None = None
+        ) -> ContentUnit:
+
+        if loop_times is None:
+            return ContentUnit(
+                role = ContentRole.TOOL,
+                tool_call_id = tool_call_id,
+                content = content
+            )
+        else:
+            if isinstance(content, str):
+                tool_response_length = len(content)
+                buffer = [
+                    "<tool_response>",
+                    "  <info>",
+                    f"    <tool_call_id>{tool_call_id}</tool_call_id>"
+                    f"    <tool_response_length>{tool_response_length}</tool_response_length>",
+                    f"    <loop_times>{loop_times}/{max_loop_times}</loop_times>",
+                    "  </info>",
+                    "  <content>",
+                    "  " + content.replace("\n", "\n  "),
+                    "  </content>",
+                    "</tool_response>"
+                ]
+                return ContentUnit(
+                    role = ContentRole.TOOL,
+                    tool_call_id = tool_call_id,
+                    content = "\n".join(buffer)
+                )
+            elif isinstance(content, list):
+                prefix_buffer = [
+                    "<tool_response>",
+                    "  <info>",
+                    f"    <tool_call_id>{tool_call_id}</tool_call_id>",
+                    f"    <tool_response_length>{len(content)}</tool_response_length>",
+                    f"    <loop_times>{loop_times}/{max_loop_times}</loop_times>",
+                    "  </info>",
+                    "  <content>"
+                ]
+                suffix_buffer = [
+                    "  </content>",
+                    "</tool_response>"
+                ]
+                return ContentUnit(
+                    role = ContentRole.TOOL,
+                    tool_call_id = tool_call_id,
+                    content = [
+                        TextBlock(text = "\n".join(prefix_buffer)),
+                        *content,
+                        TextBlock(text = "\n".join(suffix_buffer))
+                    ]
+                )
+            else:
+                raise ValueError(f"Unexpected content type: {type(content).__name__}")
+                
 
     async def call_function(
             self,
             user_id: str,
             calling_request: CallingRequest,
-            available_tool_calls: set[str]
+            available_tool_calls: set[str],
+            loop_times: int | None = None,
+            max_loop_times: int | None = None,
         ) -> ContentUnit:
         configs = ConfigManager.get_configs().tool_calls
 
@@ -211,14 +272,18 @@ class FunctionCaller:
         if calling_request.function.name not in available_tool_calls:
             return self._create_tool_content_unit(
                 tool_call_id = calling_request.id,
-                content = "Error: Function not available."
+                content = "Error: Function not available.",
+                loop_times = loop_times,
+                max_loop_times = max_loop_times
             )
         try:
             function = self._functions[calling_request.function.name]
         except KeyError:
             return self._create_tool_content_unit(
                 tool_call_id = calling_request.id,
-                content = "Error: Function not found."
+                content = "Error: Function not found.",
+                loop_times = loop_times,
+                max_loop_times = max_loop_times
             )
         parameters = function.parameters
         if parameters is not None:
@@ -233,7 +298,9 @@ class FunctionCaller:
                                 function.on_args_json_decode_error,
                                 error
                             )
-                        )
+                        ),
+                        loop_times = loop_times,
+                        max_loop_times = max_loop_times
                     )
                 else:
                     raise JSONDecodeError(f"Invalid JSON: {error}") from error
@@ -246,7 +313,9 @@ class FunctionCaller:
                                 function.on_args_validation_error,
                                 error
                             )
-                        )
+                        ),
+                        loop_times = loop_times,
+                        max_loop_times = max_loop_times
                     )
                 else:
                     errors = error.errors()
@@ -320,15 +389,18 @@ class FunctionCaller:
             result = str(raw_result)
         
         logger.info(
-            "Tool {name} Result:\n{result}",
+            "Tool {name} Result:\n{result}(length: {length})",
             user_id = user_id,
             name = function.name,
-            result = text_content_cutter(str(result), configs.result_max_length_for_logs)
+            result = text_content_cutter(str(result), configs.result_max_length_for_logs),
+            length = len(result)
         )
         
         return self._create_tool_content_unit(
             tool_call_id = calling_request.id,
-            content = result
+            content = result,
+            loop_times = loop_times,
+            max_loop_times = max_loop_times,
         )
     
     def __contains__(self, item: Any | Function) -> bool:
