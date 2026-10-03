@@ -76,7 +76,7 @@ pipx install poetry
 ### 安装
 
 ``` bash
-git clone https://github.com/repeater-bot/repeater-ai-bot.git
+git clone https://github.com/repeater-bot/repeater-ai-chatbot.git
 cd repeater-ai-bot
 poetry install
 python run.py
