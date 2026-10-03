@@ -128,6 +128,8 @@ class ModelRequester:
             response: Response,
             runtime: Runtime,
             available_tool_calls: set[str] | None = None,
+            loop_times: int | None = None,
+            max_loop_times: int | None = None,
         ) -> None:
         if available_tool_calls and response.tool_calls:
             with runtime.status_stack.enter("Calling Tools"):
@@ -140,6 +142,8 @@ class ModelRequester:
                     response.user_id,
                     calling_requests = calling_requests,
                     available_tool_calls = available_tool_calls,
+                    loop_times = loop_times,
+                    max_loop_times = max_loop_times,
                 )
                 self._tool_responses.append(results)
                 for tool_response in results:
@@ -212,6 +216,8 @@ class ModelRequester:
                         response = response,
                         runtime = runtime,
                         available_tool_calls = available_tool_calls,
+                        loop_times = generated_times,
+                        max_loop_times = max_generated_times
                     )
                     raise GenerateFinished
                 except Regenerate as e:
