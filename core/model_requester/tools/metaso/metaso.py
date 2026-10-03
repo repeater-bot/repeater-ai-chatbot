@@ -1,8 +1,7 @@
 from __future__ import annotations
-import json
 import httpx
-from environs import Env
 from pydantic import BaseModel, Field
+from ....runtime_container import RuntimeContainer
 from ....context import ToolCallPackage, CallMode
 from ....auxiliary.http import get_ssl_context
 from ..._caller import ModelRequester
@@ -26,18 +25,20 @@ class Metaso(ToolCallPackage):
     name = "metaso"
     call_mode = CallMode.ASYNC
     json_result = True
-    _env = Env()
     client: httpx.AsyncClient | None = None
     description = "Metaso Internet AI Search"
 
     async def call(self, args: Params):
+        runtime = RuntimeContainer.get_runtime()
+        env = runtime.env
+
         if self.client is None:
             self.client = httpx.AsyncClient(
                 base_url = "https://metaso.cn/api/v1",
                 headers = {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {self._env.str('METASO_API_KEY')}"
+                    "Authorization": f"Bearer {env.str('METASO_API_KEY')}"
                 },
                 verify = get_ssl_context()
             )

@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import asyncio
@@ -21,11 +22,13 @@ from .config_force_load_list import is_config_force_load_list
 
 class RepeaterMain:
     env = Env()
+    env.read_env()
+
     _now_server: ClassVar[Server | None] = None
 
     def __init__(self):
         self.server = Server()
-        self.server_initer = ServerIniter(self.server)
+        self.server_initer = ServerIniter(self.server, self.env)
 
     @classmethod
     def get_now_server(cls) -> Server:
@@ -130,6 +133,10 @@ class RepeaterMain:
         logger.info(
             "Repeater Version: {version}",
             version = __version__
+        )
+        logger.info(
+            "Usage cwd: {cwd}",
+            cwd = os.getcwd()
         )
 
         start_init_resource_time = time.perf_counter_ns()

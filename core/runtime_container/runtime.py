@@ -43,13 +43,12 @@ from ..auxiliary.http import (
 )
 
 class RepeaterRuntime:
-    _env = Env()
-
     # 初始化列表
     # 用于保证初始化顺序
     init_list = []
 
-    def __init__(self):
+    def __init__(self, env: Env):
+        self.env: Env = env
         self._configs = ConfigManager.get_configs()
         for init_func in self.init_list:
             init_func(self)
@@ -76,7 +75,7 @@ class RepeaterRuntime:
         # 初始化 Model 管理器
         self.model_info_client = ModelsClient(
             base_url = self._configs.model_api.base_url,
-            api_key = self._env.str(
+            api_key = self.env.str(
                 self._configs.model_api.api_key_env_name
             ),
             timeout = self._configs.model_api.timeout,

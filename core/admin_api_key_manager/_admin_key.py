@@ -25,7 +25,7 @@ class AdminKeyManager:
     """
     def __init__(
         self,
-        env: Optional[environs.Env] = None,
+        env: environs.Env,
         api_key: Optional[str] = None,
         auto_generate_prefix: str = "adk-",
         min_key_length: int = 16,
@@ -41,7 +41,7 @@ class AdminKeyManager:
         :raise ValueError: API Key 中包含少于 6 种字符
         :raise ValueError: API Key 熵不足
         """
-        self._env = env or environs.Env()
+        self._env = env
 
         self._auto_generate_prefix = auto_generate_prefix
         self._min_key_length = min_key_length
