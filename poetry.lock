@@ -1113,6 +1113,18 @@ files = [
 ]
 
 [[package]]
+name = "puremagic"
+version = "1.30"
+description = "Pure python implementation of magic file detection"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "puremagic-1.30-py3-none-any.whl", hash = "sha256:5eeeb2dd86f335b9cfe8e205346612197af3500c6872dffebf26929f56e9d3c1"},
+    {file = "puremagic-1.30.tar.gz", hash = "sha256:f9ff7ac157d54e9cf3bff1addfd97233548e75e685282d84ae11e7ffee1614c9"},
+]
+
+[[package]]
 name = "pydantic"
 version = "2.13.5"
 description = "Data validation using Python type hints"
@@ -1725,4 +1737,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11, <4.0"
-content-hash = "d4a657972a2ecd22912a154f4cd394aa0c9c98b1d3d6ea16d380500e03f87fe6"
+content-hash = "7ca6a5e8ab198b13a0ab8f4a756cbaca610303ea50ea54b56efcb41c7d45b0bd"
