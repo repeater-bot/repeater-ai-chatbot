@@ -1,11 +1,8 @@
 import sys
 import time
-from environs import Env
 from loguru import logger
 
 def main(run_server: bool = True):
-    env = Env()
-    env.read_env()
     start_import_time = time.perf_counter_ns()
     try:
         from core import RepeaterMain
