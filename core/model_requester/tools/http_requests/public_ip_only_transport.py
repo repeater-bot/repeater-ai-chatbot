@@ -3,7 +3,7 @@ import socket
 import asyncio
 import ipaddress
 from ....global_config_manager import ConfigManager
-from .addr_info import AddrInfo
+from .._assists import AddrInfo
 
 class PublicIPOnlyTransport(httpx.AsyncHTTPTransport):
     
@@ -22,14 +22,14 @@ class PublicIPOnlyTransport(httpx.AsyncHTTPTransport):
                 # is not an ip address
                 # try to DNS resolve
                 loop = asyncio.get_event_loop()
-                addrs: list[tuple[socket.AddressFamily, socket.SocketKind, int, str, tuple[str, int] | tuple[str, int, int, int]]] = await loop.getaddrinfo(
+                addrs: list[tuple[socket.AddressFamily, socket.SocketKind, int, str, tuple[str, int] | tuple[str, int, int, int] | tuple[int, bytes]]] = await loop.getaddrinfo(
                     host,
                     port,
                     type = socket.SOCK_STREAM
                 )
                 for addr in addrs:
                     addr_info = AddrInfo.from_addr(addr)
-                    if addr_info.to_ip_address().is_private:
+                    if addr_info.ip_address.is_private:
                         raise httpx.TransportError("Private network requests are not allowed")
             
             response: httpx.Response = await super().handle_async_request(request)
