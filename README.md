@@ -55,39 +55,52 @@
 > Repeater 使用了 Python3.11 的一些新特性
 > 请在部署时确保你的 Python 版本符合要求
 
-### 自动安装
+### Poetry
 
-1. 将项目克隆到本地
-2. 进入项目目录
-5. 运行 `run.py` 启动器 (该项目的详情请查看 [Sloves_Starter](https://github.com/qeggs-dev/Sloves_Starter))
+本项目使用 [`poetry`](https://python-poetry.org) 作为依赖管理工具
+请确保你已经安装了 [`poetry`](https://python-poetry.org)
+如果未安装请执行以下命令
 
-### 手动安装
+``` bash
+pipx install poetry
+```
 
-1. 将项目克隆到本地
-2. 进入项目目录
-3. 执行 `python3 -m venv .venv` 创建虚拟环境
-4. 执行 `.venv/bin/activate` 激活虚拟环境 (Windows下则是 `.venv\Scripts\activate` )
-5. 执行 `pip install -r requirements.txt` 安装依赖
-6. 执行 `python3 run_repeater.py` 启动服务
+> 注：[`pipx`](https://pipx.pypa.io/stable/) 是一个专门用于命令行工具的 `pip` 包管理工具
+> 其特点是隔离运行环境，每个工具都有其独立的运行环境
+> 安装不会影响其他工具，卸载也不会留下痕迹
+> 安装命令（全局环境）：
+> ``` bash
+> pip install pipx
+> ```
 
-PS: `run.py` 启动器会在完成所有操作后启动主程序，而这只需要你保证你的配置正确
+### 安装
 
-并且每一次你都可以通过启动器来启动程序
+``` bash
+git clone https://github.com/repeater-bot/repeater-ai-bot.git
+cd repeater-ai-bot
+poetry install
+python run.py
+```
+
+PS: `run.py` 虽然也有依赖管理功能，但我们此处主要使用其守护进程的功能
+
+如果配置 `restart` 为 `true`
+通过 Ctrl + C 退出内部程序之后，`run.py` 会询问是否重新启动
 
 ---
 
 ## 跨平台
 
 本项目并未在项目中加入平台强相关逻辑
-经过测试，Repeater可以在 Windows、Linux 上正常运行
+经过测试，Repeater 可以在 Windows、Linux 上正常运行
 启动器也根据平台特性做了适配
-暂未测试过 MacOS (因为没钱买Mac)
+暂未测试过 MacOS ( ~~找理由买 Mac 中~~ )
 
 ---
 
 ## 详细文档
 
-[从这里开始使用 Repeater!](./docs/index.md)
+[从这里开始了解 Repeater!](./docs/index.md)
 
 ---
 
@@ -106,7 +119,7 @@ Repeater 的功能拓展主要靠编写对应领域的 Client
 > 设计理念上，Repeater 希望用户能完全掌握自己的数据 (别把锅甩运营头上)
 > Repeater 并不主动的把目标放在拟人化上，工具的行为越清晰，用户越能对工具放心
 > 它希望在有人与它进行交流时，能时刻想起自己可以对自己才是有控制权的那方
-> (我才不会告诉你是因为我不会写拟人化才走的这条路呢)
+> ~~(我才不会告诉你是因为我不会写拟人化才走的这条路呢)~~
 
 ---
 
