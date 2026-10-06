@@ -30,6 +30,7 @@ from ..clients.nexus_client import NexusClient
 from ..clients.html_render_client import HTMLRenderClient
 from ..licenses_loader import LicenseLoader
 from ..clients.static_resources_client import StaticResourcesClient
+from ..clients.watermark_cilent import WatermarkClient
 from ..request_log import (
     RequestLogManager
 )
@@ -39,7 +40,8 @@ from ..pools.openai_pool import OpenAIPool
 from ..pools.delayed_tasks_pool import DelayedTasksPool
 from ..auxiliary.http import (
     ssl_context,
-    RepeaterTransport
+    RepeaterTransport,
+    PublicIPOnlyTransport
 )
 
 class RepeaterRuntime:
@@ -56,8 +58,12 @@ class RepeaterRuntime:
     @init_list.append
     @print_init_runtime("Repeater Transport Layer")
     def init_transport(self):
+        self.ssl_context = ssl_context.get_ssl_context()
         self.transport = RepeaterTransport(
-            verify = ssl_context.get_ssl_context()
+            verify = self.ssl_context
+        )
+        self.public_only_transport = PublicIPOnlyTransport(
+            verify = self.ssl_context
         )
 
     @init_list.append
@@ -172,6 +178,19 @@ class RepeaterRuntime:
         self.nexus_client: NexusClient = NexusClient(
             base_url = nexus_config.base_url,
             request_timeout = nexus_config.api_timeout,
+            headers = {
+                "User-Agent": self._configs.system_identification.system_ua
+            },
+            transport = self.transport,
+        )
+    
+    @init_list.append
+    @print_init_runtime("Watermark Client")
+    def init_watermark_client(self):
+        watermark_config = self._configs.watermark
+        self.watermark_client: WatermarkClient = WatermarkClient(
+            base_url = watermark_config.base_url,
+            timeout = watermark_config.timeout,
             headers = {
                 "User-Agent": self._configs.system_identification.system_ua
             },
