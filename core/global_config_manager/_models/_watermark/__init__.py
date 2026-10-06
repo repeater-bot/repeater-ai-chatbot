@@ -1,1 +1,2 @@
 from .watermark import WatermarkConfig
+from .correction_level import WatermarkCorrectionLevel
