@@ -1,4 +1,3 @@
-import ssl
 import httpx
 import random
 
@@ -23,7 +22,6 @@ class ModelsClient:
             headers: dict[str, str] | None = None,
             cookies: dict[str, str] | None = None,
             auth: tuple[str, str] | None = None,
-            verify: ssl.SSLContext | str | bool = True,
             transport: httpx.AsyncHTTPTransport | None = None,
         ):
         self._base_url = base_url
@@ -39,7 +37,6 @@ class ModelsClient:
             headers = headers,
             cookies = cookies,
             auth = auth,
-            verify = verify,
             transport = transport
         )
     
