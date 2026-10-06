@@ -24,6 +24,9 @@ Repeater 提供了许多接口，
 ## Admin API
   - [Admin API](./admin_api/index.md)
 
+## Watermark API
+  - [Watermark API](./watermark_api/index.md)
+
 ## Web API
   - [Web API](./web.md)
   - [Docs API](./docs_api.md)
