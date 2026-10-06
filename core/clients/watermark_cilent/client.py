@@ -1,7 +1,8 @@
 import httpx
 import string
-from ...global_config_manager import ConfigManager
+from ...global_config_manager import ConfigManager, WatermarkCorrectionLevel
 from typing import Any, AsyncGenerator
+from ...special_exception import HTTPException
 
 class WatermarkClient:
     CHARS = string.digits + string.ascii_letters
@@ -27,34 +28,58 @@ class WatermarkClient:
             transport = transport
         )
 
-    async def encode_watermark(self, text: str, image: bytes, output_format: str = ".png") -> AsyncGenerator[bytes, None]:
+    async def encode_watermark(
+            self,
+            text: str,
+            block_size: int,
+            correction_level: WatermarkCorrectionLevel | float,
+            image: bytes,
+            output_format: str = ".png"
+        ) -> AsyncGenerator[bytes, None]:
         stream_response = self.client.stream(
             method = "POST",
             url = "/watermark/encode",
-            json = {
+            data = {
                 "text": text,
-                "output_format": output_format
+                "block_size": block_size,
+                "correction_level": correction_level.value if isinstance(correction_level, WatermarkCorrectionLevel) else correction_level,
+                "file_format": output_format
             },
             files = {
                 "file": image,
             }
         )
 
+
         async with stream_response as stream:
+
+            if stream.status_code != 200:
+                raise HTTPException(stream.text, stream.status_code)
+            
             async for byte in stream.aiter_bytes():
                 yield byte
             
 
-    async def decode_watermark(self, image: bytes, bytes_count: int) -> str:
+    async def decode_watermark(
+            self,
+            image: bytes,
+            block_size: int,
+            correction_level: WatermarkCorrectionLevel | float,
+            bytes_count: int
+        ) -> str:
         response = await self.client.post(
             url = "/watermark/decode",
-            json = {
-                "bytes_count": bytes_count
+            data = {
+                "bytes_count": bytes_count,
+                "block_size": block_size,
+                "correction_level": correction_level.value if isinstance(correction_level, WatermarkCorrectionLevel) else correction_level,
             },
             files = {
                 "file": image,
             }
         )
+        if response.status_code != 200:
+            raise HTTPException(response.text, response.status_code)
         return response.text
 
     @classmethod
@@ -63,6 +88,8 @@ class WatermarkClient:
         for _ in range(width):
             result.append(cls.CHARS[n % 62])
             n //= 62
+        if n > 0:
+            raise ValueError("number too large")
         return ''.join(reversed(result))
 
     @classmethod
@@ -75,17 +102,19 @@ class WatermarkClient:
     async def encode_text_watermark(self, image: bytes, text: str, output_format: str = ".png") -> AsyncGenerator[bytes, None]:
         configs = ConfigManager.get_configs().watermark
 
-        text_len = len(text)
+        text_len = len(text.encode("utf-8"))
         text_bytes_count = self.num_to_fixed_str(
             text_len,
             configs.size_header_width
         )
-        encode_text = (text_bytes_count + text).ljust(configs.base_size, ' ')
+        encode_text = (text_bytes_count + text).ljust(configs.base_size, " ")
 
         stream = self.encode_watermark(
-            encode_text,
-            image,
-            output_format
+            text = encode_text,
+            block_size = configs.base_size,
+            correction_level = configs.correction_level,
+            image = image,
+            output_format = output_format
         )
 
         async for byte in stream:
@@ -96,7 +125,9 @@ class WatermarkClient:
 
         decode_text = await self.decode_watermark(
             image,
-            configs.base_size
+            block_size = configs.base_size,
+            correction_level = configs.correction_level,
+            bytes_count = configs.base_size
         )
 
         text_bytes_count = self.fixed_str_to_num(
