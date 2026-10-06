@@ -1,6 +1,5 @@
 import httpx
 
-from io import BytesIO
 from ....repeater_main import RepeaterMain
 from ....global_config_manager import ConfigManager
 from ._router import watermark_router
@@ -12,6 +11,7 @@ from fastapi.responses import StreamingResponse
 async def encode_watermark(request: WatermarkRequest):
     server = RepeaterMain.get_now_server()
     runtime = server.runtime
+    configs = ConfigManager.get_configs().watermark
 
     watermark_client = runtime.watermark_client
 
@@ -30,7 +30,7 @@ async def encode_watermark(request: WatermarkRequest):
 
     stream = watermark_client.encode_text_watermark(
         image = response.content,
-        text = request.text,
+        text = request.text or configs.default_image_watermark,
         output_format = request.output_format,
     )
 

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 class WatermarkRequest(BaseModel):
-    text: str
     image: str
+    text: str | None = None
     output_format: str = ".png"
