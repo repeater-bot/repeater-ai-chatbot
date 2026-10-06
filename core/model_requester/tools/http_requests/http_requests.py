@@ -1,14 +1,13 @@
 from __future__ import annotations
 import json
 import httpx
-import random
 import asyncio
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 from ....context import ToolCallPackage, CallMode
 from ....global_config_manager import HTTPMethods, ConfigManager
 from ..._caller import ModelRequester
-from ....auxiliary.http import get_ssl_context
+from ....auxiliary.http import get_ssl_context, RepeaterTransport, PublicIPOnlyTransport
 from loguru import logger
 from typing import ClassVar, Literal
 from pydantic import BaseModel, Field
@@ -16,7 +15,6 @@ from cachetools import TTLCache
 from .request import Request
 from .response import Response
 from .sleep import Sleep
-from .public_ip_only_transport import PublicIPOnlyTransport
 from .backoff import exponential_backoff_with_jitter
 
 @ModelRequester.reg_global_package
@@ -238,24 +236,34 @@ class HTTPRequests(ToolCallPackage):
                 reason = "No response"
             )
 
-    def init_client(self, args: Params):
+    def init_client(self, args: Params, allow_private_ip: bool = False):
+        if allow_private_ip:
+            transport = RepeaterTransport(
+                verify = get_ssl_context(),
+                proxy = args.base_proxy
+            )
+        else:
+            transport = PublicIPOnlyTransport(
+                verify = get_ssl_context(),
+                proxy = args.base_proxy
+            )
+
         client = httpx.AsyncClient(
             base_url = args.base_url,
             headers = args.base_headers,
             cookies = args.base_cookies,
             auth = args.base_auth,
             timeout = args.base_timeout,
-            transport = PublicIPOnlyTransport(
-                verify = get_ssl_context(),
-                proxy = args.base_proxy
-            )
+            transport = transport
         )
         return client
 
     async def call(self, args: Params):
+        configs = ConfigManager.get_configs().tool_calls.tools_configs.http_requests
         client = await asyncio.to_thread(
             self.init_client,
-            args
+            args,
+            allow_private_ip = configs.allow_private_network_requests
         )
 
         responses: list[list[Response | None]] = []

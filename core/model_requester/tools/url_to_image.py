@@ -9,7 +9,7 @@ from .._caller import ModelRequester
 from pydantic import BaseModel, Field
 from urllib.parse import urlsplit
 from ipaddress import ip_address
-from ._assists import AddrInfo
+from ...auxiliary.http import is_public_url
 
 @ModelRequester.reg_global_package
 class URLToImage(ToolCallPackage):
@@ -30,34 +30,6 @@ class URLToImage(ToolCallPackage):
         self.init_client()
 
     @staticmethod
-    async def is_public_url(url: str) -> bool:
-        u = urlsplit(url)
-        if u.scheme not in ("http", "https") or not u.hostname:
-            raise ValueError("Invalid URL")
-
-        host = u.hostname
-        port = u.port or (443 if u.scheme == "https" else 80)
-        
-        try:
-            ip = ip_address(u.hostname)
-            if not ip.is_global:
-                return True
-        except socket.gaierror:
-                # is not an ip address
-                # try to DNS resolve
-                loop = asyncio.get_event_loop()
-                addrs: list[tuple[socket.AddressFamily, socket.SocketKind, int, str, tuple[str, int] | tuple[str, int, int, int] | tuple[int, bytes]]] = await loop.getaddrinfo(
-                    host,
-                    port,
-                    type = socket.SOCK_STREAM
-                )
-                for addr in addrs:
-                    addr_info = AddrInfo.from_addr(addr)
-                    if not addr_info.ip_address.is_global:
-                        return True
-        return False
-
-    @staticmethod
     def make_data_url(image: bytes) -> str:
         mime_type = puremagic.from_string(image, mime = True)
         return f"data:{mime_type};base64,{base64.b64encode(image).decode(encoding='utf-8')}"
@@ -73,7 +45,7 @@ class URLToImage(ToolCallPackage):
     async def call(self, args: Params):
         submited_urls: list[str] = []
         for url in args.urls:
-            if await self.is_public_url(url):
+            if await is_public_url(url):
                 submited_urls.append(url)
             else:
                 image = await self.fetch_image(url)
