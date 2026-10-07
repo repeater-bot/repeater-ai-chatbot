@@ -3,7 +3,7 @@ from .response import VectorResponse
 from .._router import generate_router
 from .....core.vectors import vectors
 
-@generate_router.post("/vector/{user_id}")
+@generate_router.post("/vectors/{user_id}")
 async def vectors_endpoint(request: VectorRequest, user_id: str):
     """
     Vectors API
