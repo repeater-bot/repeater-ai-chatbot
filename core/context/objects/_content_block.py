@@ -1,7 +1,8 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Literal, Union, Annotated
+from typing import Literal, Any, Union, Annotated
 from enum import StrEnum
+from typing_extensions import TypeIs
 
 class ContentBlockType(StrEnum):
     TEXT = "text"
@@ -90,3 +91,14 @@ ContentBlock = Annotated[
     ],
     "OpenAI API standard multimodal content blocks."
 ]
+
+def is_content_block(obj: Any) -> TypeIs[ContentBlock]:
+    return isinstance(obj, 
+        (
+            TextBlock,
+            ImageBlock,
+            VideoBlock,
+            AudioBlock,
+            FileBlock
+        )
+    )

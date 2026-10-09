@@ -4,6 +4,7 @@ from ._context import Context
 from ._content_block import (
     ContentBlockType,
     ContentBlock,
+    is_content_block,
     TextBlock,
     ImageUrlBlock,
     ImageBlock,

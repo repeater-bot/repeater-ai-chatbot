@@ -8,4 +8,4 @@ class SpecifiedFunction(BaseModel):
 class CallingRequest(BaseModel):
     id: str
     type: ToolTypes = ToolTypes.FUNCTION
-    function: SpecifiedFunction = SpecifiedFunction()
+    function: SpecifiedFunction = Field(default_factory = SpecifiedFunction)
