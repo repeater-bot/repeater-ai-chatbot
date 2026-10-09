@@ -23,8 +23,8 @@ class OutputFormat(StrEnum):
 
 @ModelRequester.reg_global_package
 class CallModel(ToolCallPackage):
-    name = "call_model"
-    description = "Send a request to an llm and get the generated results."
+    name = "sub_agent"
+    description = "Assign a simple task to a child Agent and wait for it to finish running."
     call_mode = CallMode.ASYNC
     
     class Params(BaseModel):
@@ -188,6 +188,21 @@ class CallModel(ToolCallPackage):
             client_pool = runtime.openai_pool,
             content_buffer = ContentBuffer()
         )
+        
+        if self.global_configs.tool_calls.enabled:
+            tool_calls_configs = self.global_configs.tool_calls
+            server_registed_tools = tool_calls_configs.registed
+            if self.user_configs.allowed_tool_calls:
+                user_registed_tools = self.user_configs.allowed_tool_calls
+            elif tool_calls_configs.allowed_by_default:
+                user_registed_tools = tool_calls_configs.allowed_by_default
+            else:
+                user_registed_tools = set()
+
+            available_tool_calls = server_registed_tools.intersection(user_registed_tools)
+        else:
+            available_tool_calls = set()
+        
         requestser = ModelRequester(
             user_id = self.user_id,
             user_configs = self.user_configs,
@@ -201,7 +216,7 @@ class CallModel(ToolCallPackage):
             user_id = self.user_id,
             request = request,
             runtime = request_runtime,
-            available_tool_calls = None,
+            available_tool_calls = available_tool_calls,
             stream = False
         )
 
