@@ -15,6 +15,9 @@ from .repeater_main import (
     RepeaterMain
 )
 from .api import root_router
+from .post_init import run_post_init
+
+run_post_init()
 
 __all__ = [
     "Core",
