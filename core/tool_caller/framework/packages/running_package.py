@@ -6,12 +6,12 @@ from typing import (
     Generator,
     TextIO,
 )
+from pydantic import BaseModel
 from types import FrameType
 from dataclasses import dataclass
 
+from ....context import ContentUnit
 from .tool_package import ToolPackage
-from .params_package import ParamsPackage
-
 
 @dataclass(eq = False)
 class RunningPackage:
@@ -27,8 +27,8 @@ class RunningPackage:
     start_monotonic_time: int
     timeout: int | float | None
     package: ToolPackage
-    args: ParamsPackage
-    task: asyncio.Task[int | None]
+    args: BaseModel
+    task: asyncio.Task[ContentUnit]
 
     def __hash__(self) -> int:
         return hash((type(self), self.task_id, self.task))
@@ -41,16 +41,13 @@ class RunningPackage:
     def get_coro(self):
         return self.task.get_coro()
 
-    def get_name(self) -> str:
-        return self.package.package_name
-
     def get_stack(self, *, limit: int | None = None) -> list[FrameType]:
         return self.task.get_stack(limit = limit)
 
     def print_stack(self, *, limit: int | None = None, file: TextIO | None = None) -> None:
         return self.task.print_stack(limit = limit, file = file)
 
-    def __await__(self) -> Generator[Any, None, int | None]:
+    def __await__(self) -> Generator[Any, None, ContentUnit]:
         return self.task.__await__()
 
     def cancel(self):
