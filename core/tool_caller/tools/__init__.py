@@ -21,6 +21,8 @@ from .dispatch_trigger import (
 )
 from .url_to_image import URLToImage
 from .list_task import ListTask
+from .bypass import Bypass
+from .wait_task import WaitTask
 
 __all__ = [
     "Demo",
@@ -42,4 +44,6 @@ __all__ = [
     "DispatchAskQuestions",
     "URLToImage",
     "ListTask",
+    "Bypass",
+    "WaitTask",
 ]

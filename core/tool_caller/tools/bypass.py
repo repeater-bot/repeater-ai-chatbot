@@ -1,6 +1,20 @@
+import asyncio
 import uuid
-from ..framework import ToolsCaller, ToolPackage, ParamsPackage
+
+from loguru import logger
 from pydantic import BaseModel, Field
+
+from ..framework import ToolsCaller, ToolPackage, RuntimePackage
+
+def _log_failure(task: asyncio.Task) -> None:
+    """
+    A background task that nobody awaits still has to report its failure.
+    """
+    if task.cancelled():
+        return
+    error = task.exception()
+    if error is not None:
+        logger.error("Bypass task failed: {error}", error = error)
 
 @ToolsCaller.register
 class Bypass(ToolPackage):
@@ -16,15 +30,23 @@ class Bypass(ToolPackage):
     name = "bypass"
     description = "A task runs in the background, does not wait for it to finish, and gets its task id."
 
-    async def call(self, args: Params):
-        package = ToolsCaller.match_tool(args.tool_name)
-        running = await ToolsCaller.horizontal_enter_wait_created(
-            user_id = self.user_id,
-            package = package,
-            args = ToolsCaller.call_tools(
-                user_id = self.user_id,
-                
-            ),
-            timeout = timeout
+    async def call(self, args: Params, runtime: RuntimePackage):
+        tool = ToolsCaller.match_tool(args.tool_name)
+        if tool is None:
+            raise ValueError(f"Unknown tool: {args.tool_name}")
+
+        task_id = uuid.uuid4()
+        task = asyncio.create_task(
+            coro = ToolsCaller.run_tool(
+                task_id = task_id,
+                tool = tool,
+                args = args.args,
+                runtime = runtime,
+                timeout = args.timeout,
+            )
         )
-        return running.task_id
+        task.add_done_callback(_log_failure)
+
+        # The id goes back as a string: parse_result would not be able to
+        # serialize a bare uuid.UUID.
+        return str(task_id)
