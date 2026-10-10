@@ -77,6 +77,13 @@ class ToolPackage(ABC):
                         block_buffer.append(block)
                     else:
                         raise ValueError(f"Invalid block type: {type(block).__name__}")
+        elif isinstance(result, BaseModel):
+            # A tool may return one of its `Result` models; orjson can not
+            # serialize a pydantic model directly, so dump it first.
+            try:
+                text_buffer.append(orjson.dumps(result.model_dump()).decode("utf-8"))
+            except Exception as e:
+                text_buffer.append(f"Result Encode Error: {e}")
         else:
             try:
                 text_buffer.append(orjson.dumps(result).decode("utf-8"))

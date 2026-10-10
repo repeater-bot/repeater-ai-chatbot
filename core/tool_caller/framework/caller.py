@@ -61,6 +61,43 @@ class ToolsCaller:
     _task_id: ContextVar[uuid.UUID | None] = ContextVar("_task_id", default=None)
 
     @classmethod
+    def register(cls, package: Type[ToolPackage]) -> Type[ToolPackage]:
+        """
+        Register a tool class.
+
+        The tool is instantiated once and then shared by every user and every
+        request; anything request scoped travels in the `RuntimePackage` of the
+        call instead.
+
+        A tool that sets `enabled = False` is skipped, which is how `Demo` stays
+        a debug only tool.
+
+        :param package: The tool class.
+        :return: The tool class.
+        """
+        if not getattr(package, "enabled", True):
+            logger.info(
+                "Tool {name} is disabled, skip registration",
+                name = package.__name__
+            )
+            return package
+
+        if package in cls.tools:
+            raise ValueError(f"Tool {package.__name__} is already registered")
+        if package.name in cls.tool_names:
+            raise ValueError(f"Tool name {package.name} is already registered")
+        if package.__name__ in cls.class_names:
+            raise ValueError(f"Tool class name {package.__name__} is already registered")
+
+        instance = package()
+        cls.tools[package] = instance
+        cls.tool_names[instance.name] = package
+        cls.class_names[package.__name__] = package
+
+        logger.info("Register tool {name} done", name = instance.name)
+        return package
+
+    @classmethod
     def get_tool_names(cls) -> list[str]:
         return list(cls.tool_names.keys())
 
