@@ -26,7 +26,11 @@ class StatusPackage:
     def finish(self) -> None:
         """
         Turn off the status.
+
+        Finishing an already finished status is a no-op.
         """
+        if self.future.done():
+            return
         self.future.set_result(None)
 
     async def wait_finish(self) -> None:

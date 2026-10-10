@@ -1,8 +1,17 @@
-from pydantic import BaseModel
-from ...context import ContentBlock
+"""
+The `ContentResult` re-export of the tool calling framework.
 
-class ContentResult(BaseModel):
-    """
-    When this type is used as the return value, it is resolved to a custom message segment.
-    """
-    content: str | list[ContentBlock]
+`ContentResult` used to be declared twice — once here and once in
+`core.context.objects.function_calling._content_result` — which meant a tool and
+the framework could hold two different classes with the same name and silently
+fail every `isinstance` check. The framework now re-exports the single class
+from `context`; when the old `FunctionCaller` layer is removed, move the
+definition back in here instead of adding a second copy.
+"""
+
+from ...context import ContentResult, ContentBlock
+
+__all__ = [
+    "ContentResult",
+    "ContentBlock",
+]
