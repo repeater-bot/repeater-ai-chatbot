@@ -11,6 +11,7 @@ from .packages import (
 from .typings import (
     New
 )
+from .content_result import ContentResult
 
 __all__ = [
     # caller
@@ -28,5 +29,8 @@ __all__ = [
     "ParamsPackage",
 
     # typings
-    "New"
+    "New",
+
+    # content_result
+    "ContentResult"
 ]

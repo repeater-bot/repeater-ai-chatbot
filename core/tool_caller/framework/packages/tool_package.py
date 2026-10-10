@@ -137,7 +137,7 @@ class ToolPackage(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__}()"
     
-    async def enter_handler(self, args: ParamsPackage) -> int:
+    async def enter_handler(self, args: ParamsPackage[Params]) -> int:
         """
         This method is called before the handler method.
 
@@ -148,7 +148,7 @@ class ToolPackage(ABC):
         return result
 
     @abstractmethod
-    async def handler(self, args: ParamsPackage) -> int:
+    async def handler(self, args: ParamsPackage[Params]) -> int:
         """
         Override this method to begin writing your business logic.
 
@@ -157,7 +157,7 @@ class ToolPackage(ABC):
         """
         pass
 
-    async def on_error(self, exception: Exception, args: ParamsPackage) -> int | None | NoReturn:
+    async def on_error(self, exception: Exception, args: ParamsPackage[Params]) -> int | None | NoReturn:
         """
         The error Handler for the Handler
 
@@ -175,7 +175,7 @@ class ToolPackage(ABC):
         await args.output.put(f"Error: {exception}")
         return -1
     
-    async def on_interpreter_error(self, exception: BaseException, args: ParamsPackage) -> int | None | NoReturn:
+    async def on_interpreter_error(self, exception: BaseException, args: ParamsPackage[Params]) -> int | None | NoReturn:
         """
         This section is executed when the interpreter encounters an error that is a BaseException but not an Exception.
 
@@ -188,7 +188,7 @@ class ToolPackage(ABC):
         logger.exception(f"Error: {exception}")
         raise
     
-    async def on_cancel(self, args: ParamsPackage) -> int | None | NoReturn:
+    async def on_cancel(self, args: ParamsPackage[Params]) -> int | None | NoReturn:
         """
         This section is executed when the Handler is cancelled.
 
@@ -199,7 +199,7 @@ class ToolPackage(ABC):
         logger.warning(f"{self.package_name} cancelled")
         return None
 
-    async def on_timeout(self, args: ParamsPackage) -> int | None | NoReturn:
+    async def on_timeout(self, args: ParamsPackage[Params]) -> int | None | NoReturn:
         """
         This section is executed when the Handler times out.
 
@@ -210,7 +210,7 @@ class ToolPackage(ABC):
         logger.warning(f"{self.package_name} timed out")
         return None
     
-    async def handler_exit(self, args: ParamsPackage) -> int | None | NoReturn:
+    async def handler_exit(self, args: ParamsPackage[Params]) -> int | None | NoReturn:
         """
         This section is executed whenever the Handler fails or exits.
 
