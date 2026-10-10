@@ -15,9 +15,9 @@ from ._content_block import (
     FileDataBlock,
     FileBlock,
 )
-# from .function_calling import *
 from ._tool_types import ToolTypes
 from ._function_calling_response import (
     CallingRequest,
     SpecifiedFunction,
 )
+from ._tool_choice import ToolChoice
