@@ -2,7 +2,7 @@
 
 调用模型接口
 
-注册名：`call_model`
+注册名：`sub_agent`
 
 接受参数:
 ``` json

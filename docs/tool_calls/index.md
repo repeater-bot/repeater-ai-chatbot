@@ -22,3 +22,6 @@
 16. [Dispatch Trigger](./built-in/dispatch_trigger.md)
 17. [Dispatch Ask Questions](./built-in/dispatch_ask_questions.md)
 18. [Url to Image](./built-in/url_to_image.md)
+19. [List Task](./built-in/list_task.md)
+20. [Bypass](./built-in/bypass.md)
+21. [Wait Task](./built-in/wait_task.md)
