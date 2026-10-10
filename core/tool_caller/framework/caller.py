@@ -12,7 +12,6 @@ from typing import (
     Literal
 )
 
-from loguru import logger
 from pydantic import BaseModel
 
 from ...context import (
@@ -76,10 +75,6 @@ class ToolsCaller:
         :return: The tool class.
         """
         if not getattr(package, "enabled", True):
-            logger.info(
-                "Tool {name} is disabled, skip registration",
-                name = package.__name__
-            )
             return package
 
         if package in cls.tools:
@@ -93,8 +88,6 @@ class ToolsCaller:
         cls.tools[package] = instance
         cls.tool_names[instance.name] = package
         cls.class_names[package.__name__] = package
-
-        logger.info("Register tool {name} done", name = instance.name)
         return package
 
     @classmethod
