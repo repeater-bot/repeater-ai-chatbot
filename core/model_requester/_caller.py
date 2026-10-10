@@ -36,9 +36,9 @@ from fastapi import Request as FastAPI_Request
 from ._exceptions import *
 from ..special_exception import HTTPException
 from ._multi_response import MultiResponse
+from ..tool_caller import ToolsCaller
 
 class ModelRequester:
-    _global_package: ClassVar[list[Type[ToolCallPackage]]] = []
     def __init__(
             self,
             user_id: str,
@@ -49,65 +49,21 @@ class ModelRequester:
             max_concurrency: int | None = None,
             *args, **kwargs
         ):
-        self._tools_caller = FunctionCaller()
-        self._tools_caller.register_packages(
-            user_id = user_id,
-            packages = self._global_package,
-            user_configs = user_configs,
-            fastapi_request = fastapi_request,
-            *args,
-            **kwargs
-        )
         self._api_client = NoStreamClient(
-            global_configs.callapi.max_concurrency
+            max_concurrency = global_configs.callapi.max_concurrency
             if max_concurrency is None else max_concurrency
         )
         self._stream_api_client = StreamClient(
-            global_configs.callapi.max_concurrency
+            max_concurrency = global_configs.callapi.max_concurrency
             if max_concurrency is None else max_concurrency
         )
         self._user_configs = user_configs
+        self._user_id = user_id
         self._global_configs = global_configs
         self._model_info_client = model_info_client
+        self._fastapi_request = fastapi_request
         self._stream_chunk_queue: asyncio.Queue[Delta | ContentUnit | None] = asyncio.Queue()
         self._tool_responses: list[list[ContentUnit]] = []
-    
-    @classmethod
-    def reg_global_package(cls, package: Type[ToolCallPackage]):
-        if not issubclass(package, ToolCallPackage):
-            raise TypeError("package must be a subclass of ToolCallPackage")
-        cls._global_package.append(package)
-        return package
-    
-    def reg_func(self, function: Function):
-        self._tools_caller.register_function(function)
-    
-    def reg_packages(
-            self,
-            user_id: str,
-            packages: list[Type[ToolCallPackage]],
-            user_configs: UserConfigs,
-            fastapi_request: FastAPI_Request
-        ):
-        self._tools_caller.register_packages(
-            user_id = user_id,
-            packages = packages,
-            user_configs = user_configs,
-            fastapi_request = fastapi_request
-        )
-    
-    def unreg_func(self, func_name: str):
-        self._tools_caller.unregister_function(func_name)
-    
-    @property
-    def tools_caller(self) -> FunctionCaller:
-        return self._tools_caller
-    
-    @tools_caller.setter
-    def tools_caller(self, tools_caller: FunctionCaller):
-        if not isinstance(tools_caller, FunctionCaller):
-            raise TypeError("tools_caller must be a FunctionCaller")
-        self._tools_caller = tools_caller
     
     async def generator(self) -> AsyncGenerator[Delta | ContentUnit, None]:
         failed_times: int = 0
@@ -138,9 +94,12 @@ class ModelRequester:
                     calling_requests.append(
                         tool_call.to_calling_request()
                     )
-                results = await self._tools_caller.call_functions(
-                    response.user_id,
-                    calling_requests = calling_requests,
+                results = await ToolsCaller.call_tool(
+                    user_id = response.user_id,
+                    tool_requests = calling_requests,
+                    user_configs = self._user_configs,
+                    global_configs = self._global_configs,
+                    fastapi_request = self._fastapi_request,
                     available_tool_calls = available_tool_calls,
                     loop_times = loop_times,
                     max_loop_times = max_loop_times,
@@ -187,12 +146,10 @@ class ModelRequester:
             logger.info(
                 "Using tools: {tools}",
                 user_id = user_id,
-                tools = ", ".join(
-                    func.name for func in self._tools_caller.allowed_func(available_tool_calls)
-                )
+                tools = ", ".join(ToolsCaller.allowed_tool_ids(available_tool_calls))
             )
-            request.tools = self._tools_caller.to_request(available_tool_calls)
-            request.tool_choice = self._tools_caller.to_choice(tool_choice_model)
+            request.tools = ToolsCaller.to_request(available_tool_calls)
+            request.tool_choice = ToolsCaller.to_choice(tool_choice_model)
         try:
             while True:
                 try:

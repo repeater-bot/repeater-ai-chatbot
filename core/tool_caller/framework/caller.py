@@ -106,7 +106,7 @@ class ToolsCaller:
         return set(cls.tool_names.keys()).intersection(allowed)
     
     @classmethod
-    def allowd_tools(cls, allowed: set[str]) -> list[ToolPackage]:
+    def allowed_tools(cls, allowed: set[str]) -> list[ToolPackage]:
         allowd_tools = cls.allowed_tool_ids(allowed)
         tools: list[ToolPackage] = [cls.tools[cls.tool_names[tool_id]] for tool_id in allowd_tools]
         return tools
@@ -118,7 +118,7 @@ class ToolsCaller:
         """
         return [
             tool.to_request(strict).model_dump()
-            for tool in cls.allowd_tools(allowed)
+            for tool in cls.allowed_tools(allowed)
         ]
     
     @classmethod
