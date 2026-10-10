@@ -10,10 +10,10 @@ from yarl import URL
 from httpx import HTTPStatusError
 
 # ==== 自定义库 ==== #
-from ..assist_struct import (
+from ...assist_struct import (
     AdditionalData
 )
-from ..data_manager import (
+from ...data_manager import (
     PromptManager,
     ContextManager
 )
@@ -35,12 +35,12 @@ from .objects import (
     FileDataBlock,
 )
 from ._exceptions import *
-from ..template_render import (
+from ...template_render import (
     TemplateParser
 )
-from ..auxiliary.path import validate_path, sanitize_filename_with_dir
-from ..global_config_manager import ConfigManager as GlobalConfigManager
-from ..clients.static_resources_client import StaticResourcesClient
+from ...auxiliary.path import validate_path, sanitize_filename_with_dir
+from ...global_config_manager import ConfigManager as GlobalConfigManager
+from ...clients.static_resources_client import StaticResourcesClient
 
 # ==== 本模块代码 ==== #
 class ContextLoader:

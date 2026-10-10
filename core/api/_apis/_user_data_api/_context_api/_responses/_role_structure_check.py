@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from ......context import (
+from ......user_data_managers.context import (
     ContentRole
 )
 

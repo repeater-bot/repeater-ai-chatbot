@@ -4,7 +4,7 @@ from ...call_api.completions_api import (
     Runtime,
     StreamOptions
 )
-from ...context import Context, ContentRole
+from ...user_data_managers.context import Context, ContentRole
 from ...global_config_manager import ReasoningEffort
 from ...model_requester import ModelRequester
 from ...runtime_container import RuntimeContainer

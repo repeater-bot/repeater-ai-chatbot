@@ -1,6 +1,6 @@
 from ......repeater_main import RepeaterMain
 from .._router import context_router
-from ......context import (
+from ......user_data_managers.context import (
     ContentUnit,
     ContentRole
 )

@@ -13,10 +13,10 @@ from ..data_manager import (
     ContextManager,
     PromptManager
 )
-from ..user_config_manager import (
+from ..user_data_managers.user_config_manager import (
     ConfigManager as UserConfigManager
 )
-from ..program_data_manager import (
+from ..user_data_managers.program_data_manager import (
     ProgramDataManager
 )
 from ..pools.resource_pool import ResourcePool

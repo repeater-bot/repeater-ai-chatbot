@@ -1,13 +1,10 @@
 import asyncio
 
-from ..context import (
+from ..user_data_managers.context import (
     Context,
-    Function,
-    FunctionCaller,
     CallingRequest,
     ContentUnit,
     ToolChoice,
-    ToolCallPackage
 )
 from ..call_api.completions_api import (
     StreamClient,
@@ -24,12 +21,10 @@ from ..clients.model_info import (
     ModelsClient,
     ModelInfo
 )
-from ..user_config_manager import UserConfigs
+from ..user_data_managers.user_config_manager import UserConfigs
 from ..global_config_manager import GlobalConfigs
 from typing import (
-    AsyncGenerator,
-    ClassVar,
-    Type
+    AsyncGenerator
 )
 from loguru import logger
 from fastapi import Request as FastAPI_Request

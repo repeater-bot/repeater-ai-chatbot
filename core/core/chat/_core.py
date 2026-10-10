@@ -26,12 +26,12 @@ from ...model_requester import (
     ModelRequester,
     MultiResponse
 )
-from ...context import (
+from ...user_data_managers.context import (
     ContextLoader,
     ContentRole,
     ContentUnit,
 )
-from ...user_config_manager import (
+from ...user_data_managers.user_config_manager import (
     UserConfigs
 )
 from ...pools.lock_pool import AsyncLockPool

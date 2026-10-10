@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from fastapi import Request
-from ....user_config_manager import UserConfigs
+from ....user_data_managers.user_config_manager import UserConfigs
 from ....global_config_manager import GlobalConfigs
 
 @dataclass

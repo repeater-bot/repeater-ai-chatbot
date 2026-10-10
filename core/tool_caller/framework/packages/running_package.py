@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from types import FrameType
 from dataclasses import dataclass
 
-from ....context import ContentUnit
+from ....user_data_managers.context import ContentUnit
 from .tool_package import ToolPackage
 
 @dataclass(eq = False)

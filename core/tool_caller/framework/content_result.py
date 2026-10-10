@@ -1,4 +1,4 @@
-from ...context import ContentBlock
+from ...user_data_managers.context import ContentBlock
 from pydantic import BaseModel
 
 class ContentResult(BaseModel):

@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import AsyncGenerator, Self, TextIO
 from ._objects import Request, Delta, ToolCall, Response, Runtime
 from ...request_log import RequestLog
-from ...context import ContentUnit
+from ...user_data_managers.context import ContentUnit
 from ...request_log import TimeStamp
 from ...global_config_manager import ConfigManager
 from ...logger_init import config_to_log_level, LogLevel

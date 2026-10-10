@@ -4,11 +4,11 @@ import zipfile
 import asyncio
 
 from typing import BinaryIO
-from ......user_config_manager import (
+from ......user_data_managers.user_config_manager import (
     ConfigManager,
     UserConfigs
 )
-from ......context import (
+from ......user_data_managers.context import (
     ContextLoader,
     Context
 )

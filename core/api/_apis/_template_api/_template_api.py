@@ -4,7 +4,7 @@ from ._router import template_router
 from fastapi.responses import PlainTextResponse
 from ....repeater_main import RepeaterMain
 from ....global_config_manager import ConfigManager as Global_Config_Manager
-from ....user_config_manager import ConfigManager
+from ....user_data_managers.user_config_manager import ConfigManager
 from ._requests import ExpandVariableRequest
 from jinja2 import TemplateError
 

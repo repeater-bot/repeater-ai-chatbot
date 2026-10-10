@@ -15,7 +15,7 @@ from fastapi import (
     Request,
 )
 
-from core.context.objects._content_unit import ContentUnit
+from core.user_data_managers.context.objects._content_unit import ContentUnit
 from .....special_exception import (
     HTTPException
 )

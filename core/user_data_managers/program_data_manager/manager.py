@@ -1,5 +1,5 @@
 from pydantic import ValidationError
-from ..data_manager import ProgramDataManager as DataManager
+from ...data_manager import ProgramDataManager as DataManager
 from .object import ProgramData
 from loguru import logger
 

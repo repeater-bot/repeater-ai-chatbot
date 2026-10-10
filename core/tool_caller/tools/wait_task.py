@@ -1,6 +1,6 @@
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ..framework import ToolsCaller, ToolPackage, RuntimePackage, ContentResult
 
@@ -11,7 +11,7 @@ class WaitTask(ToolPackage):
     """
 
     class Params(BaseModel):
-        task_id: uuid.UUID
+        task_id: uuid.UUID = Field(..., description="The ID of the task to wait for.")
 
     name = "wait_task"
     description = "Waits for a task that was started by bypass and returns its result."

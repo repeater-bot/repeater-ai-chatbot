@@ -1,6 +1,6 @@
 import uuid
 from pydantic import BaseModel, Field
-from .....context import ContentRole, ContentUnit
+from .....user_data_managers.context import ContentRole, ContentUnit
 from .....assist_struct import RequestUserInfo, CrossUserDataRouting, AdditionalData
 from typing import Any
 

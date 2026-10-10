@@ -3,7 +3,7 @@ import base64
 import asyncio
 import puremagic
 
-from ...context import ImageBlock, ImageUrlBlock
+from ...user_data_managers.context import ImageBlock, ImageUrlBlock
 from ..framework import ToolsCaller, ToolPackage, RuntimePackage, ContentResult
 from pydantic import BaseModel, Field
 from ...auxiliary.http import is_public_url

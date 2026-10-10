@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from ...auxiliary.text import text_content_cutter
+from ....auxiliary.text import text_content_cutter
 from .._exceptions import *
 from ._content_role import ContentRole
 from ._content_block import (
@@ -13,7 +13,7 @@ from ._content_block import (
     FileBlock
 )
 from ._function_calling_response import CallingRequest
-from ...text_buffer import TextBuffer, IndentedText
+from ....text_buffer import TextBuffer, IndentedText
 from typing import Any, Type
 
 class ContentUnit(BaseModel):

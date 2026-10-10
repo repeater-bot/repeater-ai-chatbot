@@ -1,7 +1,7 @@
 from openai.types.chat import ChatCompletion
 from openai.types.completion import Completion
 from typing import TextIO
-from ....context import (
+from ....user_data_managers.context import (
     ContentUnit,
 )
 from .._objects import (

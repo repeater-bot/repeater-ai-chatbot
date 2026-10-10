@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from ...context import ToolTypes
+from ...user_data_managers.context import ToolTypes
 from typing import Any
 
 class FunctionStruct(BaseModel):

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from abc import ABC, abstractmethod
 from .runtime_package import RuntimePackage
 from typing import Any
-from ....context import (
+from ....user_data_managers.context import (
     ContentUnit,
     ContentRole,
     ContentBlock,

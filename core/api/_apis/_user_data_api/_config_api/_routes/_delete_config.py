@@ -5,7 +5,7 @@ from fastapi.responses import (
     ORJSONResponse,
     PlainTextResponse
 )
-from ......user_config_manager import (
+from ......user_data_managers.user_config_manager import (
     UserConfigs
 )
 from ......special_exception import (

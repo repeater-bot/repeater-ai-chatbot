@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from ......user_config_manager import UserConfigs
+from ......user_data_managers.user_config_manager import UserConfigs
 
 class EnvironmentModel(BaseModel):
     context: list

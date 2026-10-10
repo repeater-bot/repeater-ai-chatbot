@@ -5,7 +5,7 @@ from pydantic import (
     field_serializer,
     Field,
 )
-from ..global_config_manager import ReasoningEffort, UserIdStrategies
+from ...global_config_manager import ReasoningEffort, UserIdStrategies
 from zoneinfo import ZoneInfo, available_timezones
 from typing import Any
 

@@ -1,6 +1,6 @@
 from ...clients.model_info import ModelsClient, ModelInfo
 from ...global_config_manager import GlobalConfigs
-from ...user_config_manager import UserConfigs
+from ...user_data_managers.user_config_manager import UserConfigs
 
 async def get_model(
         model_id: str | list[str] | None,

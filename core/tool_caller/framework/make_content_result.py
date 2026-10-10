@@ -1,4 +1,4 @@
-from ...context import ContentUnit, ContentRole, ContentBlock, TextBlock
+from ...user_data_managers.context import ContentUnit, ContentRole, ContentBlock, TextBlock
     
 def create_tool_content_unit(
         tool_call_id: str,

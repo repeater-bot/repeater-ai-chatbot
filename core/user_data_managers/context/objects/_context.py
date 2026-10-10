@@ -8,7 +8,7 @@ from .._exceptions import *
 from ._content_role import ContentRole
 from ._content_unit import ContentUnit
 from ._content_block import ContentBlock
-from ...auxiliary.type_checker import is_iterable
+from ....auxiliary.type_checker import is_iterable
 
 class Context(BaseModel):
     """

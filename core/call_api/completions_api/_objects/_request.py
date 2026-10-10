@@ -1,14 +1,14 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Callable, Any
 from ._stream_options import StreamOptions
-from ....context import (
+from ....user_data_managers.context import (
     ContentRole
 )
 from ....global_config_manager import (
     ReasoningEffort,
     ServiceTier
 )
-from ....context import Context
+from ....user_data_managers.context import Context
 from ._interface_type import InterfaceType
 from ....auxiliary.http import (
     ClientLimits,

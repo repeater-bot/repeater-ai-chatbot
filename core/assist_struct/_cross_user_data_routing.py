@@ -3,7 +3,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field, ConfigDict
 from typing import TypeVar, Generic, Self
-from ..user_config_manager import (
+from ..user_data_managers.user_config_manager import (
     ConfigManager as UserConfigManager
 )
 from ..global_config_manager import (

@@ -6,7 +6,7 @@ import hashlib
 import numpy as np
 
 from ..global_config_manager import GlobalConfigs
-from ..user_config_manager import UserConfigs
+from ..user_data_managers.user_config_manager import UserConfigs
 from ..assist_struct import RequestUserInfo
 from .._info import __version__
 from ..clients.model_info import ModelInfo

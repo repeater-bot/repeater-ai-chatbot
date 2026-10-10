@@ -18,12 +18,12 @@ from loguru import logger
 from ...call_api.completions_api import (
     Request,
 )
-from ...context import (
+from ...user_data_managers.context import (
     ContentRole,
     Context,
     ContentUnit,
 )
-from ...user_config_manager import (
+from ...user_data_managers.user_config_manager import (
     UserConfigs
 )
 from ...global_config_manager import GlobalConfigs
