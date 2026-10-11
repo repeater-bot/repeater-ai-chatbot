@@ -16,7 +16,8 @@ class ToolCall(BaseModel):
     index: int | None = None
 
     def to_calling_request(self) -> CallingRequest:
-        if self.id is None or self.type is None or self.name is None or self.arguments is None or self.index is None:
+        # index 只用于流式累积时归并，不属于 CallingRequest 契约，故不检查
+        if self.id is None or self.type is None or self.name is None or self.arguments is None:
             raise ValueError("ToolCall is missing required fields")
         
         return CallingRequest(
