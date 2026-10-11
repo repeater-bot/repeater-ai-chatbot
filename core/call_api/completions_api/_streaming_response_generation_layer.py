@@ -55,12 +55,7 @@ class StreamingResponseGenerationLayer:
         self.response.request_log.stream = self.request.stream
 
         # set tool calls
-        # 归并键 = 协议里的逻辑序号（tool_call.index），不是 chunk 内数组下标
         self.tool_calls: dict[int, ToolCall] = {}
-        # 调用ID -> 逻辑序号，用于识别「同一调用换了 index」与上游未发送 index 的情况
-        self._tool_call_occurrence: dict[str, int] = {}
-        # 上游未发送 index 时自增分配的逻辑序号
-        self._tool_call_fallback_index: int = 0
 
         # 如果context为空，则抛出异常
         if not self.request.context:
@@ -111,8 +106,8 @@ class StreamingResponseGenerationLayer:
         self.response.request_log.stream_processing_end_time = stream_processing_end_time
         self.response.request_log.total_context_length = self.response.historical_context.total_length
 
-        # 工具调用之间没有顺序依赖，靠 id 定位，所以这里的键只用来自查
-        # 但 Key 必须是上面累积时用的逻辑序号（tool_call.index），否则取不到 arguments
+        # 由于工具调用不分顺序，而是通过 ID 定位
+        # 所以这里这里可以忽略索引
         if self.tool_calls:
             for index, buffer in self._content_buffer.tool_calls_arguments_buffer.items():
                 self.tool_calls[index].arguments = str(buffer)
@@ -210,37 +205,8 @@ class StreamingResponseGenerationLayer:
             self._content_buffer.content_buffer.push_single_no_conversion(delta_data.content)
         
         # 记录模型工具调用内容
-        # 归并键必须是协议里的逻辑序号（tool_call.index），不能用 enumerate 的数组下标：
-        # 数组下标只表示「它在本 chunk 的第几个」，而一条工具调用会被拆到多个 chunk
-        # （首个 chunk 只带 id/name，后续 chunk 只带 arguments 分片），
-        # 这些 chunk 里它都排在第 0 位 —— 用数组下标就会把 n 条调用全并成 1 条。
         if delta_data.tool_calls:
-            for position, tool_call in enumerate(delta_data.tool_calls):
-                logical_index = tool_call.index
-
-                # 同一个 id 见过就用首次分配的序号
-                # （上游不发 index 时 SDK 会兜底成 0，靠这一步拆开）
-                if tool_call.id and tool_call.id in self._tool_call_occurrence:
-                    logical_index = self._tool_call_occurrence[tool_call.id]
-                elif logical_index is None:
-                    # 上游没给 index：按 id 分配新序号，而不是退回数组下标
-                    logical_index = self._tool_call_fallback_index
-                    self._tool_call_fallback_index += 1
-
-                if logical_index is None:
-                    # 无 id 无 index 的分片（只有 arguments）：沿用该 position 上已建立的调用
-                    logical_index = position
-
-                # 该序号被另一条调用占用时另开一个序号（防御上游 index 全部给同一个值）
-                if logical_index in self.tool_calls and self.tool_calls[logical_index].id:
-                    if not (tool_call.id and self.tool_calls[logical_index].id == tool_call.id):
-                        logical_index = self._tool_call_fallback_index
-                        self._tool_call_fallback_index += 1
-
-                if tool_call.id:
-                    self._tool_call_occurrence[tool_call.id] = logical_index
-                index = logical_index
-
+            for index, tool_call in enumerate(delta_data.tool_calls):
                 if self.request.print_chunk:
                     if index not in self._content_buffer.tool_calls_arguments_buffer:
                         self._print_file.write("\n\n")
@@ -263,7 +229,6 @@ class StreamingResponseGenerationLayer:
                     self.tool_calls[index].type = tool_call.type
                 if tool_call.name:
                     self.tool_calls[index].name = tool_call.name
-                self.tool_calls[index].index = index
                 if index not in self._content_buffer.tool_calls_arguments_buffer:
                     self._content_buffer.tool_calls_arguments_buffer[index] = TextBuffer()
                 if tool_call.arguments:
