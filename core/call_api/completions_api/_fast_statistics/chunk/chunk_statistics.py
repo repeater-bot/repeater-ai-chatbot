@@ -104,7 +104,7 @@ class ChunkStatistics:
             yield f"{self.name} Chunk Time Range: {format_timedelta(self.chunk_spawn_time.chunk_spawn_time_range)}"
             yield f"{self.name} Chunk Time Median: {format_timedelta(self.chunk_spawn_time.chunk_median_time)}"
             yield f"{self.name} Chunk Time STD: {format_timedelta(self.chunk_spawn_time.chunk_spawn_time_std)}"
-            yield f"{self.name} Chunk Time MAD: {format_timedelta(self.chunk_spawn_time.chunk_spawn_time_mad)})"
+            yield f"{self.name} Chunk Time MAD: {format_timedelta(self.chunk_spawn_time.chunk_spawn_time_mad)}"
             yield f"{self.name} Chunk Time Relative MAD: {self.chunk_spawn_time.chunk_spawn_time_relative_mad:.2%}"
             yield f"{self.name} Chunk Time IQR: {format_timedelta(self.chunk_spawn_time.chunk_spawn_time_iqr)}"
             yield f"{self.name} Chunk Time IDR: {format_timedelta(self.chunk_spawn_time.chunk_spawn_time_idr)}"
