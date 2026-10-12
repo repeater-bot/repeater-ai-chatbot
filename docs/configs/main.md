@@ -551,6 +551,14 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
         // 设置为 null 则不限制长度
         "result_max_length_for_logs": 100,
 
+        // Tool Calls 超时时间
+        // 针对单个 Tool 的调用超时时间
+        "timeout": null,
+
+        // Tool Result 保留时间
+        // 在此时时间内，可以通过 get_result 获取结果
+        "tool_result_timeout": 60,
+
         // Tools 自己的配置
         "tools_configs": {
 
