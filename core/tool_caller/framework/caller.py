@@ -241,6 +241,8 @@ class ToolsCaller:
         global_configs: GlobalConfigs,
         available_tool_calls: set[str],
         fastapi_request: Request,
+        timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
         loop_times: int | None = None,
         max_loop_times: int | None = None
     ) -> list[ContentUnit]:
@@ -295,7 +297,8 @@ class ToolsCaller:
                         tool = tool,
                         args = tool_request.function.arguments,
                         runtime = runtime,
-                        timeout = None
+                        timeout = timeout,
+                        result_timeout = result_timeout
                     )
                 )
                 tasks.append(task)
@@ -311,6 +314,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
         created: asyncio.Future[RunningPackage] | None = None,
     ) -> ContentUnit:
         try:
@@ -350,6 +354,7 @@ class ToolsCaller:
                     args = args,
                     runtime = runtime,
                     timeout = timeout,
+                    result_timeout = result_timeout,
                     created = created,
                 )
             finally:
@@ -373,6 +378,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
     ) -> ContentUnit:
         """
         From a tool, call an other tool horizontally, and return the result.
@@ -382,6 +388,7 @@ class ToolsCaller:
         :param runtime: The runtime to use.
         :param timeout: The timeout for the call.
         :param created: The future to set when the call is created.
+        :param result_timeout: The timeout for the result.
         """
         if isinstance(tool, str):
             tool_instance = cls.match_tool(tool)
@@ -401,6 +408,7 @@ class ToolsCaller:
             args = args,
             runtime = runtime,
             timeout = timeout,
+            result_timeout = result_timeout,
         )
 
         return result
@@ -412,6 +420,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
     ) -> RunningPackage:
         """
         Create a new horizontal call.
@@ -421,6 +430,7 @@ class ToolsCaller:
         :param runtime: The runtime to use.
         :param timeout: The timeout for the call.
         :param created: The future to set when the call is created.
+        :param result_timeout: The timeout for the result.
         """
         if isinstance(tool, str):
             tool_instance = cls.match_tool(tool)
@@ -443,6 +453,7 @@ class ToolsCaller:
                 args = args,
                 runtime = runtime,
                 timeout = timeout,
+                result_timeout = result_timeout,
                 created = created,
             )
         )
@@ -457,6 +468,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
         created: asyncio.Future[RunningPackage] | None = None,
     ) -> ContentUnit:
         """
@@ -495,7 +507,7 @@ class ToolsCaller:
             try:
                 result = await running
             finally:
-                await cls.unreg_running(task_id = runtime.task_id)
+                await cls.unreg_running(task_id = runtime.task_id, timeout = result_timeout)
             logger.info(
                 "Tool {tool} finished with result {result}",
                 tool = tool.name,
@@ -542,7 +554,7 @@ class ToolsCaller:
         return running
 
     @classmethod
-    async def unreg_running(cls, task_id: uuid.UUID) -> None:
+    async def unreg_running(cls, task_id: uuid.UUID, timeout: int | float | None = None) -> None:
         """Unregister a running tool."""
         async with cls.running_lock:
             if task_id in cls.runnings:
@@ -555,6 +567,25 @@ class ToolsCaller:
                 async with cls.result_lock:
                     cls.results[running.task_id] = running
                     cls.result_map.setdefault(running.runtime.user_id, set()).add(running.task_id)
+        
+        async def _remove_result(sleep: float, task_id: uuid.UUID) -> None:
+            await asyncio.sleep(sleep)
+            async with cls.result_lock:
+                if task_id in cls.results:
+                    cls.results.pop(task_id)
+                    user_results = cls.result_map.get(running.runtime.user_id)
+                    if user_results is not None:
+                        user_results.remove(task_id)
+                        if not user_results:
+                            cls.result_map.pop(running.runtime.user_id)
+        
+        if timeout is not None:
+            asyncio.create_task(
+                coro = _remove_result(
+                    sleep = timeout,
+                    task_id = task_id
+                )
+            )
 
     @classmethod
     async def enter_tool(
