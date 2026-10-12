@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import asyncio
-import time
 import uuid
+import time
+import orjson
+import asyncio
 
 from contextvars import ContextVar
 from typing import (
@@ -24,15 +25,13 @@ from .packages import (
     ToolPackage,
     RunningPackage,
     RuntimePackage,
-    ResultPackage,
+    IOStreamPackage,
 )
 from fastapi import Request
 from ...global_config_manager import GlobalConfigs
 from ...user_data_managers.user_config_manager import UserConfigs
 from .make_content_result import create_tool_content_unit
-
-ToolReturn = int | None
-ToolContent = str | list[ContentBlock]
+from loguru import logger
 
 class ToolsCaller:
     """
@@ -51,7 +50,7 @@ class ToolsCaller:
     running_map: dict[str, set[uuid.UUID]] = {}
     running_lock = asyncio.Lock()
 
-    results: dict[uuid.UUID, ResultPackage] = {}
+    results: dict[uuid.UUID, RunningPackage] = {}
     result_map: dict[str, set[uuid.UUID]] = {}
     result_lock = asyncio.Lock()
 
@@ -188,6 +187,50 @@ class ToolsCaller:
             if task_id in cls.runnings:
                 return cls.runnings[task_id]
             return None
+        
+    @classmethod
+    async def get_result(cls, task_id: uuid.UUID, user_id: str, remove: bool = True) -> RunningPackage | None:
+        """Get the result of the task."""
+        async with cls.result_lock:
+            user_results = cls.result_map.get(user_id, set())
+            if task_id in user_results:
+                if remove:
+                    result = cls.results.pop(task_id, None)
+                    if result is not None:
+                        user_results.remove(task_id)
+                    if not user_results:
+                        cls.result_map.pop(user_id, None)
+                else:
+                    result = cls.results.get(task_id, None)
+                return result
+        return None
+
+    @classmethod
+    async def get_results(cls, user_id: str, remove: bool = True) -> list[RunningPackage]:
+        """Get the results of the user."""
+        async with cls.result_lock:
+            runnings = []
+            user_results = cls.result_map.get(user_id, set())
+            for task_id in user_results:
+                if remove:
+                    result = cls.results.pop(task_id, None)
+                    if result is not None:
+                        runnings.append(result)
+                else:
+                    result = cls.results.get(task_id)
+                    if result is not None:
+                        runnings.append(result)
+            if remove:
+                cls.result_map.pop(user_id, None)
+            return runnings
+
+    @classmethod
+    async def reset_results(cls, user_id: str):
+        """Reset the results of the user."""
+        async with cls.result_lock:
+            user_results = cls.result_map.pop(user_id, set())
+            for result in user_results:
+                cls.results.pop(result)
 
     @classmethod
     async def call_tool(
@@ -198,6 +241,8 @@ class ToolsCaller:
         global_configs: GlobalConfigs,
         available_tool_calls: set[str],
         fastapi_request: Request,
+        timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
         loop_times: int | None = None,
         max_loop_times: int | None = None
     ) -> list[ContentUnit]:
@@ -228,6 +273,12 @@ class ToolsCaller:
                 tasks.append(asyncio.create_task(coro=_not_found()))
             else:
                 task_id = uuid.uuid4()
+                input_pkg = IOStreamPackage(
+                    queue = asyncio.Queue(),
+                )
+                output_pkg = IOStreamPackage(
+                    queue = asyncio.Queue(),
+                )
                 runtime = RuntimePackage(
                     user_id = user_id,
                     task_id = task_id,
@@ -236,6 +287,8 @@ class ToolsCaller:
                     user_configs = user_configs,
                     global_configs = global_configs,
                     fastapi_request = fastapi_request,
+                    input = input_pkg,
+                    output = output_pkg,
                     loop_times = loop_times,
                     max_loop_times = max_loop_times
                 )
@@ -244,7 +297,8 @@ class ToolsCaller:
                         tool = tool,
                         args = tool_request.function.arguments,
                         runtime = runtime,
-                        timeout = None
+                        timeout = timeout,
+                        result_timeout = result_timeout
                     )
                 )
                 tasks.append(task)
@@ -260,6 +314,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
         created: asyncio.Future[RunningPackage] | None = None,
     ) -> ContentUnit:
         try:
@@ -274,6 +329,12 @@ class ToolsCaller:
 
                 cls.reverse_call_index[task_id] = source_task_id
             
+            input_pkg = IOStreamPackage(
+                queue = asyncio.Queue(),
+            )
+            output_pkg = IOStreamPackage(
+                queue = asyncio.Queue(),
+            )
             runtime = RuntimePackage(
                 user_id = runtime.user_id,
                 task_id = task_id,
@@ -282,6 +343,8 @@ class ToolsCaller:
                 user_configs = runtime.user_configs,
                 global_configs = runtime.global_configs,
                 fastapi_request = runtime.fastapi_request,
+                input = input_pkg,
+                output = output_pkg,
                 loop_times = runtime.loop_times,
                 max_loop_times = runtime.max_loop_times
             )
@@ -291,6 +354,7 @@ class ToolsCaller:
                     args = args,
                     runtime = runtime,
                     timeout = timeout,
+                    result_timeout = result_timeout,
                     created = created,
                 )
             finally:
@@ -314,6 +378,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
     ) -> ContentUnit:
         """
         From a tool, call an other tool horizontally, and return the result.
@@ -323,6 +388,7 @@ class ToolsCaller:
         :param runtime: The runtime to use.
         :param timeout: The timeout for the call.
         :param created: The future to set when the call is created.
+        :param result_timeout: The timeout for the result.
         """
         if isinstance(tool, str):
             tool_instance = cls.match_tool(tool)
@@ -342,6 +408,7 @@ class ToolsCaller:
             args = args,
             runtime = runtime,
             timeout = timeout,
+            result_timeout = result_timeout,
         )
 
         return result
@@ -353,6 +420,7 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
     ) -> RunningPackage:
         """
         Create a new horizontal call.
@@ -362,6 +430,7 @@ class ToolsCaller:
         :param runtime: The runtime to use.
         :param timeout: The timeout for the call.
         :param created: The future to set when the call is created.
+        :param result_timeout: The timeout for the result.
         """
         if isinstance(tool, str):
             tool_instance = cls.match_tool(tool)
@@ -384,6 +453,7 @@ class ToolsCaller:
                 args = args,
                 runtime = runtime,
                 timeout = timeout,
+                result_timeout = result_timeout,
                 created = created,
             )
         )
@@ -398,12 +468,18 @@ class ToolsCaller:
         args: str,
         runtime: RuntimePackage,
         timeout: int | float | None = None,
+        result_timeout: int | float | None = None,
         created: asyncio.Future[RunningPackage] | None = None,
     ) -> ContentUnit:
         """
         Run a tool with the given arguments.
         """
         try:
+            logger.info(
+                "Calling {tool_name} with args: {args}",
+                tool_name = tool.name,
+                args = args,
+            )
             try:
                 parsed_args = tool.parse_params(args)
             except Exception as e:
@@ -428,12 +504,22 @@ class ToolsCaller:
             )
             if created is not None:
                 created.set_result(running)
+            try:
+                result = await running
+            finally:
+                await cls.unreg_running(task_id = runtime.task_id, timeout = result_timeout)
+            logger.info(
+                "Tool {tool} finished with result {result}",
+                tool = tool.name,
+                result = orjson.dumps(
+                    result.to_content(),
+                    option = orjson.OPT_INDENT_2
+                ).decode(encoding="utf-8"),
+            )
         except BaseException as e:
             if created is not None:
                 created.set_exception(e)
             raise
-
-        result = await running
         return result
 
     @classmethod
@@ -457,6 +543,7 @@ class ToolsCaller:
                 start_monotonic_time = time.perf_counter_ns(),
                 timeout = timeout,
                 package = tool,
+                runtime = runtime,
                 args = args,
                 task = task
             )
@@ -465,6 +552,40 @@ class ToolsCaller:
                 cls.running_map[runtime.user_id] = set()
             cls.running_map[runtime.user_id].add(task_id)        
         return running
+
+    @classmethod
+    async def unreg_running(cls, task_id: uuid.UUID, timeout: int | float | None = None) -> None:
+        """Unregister a running tool."""
+        async with cls.running_lock:
+            if task_id in cls.runnings:
+                running = cls.runnings.pop(task_id)
+                user_runnings = cls.running_map.get(running.runtime.user_id)
+                if user_runnings is not None:
+                    user_runnings.remove(task_id)
+                    if len(user_runnings) == 0:
+                        cls.running_map.pop(running.runtime.user_id)
+                async with cls.result_lock:
+                    cls.results[running.task_id] = running
+                    cls.result_map.setdefault(running.runtime.user_id, set()).add(running.task_id)
+        
+        async def _remove_result(sleep: float, task_id: uuid.UUID) -> None:
+            await asyncio.sleep(sleep)
+            async with cls.result_lock:
+                if task_id in cls.results:
+                    cls.results.pop(task_id)
+                    user_results = cls.result_map.get(running.runtime.user_id)
+                    if user_results is not None:
+                        user_results.remove(task_id)
+                        if not user_results:
+                            cls.result_map.pop(running.runtime.user_id)
+        
+        if timeout is not None:
+            asyncio.create_task(
+                coro = _remove_result(
+                    sleep = timeout,
+                    task_id = task_id
+                )
+            )
 
     @classmethod
     async def enter_tool(
@@ -487,16 +608,6 @@ class ToolsCaller:
             loop_times = runtime.loop_times,
             max_loop_times = runtime.max_loop_times
         )
-
-        async with cls.result_lock:
-            loop = asyncio.get_running_loop()
-            future = loop.create_future()
-            future.set_result(parsed_result)
-            cls.results[runtime.task_id] = ResultPackage(
-                future = future,
-            )
-            if runtime.user_id in cls.result_map:
-                cls.result_map.setdefault(runtime.user_id, set()).add(runtime.task_id)
         return parsed_result
 
     @classmethod

@@ -5,19 +5,19 @@ from typing import TypeVar, Generic
 T = TypeVar("T")
 
 @dataclass
-class InputPackage(Generic[T]):
+class IOStreamPackage(Generic[T]):
     """
     Class that represents the input package for the tool.
     """
     queue: asyncio.Queue[T]
 
-    async def wait_input(self) -> T:
+    async def wait(self) -> T:
         """
         Get the next item from the queue.
         """
         return await self.queue.get()
 
-    async def input(self, item: T) -> None:
+    async def put(self, item: T) -> None:
         """
         Put an item into the queue.
         """

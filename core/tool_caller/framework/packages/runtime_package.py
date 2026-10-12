@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from fastapi import Request
 from ....user_data_managers.user_config_manager import UserConfigs
 from ....global_config_manager import GlobalConfigs
+from .input_package import IOStreamPackage
 
 @dataclass
 class RuntimePackage:
@@ -16,5 +17,7 @@ class RuntimePackage:
     user_configs: UserConfigs
     global_configs: GlobalConfigs
     fastapi_request: Request
+    input: IOStreamPackage
+    output: IOStreamPackage
     loop_times: int | None = None
     max_loop_times: int | None = None

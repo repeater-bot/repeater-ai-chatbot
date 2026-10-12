@@ -26,7 +26,7 @@ from .._responses import (
 from .._router import render_router
 
 delayed_tasks_pool = DelayedTasksPool()
-ExitHandler.add_coroutine(delayed_tasks_pool.cancel_all())
+ExitHandler.add_coroutine(coro=delayed_tasks_pool.cancel_all())
 
 @render_router.post("/{user_id}")
 async def render(

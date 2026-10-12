@@ -25,7 +25,7 @@ class Context(BaseModel):
         """
         判断上下文是否为空
         """
-        return bool(self.prompt or self.context_list)
+        return bool(self.prompt or any(self.context_list))
 
     @overload
     def __getitem__(self, index: int) -> ContentUnit:

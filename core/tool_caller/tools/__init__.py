@@ -23,6 +23,9 @@ from .url_to_image import URLToImage
 from .list_task import ListTask
 from .bypass import Bypass
 from .wait_task import WaitTask
+from .injection_input import InjectionInput
+from .consumption_output import ConsumptionOutput
+from .get_result import GetResult
 
 __all__ = [
     "Demo",

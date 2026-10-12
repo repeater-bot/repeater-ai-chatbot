@@ -26,6 +26,7 @@ class Bypass(ToolPackage):
         tool_name: str = Field(default=..., description="The name of the tool to run")
         args: str = Field(default=..., description="The arguments to pass to the tool. If not specified, lists tasks for all tools.")
         timeout: int | float | None = Field(default=None, description="The timeout in seconds for the tool to complete. If not specified, the tool will run indefinitely.")
+        result_timeout: int | float | None = Field(default=None, description="The period of time after the end of the task during which you can use get to get the results, or permanently if you do not write.")
 
     name = "bypass"
     description = "A task runs in the background, does not wait for it to finish, and gets its task id."
