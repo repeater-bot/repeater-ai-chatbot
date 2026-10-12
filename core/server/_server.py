@@ -20,7 +20,7 @@ from loguru import logger
 # ==== 自定义库 ==== #
 from ..admin_api_key_manager import AdminKeyManager
 from ..core.chat import Core
-from ._lifespan import Lifespan
+from ._lifespan import Lifespan, FastAPILifespan
 from .._info import __version__
 from ..runtime_container import RepeaterRuntime
 
@@ -37,7 +37,8 @@ class Server:
             title = "Repeater Chat Backend",
             on_startup = startup,
             on_shutdown = shutdown,
-            version = __version__
+            version = __version__,
+            lifespan = FastAPILifespan
         )
         self.runtime: RepeaterRuntime
         self.server: uvicorn.Server
