@@ -1,15 +1,12 @@
 from yarl import URL
 from ...runtime_container import RuntimeContainer
 from ...global_config_manager import ConfigManager
-from typing import TypeVar
-
-T = TypeVar("T")
 
 def directive_path(
-    base_path: T,
+    base_path: URL,
     base_type: str,
     directive_name: str
-) -> T:
+) -> URL:
     return base_path / base_type / directive_name
 
 async def load_prompt_directive(

@@ -1,3 +1,4 @@
+from . import start_time as _start_time # Initialization time.
 from .core.chat import Core
 from ._info import (
     __version__,
@@ -14,6 +15,9 @@ from .repeater_main import (
     RepeaterMain
 )
 from .api import root_router
+from .lifespan import run_post_init
+
+run_post_init()
 
 __all__ = [
     "Core",

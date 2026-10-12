@@ -52,6 +52,8 @@ async def translation_openai_chunk(
                             tool_call.id = call.id
                         if hasattr(call, "type"):
                             tool_call.type = call.type
+                        if hasattr(call, "index") and call.index is not None:
+                            tool_call.index = call.index
                         if hasattr(call, "function") and call.function is not None:
                             if hasattr(call.function, "name"):
                                 tool_call.name = call.function.name

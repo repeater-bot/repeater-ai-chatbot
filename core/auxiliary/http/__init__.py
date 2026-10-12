@@ -8,14 +8,18 @@ from ._ssl import (
 )
 from ._http_code import HTTPCode
 from ._transport import RepeaterTransport
+from ._public_ip_only_transport import PublicIPOnlyTransport
+from ._is_public_url import is_public_url
 
 __all__ = [
     "ClientLimits",
     "ClientTimeout",
+    "ssl_context",
     "get_ssl_context",
     "set_ssl_context",
     "update_ssl_context",
     "HTTPCode",
     "RepeaterTransport",
-    "transport"
+    "PublicIPOnlyTransport",
+    "is_public_url",
 ]

@@ -13,10 +13,10 @@ from ..data_manager import (
     ContextManager,
     PromptManager
 )
-from ..user_config_manager import (
+from ..user_data_managers.user_config_manager import (
     ConfigManager as UserConfigManager
 )
-from ..program_data_manager import (
+from ..user_data_managers.program_data_manager import (
     ProgramDataManager
 )
 from ..pools.resource_pool import ResourcePool
@@ -30,6 +30,7 @@ from ..clients.nexus_client import NexusClient
 from ..clients.html_render_client import HTMLRenderClient
 from ..licenses_loader import LicenseLoader
 from ..clients.static_resources_client import StaticResourcesClient
+from ..clients.watermark_cilent import WatermarkClient
 from ..request_log import (
     RequestLogManager
 )
@@ -39,17 +40,17 @@ from ..pools.openai_pool import OpenAIPool
 from ..pools.delayed_tasks_pool import DelayedTasksPool
 from ..auxiliary.http import (
     ssl_context,
-    RepeaterTransport
+    RepeaterTransport,
+    PublicIPOnlyTransport
 )
 
 class RepeaterRuntime:
-    _env = Env()
-
     # 初始化列表
     # 用于保证初始化顺序
     init_list = []
 
-    def __init__(self):
+    def __init__(self, env: Env):
+        self.env: Env = env
         self._configs = ConfigManager.get_configs()
         for init_func in self.init_list:
             init_func(self)
@@ -57,8 +58,12 @@ class RepeaterRuntime:
     @init_list.append
     @print_init_runtime("Repeater Transport Layer")
     def init_transport(self):
+        self.ssl_context = ssl_context.get_ssl_context()
         self.transport = RepeaterTransport(
-            verify = ssl_context.get_ssl_context()
+            verify = self.ssl_context
+        )
+        self.public_only_transport = PublicIPOnlyTransport(
+            verify = self.ssl_context
         )
 
     @init_list.append
@@ -76,7 +81,7 @@ class RepeaterRuntime:
         # 初始化 Model 管理器
         self.model_info_client = ModelsClient(
             base_url = self._configs.model_api.base_url,
-            api_key = self._env.str(
+            api_key = self.env.str(
                 self._configs.model_api.api_key_env_name
             ),
             timeout = self._configs.model_api.timeout,
@@ -173,6 +178,19 @@ class RepeaterRuntime:
         self.nexus_client: NexusClient = NexusClient(
             base_url = nexus_config.base_url,
             request_timeout = nexus_config.api_timeout,
+            headers = {
+                "User-Agent": self._configs.system_identification.system_ua
+            },
+            transport = self.transport,
+        )
+    
+    @init_list.append
+    @print_init_runtime("Watermark Client")
+    def init_watermark_client(self):
+        watermark_config = self._configs.watermark
+        self.watermark_client: WatermarkClient = WatermarkClient(
+            base_url = watermark_config.base_url,
+            timeout = watermark_config.timeout,
             headers = {
                 "User-Agent": self._configs.system_identification.system_ua
             },

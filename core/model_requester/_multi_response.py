@@ -1,7 +1,7 @@
 from typing import Generator
 from ..request_log import RequestLog
 from ..call_api.completions_api import Request, Response
-from ..context import Context, ContentUnit
+from ..user_data_managers.context import Context, ContentUnit
 from pydantic import BaseModel, Field
 
 class MultiResponse(BaseModel):

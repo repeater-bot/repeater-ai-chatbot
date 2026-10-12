@@ -50,6 +50,15 @@ from .image import (
     ImageGenerateClient
 )
 
+from .embeddings import (
+    Embeddings,
+    EmbeddingsRequest,
+    EmbeddingsRuntime,
+    EncodingFormat,
+    EmbeddingsResponse,
+    EmbeddingsData
+)
+
 __all__ = [
     
     "ClientBase",
@@ -98,5 +107,12 @@ __all__ = [
     "ImageUsageTokensDetails",
     "FILE_TYPES",
 
-    "ImageGenerateClient"
+    "ImageGenerateClient",
+
+    "Embeddings",
+    "EmbeddingsRequest",
+    "EmbeddingsRuntime",
+    "EncodingFormat",
+    "EmbeddingsResponse",
+    "EmbeddingsData"
 ]

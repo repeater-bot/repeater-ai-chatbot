@@ -1,4 +1,3 @@
-import ssl
 import httpx
 
 from urllib.parse import quote
@@ -14,7 +13,6 @@ class StaticResourcesClient:
             headers: dict[str, str] | None = None,
             cookies: dict[str, str] | None = None,
             auth: tuple[str, str] | None = None,
-            verify: ssl.SSLContext | str | bool = True,
             transport: httpx.AsyncHTTPTransport | None = None,
         ):
         if isinstance(base_url, str):
@@ -32,7 +30,6 @@ class StaticResourcesClient:
             headers = headers,
             cookies = cookies,
             auth = auth,
-            verify = verify,
             transport = transport
         )
     

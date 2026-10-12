@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import AsyncGenerator, Self, TextIO
 from ._objects import Request, Delta, ToolCall, Response, Runtime
 from ...request_log import RequestLog
-from ...context import ContentUnit
+from ...user_data_managers.context import ContentUnit
 from ...request_log import TimeStamp
 from ...global_config_manager import ConfigManager
 from ...logger_init import config_to_log_level, LogLevel
@@ -56,6 +56,9 @@ class StreamingResponseGenerationLayer:
 
         # set tool calls
         self.tool_calls: dict[int, ToolCall] = {}
+        # chunk 内数组位置 -> 该位置当前所属调用的逻辑序号
+        # 只在「上游没发 index、且分片不带 id」时用来兜底归属
+        self._position_owner: dict[int, int] = {}
 
         # 如果context为空，则抛出异常
         if not self.request.context:
@@ -106,11 +109,13 @@ class StreamingResponseGenerationLayer:
         self.response.request_log.stream_processing_end_time = stream_processing_end_time
         self.response.request_log.total_context_length = self.response.historical_context.total_length
 
-        # 由于工具调用不分顺序，而是通过 ID 定位
-        # 所以这里这里可以忽略索引
+        # 工具调用之间没有顺序依赖、靠 id 定位，但这里的键必须与上面累积时一致
+        # （协议 index / 兜底序号），否则参数取不到、会产出 arguments 为 None 的帧
         if self.tool_calls:
-            for index, buffer in self._content_buffer.tool_calls_arguments_buffer.items():
-                self.tool_calls[index].arguments = str(buffer)
+            for index in list(self.tool_calls.keys()):
+                buffer = self._content_buffer.tool_calls_arguments_buffer.get(index)
+                self.tool_calls[index].arguments = str(buffer) if buffer is not None else ""
+                self.tool_calls[index].index = index
         self.response.tool_calls = list(self.tool_calls.values())
 
         # 添加上下文
@@ -205,8 +210,18 @@ class StreamingResponseGenerationLayer:
             self._content_buffer.content_buffer.push_single_no_conversion(delta_data.content)
         
         # 记录模型工具调用内容
+        # 归并键必须是协议里的 index（每个 tool_call delta 都带，标识「第几条调用」），
+        # 不能用 enumerate 的数组下标：数组下标只表示「它在本 chunk 的第几个」，
+        # 而一条调用会被拆到几十个 chunk 里，每个 chunk 都只含 1 个条目、位置恒为 0 ——
+        # 用数组下标会把 n 条并行调用全并成 1 条（参数按到达顺序拼接、id/name 被最后一条覆盖）。
         if delta_data.tool_calls:
-            for index, tool_call in enumerate(delta_data.tool_calls):
+            for position, tool_call in enumerate(delta_data.tool_calls):
+                index = tool_call.index
+                if index is None:
+                    # 上游没发 index 时才退回「该位置当前所属的调用」
+                    index = self._position_owner.get(position, len(self.tool_calls))
+                self._position_owner[position] = index
+
                 if self.request.print_chunk:
                     if index not in self._content_buffer.tool_calls_arguments_buffer:
                         self._print_file.write("\n\n")
@@ -229,9 +244,11 @@ class StreamingResponseGenerationLayer:
                     self.tool_calls[index].type = tool_call.type
                 if tool_call.name:
                     self.tool_calls[index].name = tool_call.name
+                self.tool_calls[index].index = index
                 if index not in self._content_buffer.tool_calls_arguments_buffer:
                     self._content_buffer.tool_calls_arguments_buffer[index] = TextBuffer()
-                self._content_buffer.tool_calls_arguments_buffer[index].push_single_no_conversion(tool_call.arguments)
+                if tool_call.arguments:
+                    self._content_buffer.tool_calls_arguments_buffer[index].push_single_no_conversion(tool_call.arguments)
         
         if delta_data.system_fingerprint:
             self.response.system_fingerprint = delta_data.system_fingerprint

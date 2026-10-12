@@ -11,7 +11,8 @@ from ._index_web import *
 from ._static_api import *
 from ._status_api import *
 from ._ping_provider import *
-from ._alived import alived
+from ._watermark_api import *
+from ._alived import *
 from ._version import (
     version,
     module_version

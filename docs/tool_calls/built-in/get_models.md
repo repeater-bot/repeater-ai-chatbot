@@ -7,7 +7,7 @@
 接受一个参数
 ``` json
 {
-  "model_type": "chat" // 模型类型，目前只有 chat
+  "model_id": null // 模型查询表达式
 }
 ```
 

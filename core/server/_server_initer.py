@@ -2,6 +2,7 @@
 from __future__ import annotations
 import ssl
 import asyncio
+from environs import Env
 from os import PathLike
 from typing import Callable, Awaitable, Literal, Any, IO
 from configparser import RawConfigParser
@@ -26,7 +27,9 @@ class ServerIniter:
     def __init__(
         self,
         server: Server,
+        env: Env
     ) -> None:
+        self.env = env
         self.server = server
 
     def inited(self):
@@ -55,7 +58,7 @@ class ServerIniter:
         Init runtime instance.
         """
         from ..runtime_container import RuntimeContainer
-        self.server.runtime = RuntimeContainer.init_runtime()
+        self.server.runtime = RuntimeContainer.init_runtime(self.env)
     
     @init_list.append
     @print_init_runtime("Core")
@@ -86,7 +89,7 @@ class ServerIniter:
         Init admin key manager.
         """
         from ..admin_api_key_manager import AdminKeyManager
-        self.server.admin_key_manager = AdminKeyManager()
+        self.server.admin_key_manager = AdminKeyManager(self.env)
     
     @print_init_runtime("Server")
     def init_server(

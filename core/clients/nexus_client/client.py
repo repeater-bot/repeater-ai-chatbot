@@ -1,4 +1,3 @@
-import ssl
 import httpx
 import orjson
 
@@ -24,7 +23,6 @@ class NexusClient:
             headers: dict[str, str] | None = None,
             cookies: dict[str, str] | None = None,
             auth: tuple[str, str] | None = None,
-            verify: ssl.SSLContext | str | bool = True,
             transport: httpx.AsyncHTTPTransport | None = None
         ) -> None:
         self._client = httpx.AsyncClient(
@@ -34,7 +32,6 @@ class NexusClient:
             headers = headers,
             cookies = cookies,
             auth = auth,
-            verify = verify,
             transport = transport
         )
     

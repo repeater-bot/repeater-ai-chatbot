@@ -14,7 +14,7 @@ from ...call_api.completions_api import (
 from ...model_requester import (
     MultiResponse
 )
-from ...context import (
+from ...user_data_managers.context import (
     ContextLoader,
     Context,
     ContentUnit,

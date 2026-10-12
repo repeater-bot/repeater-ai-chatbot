@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import ssl
+from environs import Env
 from typing import ClassVar
 from .runtime import RepeaterRuntime
 
@@ -14,15 +14,12 @@ class RuntimeContainer:
         return cls._instance
     
     @classmethod
-    def init_runtime(cls) -> RepeaterRuntime:
-        cls._objects = RepeaterRuntime()
+    def init_runtime(cls, env: Env) -> RepeaterRuntime:
+        cls._objects = RepeaterRuntime(env)
         return cls._objects
     
     @classmethod
-    def get_runtime(cls, auto_init: bool = True) -> RepeaterRuntime:
+    def get_runtime(cls) -> RepeaterRuntime:
         if cls._objects is None:
-            if auto_init:
-                return cls.init_runtime()
-            else:
-                raise RuntimeError("GlobalObjects not initialized")
+            raise RuntimeError("GlobalObjects not initialized")
         return cls._objects

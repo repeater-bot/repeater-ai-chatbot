@@ -3,7 +3,7 @@ from .._router import context_router
 from fastapi.responses import (
     PlainTextResponse,
 )
-from ......context import ContentUnit, Context
+from ......user_data_managers.context import ContentUnit, Context
 from loguru import logger
 
 @context_router.put("/set/{user_id}")

@@ -1,4 +1,3 @@
-import ssl
 import httpx
 from ._model import RenderResponse
 from ...http_response import Response
@@ -12,7 +11,6 @@ class HTMLRenderClient:
             headers: dict[str, str] | None = None,
             cookies: dict[str, str] | None = None,
             auth: tuple[str, str] | None = None,
-            verify: ssl.SSLContext | str | bool = True,
             transport: httpx.AsyncHTTPTransport | None = None
         ):
         self._base_url = base_url
@@ -24,7 +22,6 @@ class HTMLRenderClient:
             headers = headers,
             cookies = cookies,
             auth = auth,
-            verify = verify,
             transport = transport
         )
     

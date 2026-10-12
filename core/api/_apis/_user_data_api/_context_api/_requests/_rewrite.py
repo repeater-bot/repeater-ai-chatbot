@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from ......context import ContentUnit
+from ......user_data_managers.context import ContentUnit
 
 class RewriteContext(BaseModel):
     index: int

@@ -23,4 +23,5 @@ class GlobalConfigs(BaseModel):
     system_identification: SystemIdentificationConfig = Field(default_factory=SystemIdentificationConfig)
     user_data: UserDataConfig = Field(default_factory=UserDataConfig)
     user_nickname_mapping: UserNicknameMappingConfig = Field(default_factory=UserNicknameMappingConfig)
+    watermark: WatermarkConfig = Field(default_factory=WatermarkConfig)
     web: WebConfig = Field(default_factory=WebConfig)

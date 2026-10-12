@@ -18,7 +18,7 @@ dependencies = [
     "uvicorn (>=0.54.0,<0.55.0)",
     "markdown (>=3.11,<4.0)",
     "httpx (>=0.28.1,<0.29.0)",
-    "numpy (<=2.5.3)",
+    "numpy (<=2.4.6)",
     "pyyaml (>=6.0.3,<7.0.0)",
     "python-box (>=7.4.1,<8.0.0)",
     "tzdata",
@@ -29,7 +29,9 @@ dependencies = [
     "jsonpatch (>=1.33,<2.0)",
     "pythonping (==1.1.4)",
     "cachetools (>=7.2.0,<8.0.0)",
-    "starlark (>=0.6.0,<0.7.0)"
+    "starlark (>=0.6.0,<0.7.0)",
+    "puremagic (<=1.30)",
+    "python-multipart (>=0.0.32,<0.0.33)"
 ]
 
 
