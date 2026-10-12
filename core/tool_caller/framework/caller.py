@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import asyncio
-import time
 import uuid
+import time
+import orjson
+import asyncio
 
 from contextvars import ContextVar
 from typing import (
@@ -25,14 +26,13 @@ from .packages import (
     RunningPackage,
     RuntimePackage,
     ResultPackage,
+    IOStreamPackage,
 )
 from fastapi import Request
 from ...global_config_manager import GlobalConfigs
 from ...user_data_managers.user_config_manager import UserConfigs
 from .make_content_result import create_tool_content_unit
-
-ToolReturn = int | None
-ToolContent = str | list[ContentBlock]
+from loguru import logger
 
 class ToolsCaller:
     """
@@ -228,6 +228,12 @@ class ToolsCaller:
                 tasks.append(asyncio.create_task(coro=_not_found()))
             else:
                 task_id = uuid.uuid4()
+                input_pkg = IOStreamPackage(
+                    queue = asyncio.Queue(),
+                )
+                output_pkg = IOStreamPackage(
+                    queue = asyncio.Queue(),
+                )
                 runtime = RuntimePackage(
                     user_id = user_id,
                     task_id = task_id,
@@ -236,6 +242,8 @@ class ToolsCaller:
                     user_configs = user_configs,
                     global_configs = global_configs,
                     fastapi_request = fastapi_request,
+                    input = input_pkg,
+                    output = output_pkg,
                     loop_times = loop_times,
                     max_loop_times = max_loop_times
                 )
@@ -274,6 +282,12 @@ class ToolsCaller:
 
                 cls.reverse_call_index[task_id] = source_task_id
             
+            input_pkg = IOStreamPackage(
+                queue = asyncio.Queue(),
+            )
+            output_pkg = IOStreamPackage(
+                queue = asyncio.Queue(),
+            )
             runtime = RuntimePackage(
                 user_id = runtime.user_id,
                 task_id = task_id,
@@ -282,6 +296,8 @@ class ToolsCaller:
                 user_configs = runtime.user_configs,
                 global_configs = runtime.global_configs,
                 fastapi_request = runtime.fastapi_request,
+                input = input_pkg,
+                output = output_pkg,
                 loop_times = runtime.loop_times,
                 max_loop_times = runtime.max_loop_times
             )
@@ -404,6 +420,11 @@ class ToolsCaller:
         Run a tool with the given arguments.
         """
         try:
+            logger.info(
+                "Calling {tool_name} with args: {args}",
+                tool_name = tool.name,
+                args = args,
+            )
             try:
                 parsed_args = tool.parse_params(args)
             except Exception as e:
@@ -428,12 +449,19 @@ class ToolsCaller:
             )
             if created is not None:
                 created.set_result(running)
+            result = await running
+            logger.info(
+                "Tool {tool} finished with result {result}",
+                tool = tool.name,
+                result = orjson.dumps(
+                    result.to_content(),
+                    option = orjson.OPT_INDENT_2
+                ).decode(encoding="utf-8"),
+            )
         except BaseException as e:
             if created is not None:
                 created.set_exception(e)
             raise
-
-        result = await running
         return result
 
     @classmethod
@@ -457,6 +485,7 @@ class ToolsCaller:
                 start_monotonic_time = time.perf_counter_ns(),
                 timeout = timeout,
                 package = tool,
+                runtime = runtime,
                 args = args,
                 task = task
             )
