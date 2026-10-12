@@ -30,12 +30,12 @@ class OutputFormat(StrEnum):
 @ToolsCaller.register
 class SubAgent(ToolPackage):
     name = "sub_agent"
-    description = "Assign a simple task to a sub-Agent, and when it finishes running, it doesn't quit, it waits for a new input. Please use the cancel task to close."
+    description = "Assign a simple task to a sub-Agent, and wait for the result."
     
     class Params(BaseModel):
-        model_id: str = Field(
-            default="", 
-            description="Unique identifier used to locate and load the target model."
+        model_id: str | list[str] | None = Field(
+            default = None, 
+            description="Model ID, or use the default model."
         )
         user_name: str = Field(
             default="", 
@@ -112,6 +112,10 @@ class SubAgent(ToolPackage):
             default=OutputFormat.TEXT, 
             description="Format of the output data returned by the API (e.g., 'text')."
         )
+        continuous_run: bool = Field(
+            default=False, 
+            description="The SubAgent doesn't exit, but waits for input, which works better with bypass and injection."
+        )
         extra_bodys: dict[str, Any] = Field(
             default_factory=dict, 
             description="Additional parameters to pass to the API call."
@@ -140,9 +144,15 @@ class SubAgent(ToolPackage):
 
     async def call(self, args: Params, runtime: RuntimePackage):
         global_runtime = RuntimeContainer.get_runtime()
+
+        model_id = args.model_id
+        if model_id is None:
+            model_id = runtime.user_configs.model_id
+        if model_id is None:
+            model_id = runtime.global_configs.model_api.default_model_id
         
         model = await global_runtime.model_info_client.get_random_model(
-            model_id = args.model_id
+            model_id = model_id,
         )
         
         if runtime.user_configs.send_user_id is not None:
@@ -297,6 +307,10 @@ class SubAgent(ToolPackage):
                 if runtime.global_configs.context.remove_reasoning_prompt:
                     new_context.remove_reasoning_content()
             context.extend(new_context)
+
+            if not args.continuous_run:
+                break
+
             while True:
                 input_next = await runtime.input.wait()
                 if not isinstance(input_next, str):
@@ -312,3 +326,5 @@ class SubAgent(ToolPackage):
                 )
                 context.append(new_content)
                 break
+
+        return outputs
