@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass, field
 from fastapi import Request
 from ....user_data_managers.user_config_manager import UserConfigs
@@ -9,7 +10,9 @@ class RuntimePackage:
     This class represents a runtime package.
     """
     user_id: str
+    task_id: uuid.UUID
     tool_call_id: str
+    raw_argument: str
     user_configs: UserConfigs
     global_configs: GlobalConfigs
     fastapi_request: Request

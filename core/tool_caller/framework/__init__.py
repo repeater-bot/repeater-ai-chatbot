@@ -16,6 +16,7 @@ from .tool_request import (
     ToolStruct,
     FunctionStruct,
 )
+from .lifespan import start, stop
 
 __all__ = [
     # caller

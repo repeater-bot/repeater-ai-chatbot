@@ -24,6 +24,7 @@ from .packages import (
     ToolPackage,
     RunningPackage,
     RuntimePackage,
+    ResultPackage,
 )
 from fastapi import Request
 from ...global_config_manager import GlobalConfigs
@@ -32,7 +33,6 @@ from .make_content_result import create_tool_content_unit
 
 ToolReturn = int | None
 ToolContent = str | list[ContentBlock]
-
 
 class ToolsCaller:
     """
@@ -52,12 +52,42 @@ class ToolsCaller:
     running_map: dict[str, set[uuid.UUID]] = {}
     running_lock = asyncio.Lock()
 
+    results: dict[uuid.UUID, ResultPackage] = {}
+    result_map: dict[str, set[uuid.UUID]] = {}
+    result_lock = asyncio.Lock()
+
     forward_call_index: dict[uuid.UUID, set[uuid.UUID]] = {}
     reverse_call_index: dict[uuid.UUID, uuid.UUID] = {}
     call_index_lock = asyncio.Lock()
 
     _identity: ContextVar[ToolPackage | None] = ContextVar("_identity", default=None)
     _task_id: ContextVar[uuid.UUID | None] = ContextVar("_task_id", default=None)
+
+    @classmethod
+    async def start(cls) -> None:
+        pass
+
+    @classmethod
+    async def stop(cls) -> None:
+        await cls.close_all_packages()
+
+    @classmethod
+    async def close_all_packages(cls) -> None:
+        async with cls.running_lock:
+            for running in cls.runnings.values():
+                running.cancel()
+            cls.running = {}
+            cls.running_map = {}
+
+        async with cls.result_lock:
+            for result in cls.results.values():
+                result.cancel()
+            cls.results = {}
+            cls.result_map = {}
+
+        async with cls.call_index_lock:
+            cls.forward_call_index = {}
+            cls.reverse_call_index = {}
 
     @classmethod
     def register(cls, package: Type[ToolPackage]) -> Type[ToolPackage]:
@@ -201,7 +231,9 @@ class ToolsCaller:
                 task_id = uuid.uuid4()
                 runtime = RuntimePackage(
                     user_id = user_id,
+                    task_id = task_id,
                     tool_call_id = tool_request.id,
+                    raw_argument = tool_request.function.arguments,
                     user_configs = user_configs,
                     global_configs = global_configs,
                     fastapi_request = fastapi_request,
@@ -210,7 +242,6 @@ class ToolsCaller:
                 )
                 task = asyncio.create_task(
                     coro = cls.run_tool(
-                        task_id = task_id,
                         tool = tool,
                         args = tool_request.function.arguments,
                         runtime = runtime,
@@ -223,9 +254,147 @@ class ToolsCaller:
         return result
 
     @classmethod
-    async def run_tool(
+    async def _horizontal_call(
         cls,
         task_id: uuid.UUID,
+        tool: ToolPackage,
+        args: str,
+        runtime: RuntimePackage,
+        timeout: int | float | None = None,
+        created: asyncio.Future[RunningPackage] | None = None,
+    ) -> ContentUnit:
+        try:
+            source_task_id = cls._task_id.get()
+            identity = cls._identity.get()
+            if source_task_id is None or identity is None:
+                raise RuntimeError("Is not a valid tool context.")
+
+            async with cls.call_index_lock:
+                childs = cls.forward_call_index.setdefault(source_task_id, set())
+                childs.add(task_id)
+
+                cls.reverse_call_index[task_id] = source_task_id
+            
+            runtime = RuntimePackage(
+                user_id = runtime.user_id,
+                task_id = task_id,
+                tool_call_id = runtime.tool_call_id,
+                raw_argument = args,
+                user_configs = runtime.user_configs,
+                global_configs = runtime.global_configs,
+                fastapi_request = runtime.fastapi_request,
+                loop_times = runtime.loop_times,
+                max_loop_times = runtime.max_loop_times
+            )
+            try:
+                result = await cls.run_tool(
+                    tool = tool,
+                    args = args,
+                    runtime = runtime,
+                    timeout = timeout,
+                    created = created,
+                )
+            finally:
+                async with cls.call_index_lock:
+                    childs = cls.forward_call_index.get(source_task_id)
+                    if childs is not None:
+                        childs.discard(task_id)
+                        if not childs:
+                            cls.forward_call_index.pop(source_task_id)
+                    cls.reverse_call_index.pop(task_id, None)
+            return result
+        except BaseException as e:
+            if created is not None:
+                created.set_exception(e)
+            raise
+
+    @classmethod
+    async def horizontal_call(
+        cls,
+        tool: str | Type[ToolPackage] | ToolPackage,
+        args: str,
+        runtime: RuntimePackage,
+        timeout: int | float | None = None,
+    ) -> ContentUnit:
+        """
+        From a tool, call an other tool horizontally, and return the result.
+        
+        :param tool: The tool to call.
+        :param args: The arguments to pass to the tool.
+        :param runtime: The runtime to use.
+        :param timeout: The timeout for the call.
+        :param created: The future to set when the call is created.
+        """
+        if isinstance(tool, str):
+            tool_instance = cls.match_tool(tool)
+            if tool_instance is None:
+                raise ValueError(f"Tool {tool} not found")
+        elif isinstance(tool, type) and issubclass(tool, ToolPackage):
+            tool_instance = tool()
+        elif isinstance(tool, ToolPackage):
+            tool_instance = tool
+        else:
+            raise TypeError("tool must be a string, a ToolPackage subclass, or a ToolPackage instance")
+
+        task_id = uuid.uuid4()
+        result = await cls._horizontal_call(
+            task_id,
+            tool = tool_instance,
+            args = args,
+            runtime = runtime,
+            timeout = timeout,
+        )
+
+        return result
+
+    @classmethod
+    async def horizontal_create(
+        cls,
+        tool: str | Type[ToolPackage] | ToolPackage,
+        args: str,
+        runtime: RuntimePackage,
+        timeout: int | float | None = None,
+    ) -> RunningPackage:
+        """
+        Create a new horizontal call.
+        
+        :param tool: The tool to call.
+        :param args: The arguments to pass to the tool.
+        :param runtime: The runtime to use.
+        :param timeout: The timeout for the call.
+        :param created: The future to set when the call is created.
+        """
+        if isinstance(tool, str):
+            tool_instance = cls.match_tool(tool)
+            if tool_instance is None:
+                raise ValueError(f"Tool {tool} not found")
+        elif isinstance(tool, type) and issubclass(tool, ToolPackage):
+            tool_instance = tool()
+        elif isinstance(tool, ToolPackage):
+            tool_instance = tool
+        else:
+            raise TypeError("tool must be a string, a ToolPackage subclass, or a ToolPackage instance")
+
+        task_id: uuid.UUID = uuid.uuid4()
+        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+        created: asyncio.Future[RunningPackage] = loop.create_future()
+        task: asyncio.Task[ContentUnit] = asyncio.create_task(
+            coro = cls._horizontal_call(
+                task_id,
+                tool = tool_instance,
+                args = args,
+                runtime = runtime,
+                timeout = timeout,
+                created = created,
+            )
+        )
+
+        result = await created
+        return result
+
+    @classmethod
+    async def run_tool(
+        cls,
         tool: ToolPackage,
         args: str,
         runtime: RuntimePackage,
@@ -246,8 +415,8 @@ class ToolsCaller:
                     max_loop_times = runtime.max_loop_times
                 )
 
-            running = await cls.reg_running(
-                task_id = task_id,
+            running: RunningPackage = await cls.reg_running(
+                task_id = runtime.task_id,
                 tool = tool,
                 args = parsed_args,
                 runtime = runtime,
@@ -258,6 +427,8 @@ class ToolsCaller:
                 ),
                 timeout = timeout,
             )
+            if created is not None:
+                created.set_result(running)
         except BaseException as e:
             if created is not None:
                 created.set_exception(e)
@@ -282,7 +453,7 @@ class ToolsCaller:
                 coro = coroutine
             )
             running = RunningPackage(
-                task_id = task_id,
+                task_id = runtime.task_id,
                 start_time = time.time_ns(),
                 start_monotonic_time = time.perf_counter_ns(),
                 timeout = timeout,
@@ -303,6 +474,8 @@ class ToolsCaller:
         args: BaseModel,
         runtime: RuntimePackage,
     ) -> ContentUnit:
+        cls._identity.set(tool)
+        cls._task_id.set(runtime.task_id)
         result = await cls._enter_tool(
             tool = tool,
             args = args,
@@ -316,6 +489,15 @@ class ToolsCaller:
             max_loop_times = runtime.max_loop_times
         )
 
+        async with cls.result_lock:
+            loop = asyncio.get_running_loop()
+            future = loop.create_future()
+            future.set_result(parsed_result)
+            cls.results[runtime.task_id] = ResultPackage(
+                future = future,
+            )
+            if runtime.user_id in cls.result_map:
+                cls.result_map.setdefault(runtime.user_id, set()).add(runtime.task_id)
         return parsed_result
 
     @classmethod

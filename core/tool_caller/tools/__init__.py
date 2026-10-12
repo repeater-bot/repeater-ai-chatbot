@@ -4,7 +4,7 @@ from .set_prompt import SetPrompt
 from .metaso import Metaso
 from .asteval_tool import Asteval
 from .get_models import GetModels
-from .call_model import CallModel
+from .sub_agent import SubAgent
 from .token_count import TokenCount
 from .system_info import SystemInfo
 from .starlark_tool import Starlark
@@ -31,7 +31,7 @@ __all__ = [
     "Metaso",
     "Asteval",
     "GetModels",
-    "CallModel",
+    "SubAgent",
     "TokenCount",
     "SystemInfo",
     "Starlark",

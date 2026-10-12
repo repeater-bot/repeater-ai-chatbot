@@ -31,22 +31,13 @@ class Bypass(ToolPackage):
     description = "A task runs in the background, does not wait for it to finish, and gets its task id."
 
     async def call(self, args: Params, runtime: RuntimePackage):
-        tool = ToolsCaller.match_tool(args.tool_name)
-        if tool is None:
-            raise ValueError(f"Unknown tool: {args.tool_name}")
-
-        task_id = uuid.uuid4()
-        task = asyncio.create_task(
-            coro = ToolsCaller.run_tool(
-                task_id = task_id,
-                tool = tool,
-                args = args.args,
-                runtime = runtime,
-                timeout = args.timeout,
-            )
+        running = await ToolsCaller.horizontal_create(
+            tool = args.tool_name,
+            args = args.args,
+            runtime = runtime,
+            timeout = args.timeout,
         )
-        task.add_done_callback(_log_failure)
 
         # The id goes back as a string: parse_result would not be able to
         # serialize a bare uuid.UUID.
-        return str(task_id)
+        return str(running.task_id)

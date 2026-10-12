@@ -23,7 +23,7 @@ class OutputFormat(StrEnum):
     NEW_REASONING_ONLY = "new_reasoning_only"
 
 @ToolsCaller.register
-class CallModel(ToolPackage):
+class SubAgent(ToolPackage):
     name = "sub_agent"
     description = "Assign a simple task to a child Agent and wait for it to finish running."
     
@@ -130,9 +130,9 @@ class CallModel(ToolPackage):
             yield "</content>"
 
     async def call(self, args: Params, runtime: RuntimePackage):
-        runtime = RuntimeContainer.get_runtime()
+        global_runtime = RuntimeContainer.get_runtime()
         
-        model = await runtime.model_info_client.get_random_model(
+        model = await global_runtime.model_info_client.get_random_model(
             model_id = args.model_id
         )
         
@@ -185,7 +185,7 @@ class CallModel(ToolPackage):
         )
         
         request_runtime = Runtime(
-            client_pool = runtime.openai_pool,
+            client_pool = global_runtime.openai_pool,
             content_buffer = ContentBuffer()
         )
         
@@ -208,7 +208,7 @@ class CallModel(ToolPackage):
             user_configs = runtime.user_configs,
             global_configs = runtime.global_configs,
             fastapi_request = runtime.fastapi_request,
-            model_info_client = runtime.model_info_client,
+            model_info_client = global_runtime.model_info_client,
             max_concurrency = runtime.global_configs.callapi.max_concurrency
         )
 

@@ -10,7 +10,7 @@ from .framework import *
 from .framework import __all__ as _framework_all
 
 def _delayed_import():
-    from ..post_init import register_post_init
+    from ..lifespan import register_post_init
     @register_post_init
     def post_init():
         from . import tools
