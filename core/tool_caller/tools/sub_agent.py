@@ -34,78 +34,82 @@ class SubAgent(ToolPackage):
     
     class Params(BaseModel):
         model_id: str = Field(
-            "", 
+            default="", 
             description="Unique identifier used to locate and load the target model."
         )
         user_name: str = Field(
-            "", 
+            default="", 
             description="Name of the user making the request, used for logging and personalization."
         )
         temperature: float = Field(
-            1.0, 
+            default=1.0, 
             ge=0.0, 
             le=2.0, 
             description="Controls randomness in output. Lower values (e.g., 0.2) make output more deterministic; higher values (e.g., 1.5) increase diversity. Must be between 0 and 2."
         )
         top_p: float = Field(
-            1.0, 
+            default=1.0, 
             ge=0.0, 
             le=1.0, 
             description="Nucleus sampling threshold. The model considers only the smallest set of tokens whose cumulative probability >= top_p. Must be between 0 and 1."
         )
         presence_penalty: float = Field(
-            0.0, 
+            default=0.0, 
             ge=-2.0, 
             le=2.0, 
             description="Penalizes tokens that have appeared at all in the text so far, encouraging the model to talk about new topics. Positive values discourage repetition. Range: -2.0 to 2.0."
         )
         frequency_penalty: float = Field(
-            0.0, 
+            default=0.0, 
             ge=-2.0, 
             le=2.0, 
             description="Penalizes tokens proportionally to how often they have appeared, reducing verbatim repetition. Positive values discourage frequent tokens. Range: -2.0 to 2.0."
         )
         max_tokens: int = Field(
-            4096, 
+            default=4096, 
             gt=0, 
             description="The maximum number of tokens the model can generate in the response."
         )
         max_completion_tokens: int = Field(
-            4096, 
+            default=4096, 
             gt=0, 
             description="Alias for max_tokens. The maximum number of tokens allowed in the completion output."
         )
         thinking: bool | None = Field(
-            None, 
+            default=None, 
             description="When enabled, the model allocates tokens for internal reasoning before producing the final answer. Useful for complex, multi-step problems."
         )
         stop: list[str] | None = Field(
-            None, 
+            default=None, 
             description="List of strings where the model stops generating further tokens when encountered."
         )
         context: Context | None = Field(
-            None, 
+            default=None, 
             description="Predefined conversation history or system context to guide the model's behavior."
         )
+        allow_tools: list[str] | None = Field(
+            default=None, 
+            description="List of tool names that the model is allowed to use."
+        )
         reasoning_effort: ReasoningEffort | None = Field(
-            None, 
+            default=None, 
             description="Controls how many tokens the model spends on internal reasoning (e.g., 'low', 'medium', 'high')."
         )
         remove_reasoning_prompt: bool = Field(
-            False, 
+            default=False, 
             description="If True, strips the internal reasoning prompt from the output, returning only the final answer."
         )
         output_role: ContentRole = Field(
-            ContentRole.ASSISTANT, 
+            default=ContentRole.ASSISTANT, 
             description="Role assigned to the generated content in the conversation structure (e.g., 'assistant')."
         )
         timeout: int | float | None = Field(
-            None, 
+            default=None, 
             gt=0, 
             description="Maximum time in seconds to wait for a response before the request is cancelled."
         )
         output_format: OutputFormat = Field(
-            OutputFormat.TEXT, 
+            default=OutputFormat.TEXT, 
             description="Format of the output data returned by the API (e.g., 'text')."
         )
         extra_bodys: dict[str, Any] = Field(
@@ -158,6 +162,25 @@ class SubAgent(ToolPackage):
             extra_bodys.update(runtime.user_configs.extra_bodys)
         if runtime.global_configs.model.extra_bodys_priority is not None:
             extra_bodys.update(runtime.global_configs.model.extra_bodys_priority)
+            
+        if runtime.global_configs.tool_calls.enabled:
+            tool_calls_configs = runtime.global_configs.tool_calls
+            server_registed_tools = tool_calls_configs.registed
+            if runtime.user_configs.allowed_tool_calls:
+                user_registed_tools = runtime.user_configs.allowed_tool_calls
+            elif tool_calls_configs.allowed_by_default:
+                user_registed_tools = tool_calls_configs.allowed_by_default
+            else:
+                user_registed_tools = set()
+
+            available_tool_calls = server_registed_tools.intersection(user_registed_tools)
+        else:
+            available_tool_calls = set()
+
+        if args.allow_tools:
+            allowed_tool_calls = set(args.allow_tools).intersection(available_tool_calls)
+        else:
+            allowed_tool_calls = set()
 
         context: Context = args.context or Context()
         outputs: list[str] = []
@@ -198,20 +221,6 @@ class SubAgent(ToolPackage):
                 content_buffer = ContentBuffer()
             )
             
-            if runtime.global_configs.tool_calls.enabled:
-                tool_calls_configs = runtime.global_configs.tool_calls
-                server_registed_tools = tool_calls_configs.registed
-                if runtime.user_configs.allowed_tool_calls:
-                    user_registed_tools = runtime.user_configs.allowed_tool_calls
-                elif tool_calls_configs.allowed_by_default:
-                    user_registed_tools = tool_calls_configs.allowed_by_default
-                else:
-                    user_registed_tools = set()
-
-                available_tool_calls = server_registed_tools.intersection(user_registed_tools)
-            else:
-                available_tool_calls = set()
-            
             requestser = ModelRequester(
                 user_id = runtime.user_id,
                 user_configs = runtime.user_configs,
@@ -225,7 +234,7 @@ class SubAgent(ToolPackage):
                 user_id = runtime.user_id,
                 request = request,
                 runtime = request_runtime,
-                available_tool_calls = available_tool_calls,
+                available_tool_calls = allowed_tool_calls,
                 stream = False
             )
 
