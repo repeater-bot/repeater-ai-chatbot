@@ -96,6 +96,8 @@ class ModelRequester:
                     global_configs = self._global_configs,
                     fastapi_request = self._fastapi_request,
                     available_tool_calls = available_tool_calls,
+                    timeout = self._global_configs.tool_calls.timeout,
+                    result_timeout = self._global_configs.tool_calls.tool_result_timeout,
                     loop_times = loop_times,
                     max_loop_times = max_loop_times,
                 )
