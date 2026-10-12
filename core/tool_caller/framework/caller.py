@@ -46,7 +46,6 @@ class ToolsCaller:
     tools: dict[Type[ToolPackage], ToolPackage] = {}
     tool_names: dict[str, Type[ToolPackage]] = {}
     class_names: dict[str, Type[ToolPackage]] = {}
-    _force_choice: Type[ToolPackage] | None = None
 
     runnings: dict[uuid.UUID, RunningPackage] = {}
     running_map: dict[str, set[uuid.UUID]] = {}
