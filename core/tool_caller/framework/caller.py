@@ -51,7 +51,7 @@ class ToolsCaller:
     running_map: dict[str, set[uuid.UUID]] = {}
     running_lock = asyncio.Lock()
 
-    results: dict[uuid.UUID, ResultPackage] = {}
+    results: dict[uuid.UUID, RunningPackage] = {}
     result_map: dict[str, set[uuid.UUID]] = {}
     result_lock = asyncio.Lock()
 
@@ -188,6 +188,50 @@ class ToolsCaller:
             if task_id in cls.runnings:
                 return cls.runnings[task_id]
             return None
+        
+    @classmethod
+    async def get_result(cls, task_id: uuid.UUID, user_id: str, remove: bool = True) -> RunningPackage | None:
+        """Get the result of the task."""
+        async with cls.result_lock:
+            user_results = cls.result_map.get(user_id, set())
+            if task_id in user_results:
+                if remove:
+                    result = cls.results.pop(task_id, None)
+                    if result is not None:
+                        user_results.remove(task_id)
+                    if not user_results:
+                        cls.result_map.pop(user_id, None)
+                else:
+                    result = cls.results.get(task_id, None)
+                return result
+        return None
+
+    @classmethod
+    async def get_results(cls, user_id: str, remove: bool = True) -> list[RunningPackage]:
+        """Get the results of the user."""
+        async with cls.result_lock:
+            runnings = []
+            user_results = cls.result_map.get(user_id, set())
+            for task_id in user_results:
+                if remove:
+                    result = cls.results.pop(task_id, None)
+                    if result is not None:
+                        runnings.append(result)
+                else:
+                    result = cls.results.get(task_id)
+                    if result is not None:
+                        runnings.append(result)
+            if remove:
+                cls.result_map.pop(user_id, None)
+            return runnings
+
+    @classmethod
+    async def reset_results(cls, user_id: str):
+        """Reset the results of the user."""
+        async with cls.result_lock:
+            user_results = cls.result_map.pop(user_id, set())
+            for result in user_results:
+                cls.results.pop(result)
 
     @classmethod
     async def call_tool(
@@ -449,7 +493,10 @@ class ToolsCaller:
             )
             if created is not None:
                 created.set_result(running)
-            result = await running
+            try:
+                result = await running
+            finally:
+                await cls.unreg_running(task_id = runtime.task_id)
             logger.info(
                 "Tool {tool} finished with result {result}",
                 tool = tool.name,
@@ -496,6 +543,21 @@ class ToolsCaller:
         return running
 
     @classmethod
+    async def unreg_running(cls, task_id: uuid.UUID) -> None:
+        """Unregister a running tool."""
+        async with cls.running_lock:
+            if task_id in cls.runnings:
+                running = cls.runnings.pop(task_id)
+                user_runnings = cls.running_map.get(running.runtime.user_id)
+                if user_runnings is not None:
+                    user_runnings.remove(task_id)
+                    if len(user_runnings) == 0:
+                        cls.running_map.pop(running.runtime.user_id)
+                async with cls.result_lock:
+                    cls.results[running.task_id] = running
+                    cls.result_map.setdefault(running.runtime.user_id, set()).add(running.task_id)
+
+    @classmethod
     async def enter_tool(
         cls,
         tool: ToolPackage,
@@ -516,16 +578,6 @@ class ToolsCaller:
             loop_times = runtime.loop_times,
             max_loop_times = runtime.max_loop_times
         )
-
-        async with cls.result_lock:
-            loop = asyncio.get_running_loop()
-            future = loop.create_future()
-            future.set_result(parsed_result)
-            cls.results[runtime.task_id] = ResultPackage(
-                future = future,
-            )
-            if runtime.user_id in cls.result_map:
-                cls.result_map.setdefault(runtime.user_id, set()).add(runtime.task_id)
         return parsed_result
 
     @classmethod

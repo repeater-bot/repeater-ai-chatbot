@@ -52,5 +52,11 @@ class RunningPackage:
     def __await__(self) -> Generator[Any, None, ContentUnit]:
         return self.task.__await__()
 
+    def done(self) -> bool:
+        return self.task.done()
+
+    def result(self) -> ContentUnit:
+        return self.task.result()
+
     def cancel(self):
         self.task.cancel()
