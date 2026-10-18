@@ -11,3 +11,5 @@
 | Static Resource Server | `1.0.0`    | 静态资源服务 | [Github](https://github.com/qeggs-dev/static-resources-server) |
 | Nexus                  | `1.0.0.0`  | 数据共享服务 | [Github](https://github.com/repeater-bot/repeater-nexus) |
 | Render Server          | `1.0.0`    | 渲染服务     | [Github](https://github.com/repeater-bot/repeater-render-server) |
+| Watermark Server       | `0.1.0`    | 水印服务     | [Github](https://github.com/repeater-bot/watermark_server) |
+| Data Server            | `1.0.0`    | 数据服务     | [Github](https://github.com/repeater-bot/data_server) |

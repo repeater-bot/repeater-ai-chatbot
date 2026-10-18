@@ -12,6 +12,7 @@ from dataclasses import dataclass
 
 from ....user_data_managers.context import ContentUnit
 from .tool_package import ToolPackage
+from .runtime_package import RuntimePackage
 
 @dataclass(eq = False)
 class RunningPackage:
@@ -27,6 +28,7 @@ class RunningPackage:
     start_monotonic_time: int
     timeout: int | float | None
     package: ToolPackage
+    runtime: RuntimePackage
     args: BaseModel
     task: asyncio.Task[ContentUnit]
 
@@ -49,6 +51,12 @@ class RunningPackage:
 
     def __await__(self) -> Generator[Any, None, ContentUnit]:
         return self.task.__await__()
+
+    def done(self) -> bool:
+        return self.task.done()
+
+    def result(self) -> ContentUnit:
+        return self.task.result()
 
     def cancel(self):
         self.task.cancel()

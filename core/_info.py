@@ -1,6 +1,6 @@
 # ==== 模块信息 ==== #
 
-__version__ = "4.10.2.0"
+__version__ = "4.10.4.0"
 
 __author__ = "Qeggs"
 __license__ = "MIT"
@@ -16,6 +16,8 @@ __github__ = [
     "https://github.com/repeater-bot/repeater-document-library",
     "https://github.com/repeater-bot/repeater-model-info-server",
     "https://github.com/qeggs-dev/static-resources-server",
+    "https://github.com/repeater-bot/watermark_server",
+    "https://github.com/repeater-bot/data_server",
     "https://github.com/repeater-bot/repeater-static-data",
     "https://github.com/repeater-bot/repeater-render-server",
 ]

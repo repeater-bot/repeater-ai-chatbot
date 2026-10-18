@@ -24,7 +24,8 @@ from ..clients.model_info import (
 from ..user_data_managers.user_config_manager import UserConfigs
 from ..global_config_manager import GlobalConfigs
 from typing import (
-    AsyncGenerator
+    AsyncGenerator,
+    NoReturn
 )
 from loguru import logger
 from fastapi import Request as FastAPI_Request
@@ -96,6 +97,8 @@ class ModelRequester:
                     global_configs = self._global_configs,
                     fastapi_request = self._fastapi_request,
                     available_tool_calls = available_tool_calls,
+                    timeout = self._global_configs.tool_calls.timeout,
+                    result_timeout = self._global_configs.tool_calls.tool_result_timeout,
                     loop_times = loop_times,
                     max_loop_times = max_loop_times,
                 )
@@ -113,6 +116,57 @@ class ModelRequester:
                     
                 response.new_context.clear()
                 raise Regenerate(request)
+
+    async def _generate_loop(
+        self,
+        user_id: str,
+        request: Request,
+        runtime: Runtime,
+        responses: MultiResponse,
+        stream: bool = False,
+        max_generated_times: int = 16,
+        available_tool_calls: set[str] | None = None,
+    ) -> NoReturn:
+        generated_times: int = 0
+        while True:
+            try:
+                generated_times += 1
+                logger.info(
+                    "Generate Times: {now}/{max}",
+                    user_id = user_id,
+                    now = generated_times,
+                    max = max_generated_times
+                )
+                response = await self._send_request(
+                    user_id = user_id,
+                    request = request,
+                    runtime = runtime,
+                    stream = stream
+                )
+                responses.add_copy(response)
+                responses.tool_requests = self._tool_responses
+                await self._parse_response(
+                    request = request,
+                    response = response,
+                    runtime = runtime,
+                    available_tool_calls = available_tool_calls,
+                    loop_times = generated_times,
+                    max_loop_times = max_generated_times
+                )
+                raise GenerateFinished
+            except Regenerate as e:
+                logger.info(
+                    "Regenerate",
+                    user_id = user_id,
+                )
+                request = e.request
+                runtime.content_buffer.clear()
+                if generated_times >= max_generated_times:
+                    logger.warning(
+                        "Times too many, removeing tools",
+                        user_id = user_id,
+                    )
+                    raise GenerateFinished
     
     async def submit(
         self,
@@ -124,7 +178,6 @@ class ModelRequester:
         tool_choice_model: ToolChoice = ToolChoice.AUTO,
         stream: bool = False,
     ) -> MultiResponse:
-        generated_times: int = 0
         responses: MultiResponse = MultiResponse()
         if request.context is None:
             historical_context = Context()
@@ -146,48 +199,15 @@ class ModelRequester:
             request.tools = ToolsCaller.to_request(available_tool_calls)
             request.tool_choice = ToolsCaller.to_choice(tool_choice_model)
         try:
-            while True:
-                try:
-                    generated_times += 1
-                    logger.info(
-                        "Generate Times: {now}/{max}",
-                        user_id = user_id,
-                        now = generated_times,
-                        max = max_generated_times
-                    )
-                    response = await self._send_request(
-                        user_id = user_id,
-                        request = request,
-                        runtime = runtime,
-                        stream = stream
-                    )
-                    responses.add_copy(response)
-                    responses.tool_requests = self._tool_responses
-                    await self._parse_response(
-                        request = request,
-                        response = response,
-                        runtime = runtime,
-                        available_tool_calls = available_tool_calls,
-                        loop_times = generated_times,
-                        max_loop_times = max_generated_times
-                    )
-                    raise GenerateFinished
-                except Regenerate as e:
-                    logger.info(
-                        "Regenerate",
-                        user_id = user_id,
-                    )
-                    request = e.request
-                    runtime.content_buffer.clear()
-                    if generated_times >= max_generated_times:
-                        raise GenerateFinished
-                    elif (generated_times + 1) >= max_generated_times:
-                        logger.warning(
-                            "Times too many, removeing tools",
-                            user_id = user_id,
-                        )
-                        request.tools = None
-                        request.tool_choice = None
+            await self._generate_loop(
+                user_id,
+                request,
+                runtime,
+                responses,
+                stream = stream,
+                max_generated_times = max_generated_times,
+                available_tool_calls = available_tool_calls
+            )
         except GenerateFinished as e:
             logger.info(
                 "GenerateFinished",

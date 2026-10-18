@@ -4,7 +4,11 @@ from ...call_api.completions_api import (
     Runtime,
     StreamOptions
 )
-from ...user_data_managers.context import Context, ContentRole
+from ...user_data_managers.context import (
+    Context,
+    ContentRole,
+    ContentUnit
+)
 from ...global_config_manager import ReasoningEffort
 from ...model_requester import ModelRequester
 from ...runtime_container import RuntimeContainer
@@ -13,6 +17,7 @@ from ...clients.model_info import ModelInfo, SafeModelInfo
 from ..framework import ToolsCaller, ToolPackage, RuntimePackage
 from pydantic import BaseModel, Field
 from enum import StrEnum
+from loguru import logger
 
 class OutputFormat(StrEnum):
     TEXT = "text"
@@ -25,83 +30,91 @@ class OutputFormat(StrEnum):
 @ToolsCaller.register
 class SubAgent(ToolPackage):
     name = "sub_agent"
-    description = "Assign a simple task to a child Agent and wait for it to finish running."
+    description = "Assign a simple task to a sub-Agent, and wait for the result."
     
     class Params(BaseModel):
-        model_id: str = Field(
-            "", 
-            description="Unique identifier used to locate and load the target model."
+        model_id: str | list[str] | None = Field(
+            default = None, 
+            description="Model ID, or use the default model."
         )
         user_name: str = Field(
-            "", 
+            default="", 
             description="Name of the user making the request, used for logging and personalization."
         )
         temperature: float = Field(
-            1.0, 
+            default=1.0, 
             ge=0.0, 
             le=2.0, 
             description="Controls randomness in output. Lower values (e.g., 0.2) make output more deterministic; higher values (e.g., 1.5) increase diversity. Must be between 0 and 2."
         )
         top_p: float = Field(
-            1.0, 
+            default=1.0, 
             ge=0.0, 
             le=1.0, 
             description="Nucleus sampling threshold. The model considers only the smallest set of tokens whose cumulative probability >= top_p. Must be between 0 and 1."
         )
         presence_penalty: float = Field(
-            0.0, 
+            default=0.0, 
             ge=-2.0, 
             le=2.0, 
             description="Penalizes tokens that have appeared at all in the text so far, encouraging the model to talk about new topics. Positive values discourage repetition. Range: -2.0 to 2.0."
         )
         frequency_penalty: float = Field(
-            0.0, 
+            default=0.0, 
             ge=-2.0, 
             le=2.0, 
             description="Penalizes tokens proportionally to how often they have appeared, reducing verbatim repetition. Positive values discourage frequent tokens. Range: -2.0 to 2.0."
         )
         max_tokens: int = Field(
-            4096, 
+            default=4096, 
             gt=0, 
             description="The maximum number of tokens the model can generate in the response."
         )
         max_completion_tokens: int = Field(
-            4096, 
+            default=4096, 
             gt=0, 
             description="Alias for max_tokens. The maximum number of tokens allowed in the completion output."
         )
         thinking: bool | None = Field(
-            None, 
+            default=None, 
             description="When enabled, the model allocates tokens for internal reasoning before producing the final answer. Useful for complex, multi-step problems."
         )
         stop: list[str] | None = Field(
-            None, 
+            default=None, 
             description="List of strings where the model stops generating further tokens when encountered."
         )
         context: Context | None = Field(
-            None, 
+            default=None, 
             description="Predefined conversation history or system context to guide the model's behavior."
         )
+        allow_tools: list[str] | None = Field(
+            default=None, 
+            description="List of tool names that the model is allowed to use."
+        )
         reasoning_effort: ReasoningEffort | None = Field(
-            None, 
+            default=None, 
             description="Controls how many tokens the model spends on internal reasoning (e.g., 'low', 'medium', 'high')."
         )
         remove_reasoning_prompt: bool = Field(
-            False, 
+            default=False, 
             description="If True, strips the internal reasoning prompt from the output, returning only the final answer."
         )
         output_role: ContentRole = Field(
-            ContentRole.ASSISTANT, 
+            default=ContentRole.ASSISTANT, 
             description="Role assigned to the generated content in the conversation structure (e.g., 'assistant')."
         )
         timeout: int | float | None = Field(
-            None, 
+            default=None, 
             gt=0, 
             description="Maximum time in seconds to wait for a response before the request is cancelled."
         )
         output_format: OutputFormat = Field(
-            OutputFormat.TEXT, 
+            default=OutputFormat.TEXT, 
             description="Format of the output data returned by the API (e.g., 'text')."
+        )
+        continuous_run: bool = Field(
+            default=False, 
+            description="The SubAgent doesn't exit, but waits for input, which works better with bypass and injection."
         )
         extra_bodys: dict[str, Any] = Field(
             default_factory=dict, 
@@ -131,9 +144,15 @@ class SubAgent(ToolPackage):
 
     async def call(self, args: Params, runtime: RuntimePackage):
         global_runtime = RuntimeContainer.get_runtime()
+
+        model_id = args.model_id
+        if model_id is None:
+            model_id = runtime.user_configs.model_id
+        if model_id is None:
+            model_id = runtime.global_configs.model_api.default_model_id
         
         model = await global_runtime.model_info_client.get_random_model(
-            model_id = args.model_id
+            model_id = model_id,
         )
         
         if runtime.user_configs.send_user_id is not None:
@@ -153,42 +172,7 @@ class SubAgent(ToolPackage):
             extra_bodys.update(runtime.user_configs.extra_bodys)
         if runtime.global_configs.model.extra_bodys_priority is not None:
             extra_bodys.update(runtime.global_configs.model.extra_bodys_priority)
-
-        request = Request(
-            url = model.get_base_url(),
-            limits = model.limits,
-            key = model.api_key,
-            timeout = args.timeout if args.timeout is not None else model.timeout,
-            model = model.id,
-            model_id = args.model_id,
-            model_uid = model.uid,
-            user_name = args.user_name,
-            temperature = args.temperature,
-            top_p = args.top_p,
-            presence_penalty = args.presence_penalty,
-            frequency_penalty = args.frequency_penalty,
-            max_tokens = args.max_tokens,
-            max_completion_tokens = args.max_completion_tokens,
-            thinking = args.thinking,
-            stop = args.stop,
-            context = args.context,
-            reasoning_effort = args.reasoning_effort,
-            remove_reasoning_prompt = args.remove_reasoning_prompt,
-            remove_created = True,
-            send_user_id = send_user_id,
-            stream = runtime.global_configs.model.stream,
-            stream_options = StreamOptions(
-                include_obfuscation = runtime.global_configs.callapi.include_obfuscation,
-                include_usage = runtime.global_configs.callapi.include_usage
-            ),
-            extra_bodys = extra_bodys,
-        )
-        
-        request_runtime = Runtime(
-            client_pool = global_runtime.openai_pool,
-            content_buffer = ContentBuffer()
-        )
-        
+            
         if runtime.global_configs.tool_calls.enabled:
             tool_calls_configs = runtime.global_configs.tool_calls
             server_registed_tools = tool_calls_configs.registed
@@ -202,69 +186,145 @@ class SubAgent(ToolPackage):
             available_tool_calls = server_registed_tools.intersection(user_registed_tools)
         else:
             available_tool_calls = set()
-        
-        requestser = ModelRequester(
-            user_id = runtime.user_id,
-            user_configs = runtime.user_configs,
-            global_configs = runtime.global_configs,
-            fastapi_request = runtime.fastapi_request,
-            model_info_client = global_runtime.model_info_client,
-            max_concurrency = runtime.global_configs.callapi.max_concurrency
-        )
 
-        responses = await requestser.submit(
-            user_id = runtime.user_id,
-            request = request,
-            runtime = request_runtime,
-            available_tool_calls = available_tool_calls,
-            stream = False
-        )
+        if args.allow_tools:
+            allowed_tool_calls = set(args.allow_tools).intersection(available_tool_calls)
+        else:
+            allowed_tool_calls = set()
 
-        context = responses.new_contexts()
-        match args.output_format:
-            case OutputFormat.TEXT:
-                buffer = TextBuffer(separator = "\n")
-                buffer.consume_iterable_no_conversion(
-                    self.response_parser(
-                        model,
-                        context
+        context: Context = args.context or Context()
+        outputs: list[str] = []
+
+        while True:
+            request = Request(
+                url = model.get_base_url(),
+                limits = model.limits,
+                key = model.api_key,
+                timeout = args.timeout if args.timeout is not None else model.timeout,
+                model = model.id,
+                model_id = args.model_id,
+                model_uid = model.uid,
+                user_name = args.user_name,
+                temperature = args.temperature,
+                top_p = args.top_p,
+                presence_penalty = args.presence_penalty,
+                frequency_penalty = args.frequency_penalty,
+                max_tokens = args.max_tokens,
+                max_completion_tokens = args.max_completion_tokens,
+                thinking = args.thinking,
+                stop = args.stop,
+                context = context,
+                reasoning_effort = args.reasoning_effort,
+                remove_reasoning_prompt = args.remove_reasoning_prompt,
+                remove_created = True,
+                send_user_id = send_user_id,
+                stream = runtime.global_configs.model.stream,
+                stream_options = StreamOptions(
+                    include_obfuscation = runtime.global_configs.callapi.include_obfuscation,
+                    include_usage = runtime.global_configs.callapi.include_usage
+                ),
+                extra_bodys = extra_bodys,
+            )
+            
+            request_runtime = Runtime(
+                client_pool = global_runtime.openai_pool,
+                content_buffer = ContentBuffer()
+            )
+            
+            requestser = ModelRequester(
+                user_id = runtime.user_id,
+                user_configs = runtime.user_configs,
+                global_configs = runtime.global_configs,
+                fastapi_request = runtime.fastapi_request,
+                model_info_client = global_runtime.model_info_client,
+                max_concurrency = runtime.global_configs.callapi.max_concurrency
+            )
+
+            responses = await requestser.submit(
+                user_id = runtime.user_id,
+                request = request,
+                runtime = request_runtime,
+                available_tool_calls = allowed_tool_calls,
+                stream = False
+            )
+
+            new_context = responses.new_contexts()
+            match args.output_format:
+                case OutputFormat.TEXT:
+                    buffer = TextBuffer(separator = "\n")
+                    buffer.consume_iterable_no_conversion(
+                        self.response_parser(
+                            model,
+                            new_context
+                        )
                     )
-                )
-                return str(buffer)
-            case OutputFormat.JSON:
-                return self.Result(
-                    model = model.to_safe(),
-                    context = context,
-                )
-            case OutputFormat.CONTENT_ONLY:
-                buffer = TextBuffer(separator = "\n")
-                buffer.consume_iterable_no_conversion(
-                    self.response_parser(
-                        model,
-                        context,
-                        include_content = True,
-                        include_reasoning = False,
+                    output = str(buffer)
+                case OutputFormat.JSON:
+                    output = self.Result(
+                        model = model.to_safe(),
+                        context = new_context,
+                    ).model_dump_json()
+                case OutputFormat.CONTENT_ONLY:
+                    buffer = TextBuffer(separator = "\n")
+                    buffer.consume_iterable_no_conversion(
+                        self.response_parser(
+                            model,
+                            new_context,
+                            include_content = True,
+                            include_reasoning = False,
+                        )
                     )
-                )
-                return str(buffer)
-            case OutputFormat.REASONING_ONLY:
-                buffer = TextBuffer(separator = "\n")
-                buffer.consume_iterable_no_conversion(
-                    self.response_parser(
-                        model,
-                        context,
-                        include_content = False,
-                        include_reasoning = True,
+                    output = str(buffer)
+                case OutputFormat.REASONING_ONLY:
+                    buffer = TextBuffer(separator = "\n")
+                    buffer.consume_iterable_no_conversion(
+                        self.response_parser(
+                            model,
+                            new_context,
+                            include_content = False,
+                            include_reasoning = True,
+                        )
                     )
+                    output = str(buffer)
+                case OutputFormat.NEW_CONTENT_ONLY:
+                    last_content = new_context.last_content
+                    if last_content is None:
+                        output = ""
+                    else:
+                        output = last_content.content_to_string()
+                case OutputFormat.NEW_REASONING_ONLY:
+                    last_content = new_context.last_content
+                    if last_content is None:
+                        output = ""
+                    else:
+                        output = str(last_content.reasoning_content)
+            outputs.append(output)
+            await runtime.output.put(output)
+            if runtime.user_configs.remove_reasoning_prompt is not None:
+                if runtime.user_configs.remove_reasoning_prompt:
+                    new_context.remove_reasoning_content()
+            else:
+                if runtime.global_configs.context.remove_reasoning_prompt:
+                    new_context.remove_reasoning_content()
+            context.extend(new_context)
+
+            if not args.continuous_run:
+                break
+
+            while True:
+                input_next = await runtime.input.wait()
+                if not isinstance(input_next, str):
+                    logger.warning(
+                        "SubAgent input is not a string",
+                        user_id = runtime.user_id
+                    )
+                    continue
+
+                new_content = ContentUnit(
+                    content = input_next,
+                    role = ContentRole.USER,
                 )
-                return str(buffer)
-            case OutputFormat.NEW_CONTENT_ONLY:
-                last_content = context.last_content
-                if last_content is None:
-                    return ""
-                return last_content.content_to_string()
-            case OutputFormat.NEW_REASONING_ONLY:
-                last_content = context.last_content
-                if last_content is None:
-                    return ""
-                return last_content.reasoning_content
+                context.append(new_content)
+                break
+
+        return outputs

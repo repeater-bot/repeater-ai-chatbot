@@ -648,12 +648,17 @@ class SlovesStarter:
 
         :return: the configuration file
         """
-        find_file = FindFile(
-            base_path = [Path.cwd(), Path(__file__).parent],
-            glob = "*.json",
-            skip_only_one = True
-        )
-        config_file = find_file.ask()
+        default_path = Path(__file__).parent / "run.json"
+        if default_path.exists():
+            config_file = default_path
+        else:
+            find_file = FindFile(
+                base_path = [Path.cwd(), Path(__file__).parent],
+                glob = "*.json",
+                skip_only_one = True
+            )
+            config_file = find_file.ask()
+        
         if config_file is None:
             raise FileNotFoundError("No configuration file found")
         elif config_file.exists():
