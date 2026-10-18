@@ -1049,6 +1049,17 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
         "timeout": 10.0
     },
 
+    // 数据服务配置
+    // 用于访问 Workspace Data Server（虚拟文件读写）
+    "data_server": {
+
+        // 数据服务器的地址，留空时不启用 DataClient
+        "base_url": "",
+
+        // 数据服务器的超时时间
+        "timeout": 60.0
+    },
+
     // 系统识别配置
     "system_identification": {
         // 系统名称

@@ -25,3 +25,13 @@
 19. [List Task](./built-in/list_task.md)
 20. [Bypass](./built-in/bypass.md)
 21. [Wait Task](./built-in/wait_task.md)
+22. [Workspace Read](./built-in/workspace_read.md)
+23. [Workspace Write](./built-in/workspace_write.md)
+24. [Workspace Delete](./built-in/workspace_delete.md)
+25. [Workspace List](./built-in/workspace_list.md)
+26. [Workspace Info](./built-in/workspace_info.md)
+
+> Workspace 系列工具通过 Data Server 访问虚拟工作区。使用前需要：
+> 在 `configs/project_configs/config.json` 里把 `data_server.base_url` 指向运行中的
+> Data Server，并把工具名加入 `tool_calls.registed`；用户侧还要在
+> `allowed_tool_calls`（或 `tool_calls.allowed_by_default`）中允许，模型才能调用。

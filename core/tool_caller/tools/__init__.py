@@ -26,6 +26,13 @@ from .wait_task import WaitTask
 from .injection_input import InjectionInput
 from .consumption_output import ConsumptionOutput
 from .get_result import GetResult
+from .workspace_tools import (
+    WorkspaceRead,
+    WorkspaceWrite,
+    WorkspaceDelete,
+    WorkspaceList,
+    WorkspaceInfo
+)
 
 __all__ = [
     "Demo",
@@ -49,4 +56,12 @@ __all__ = [
     "ListTask",
     "Bypass",
     "WaitTask",
+    "InjectionInput",
+    "ConsumptionOutput",
+    "GetResult",
+    "WorkspaceRead",
+    "WorkspaceWrite",
+    "WorkspaceDelete",
+    "WorkspaceList",
+    "WorkspaceInfo"
 ]
