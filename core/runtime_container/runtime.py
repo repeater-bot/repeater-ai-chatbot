@@ -30,6 +30,7 @@ from ..clients.nexus_client import NexusClient
 from ..clients.html_render_client import HTMLRenderClient
 from ..licenses_loader import LicenseLoader
 from ..clients.static_resources_client import StaticResourcesClient
+from ..clients.data_client import DataClient
 from ..clients.watermark_cilent import WatermarkClient
 from ..request_log import (
     RequestLogManager
@@ -98,6 +99,19 @@ class RepeaterRuntime:
         self.static_resources_client = StaticResourcesClient(
             base_url = self._configs.static_resources_server.base_url,
             timeout = self._configs.static_resources_server.timeout,
+            headers = {
+                "User-Agent": self._configs.system_identification.system_ua
+            },
+            transport = self.transport,
+        )
+
+    @init_list.append
+    @print_init_runtime("Data Client")
+    def init_data_client(self):
+        data_server_config = self._configs.data_server
+        self.data_client = DataClient(
+            base_url = data_server_config.base_url,
+            timeout = data_server_config.timeout,
             headers = {
                 "User-Agent": self._configs.system_identification.system_ua
             },
