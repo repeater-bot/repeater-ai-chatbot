@@ -2,7 +2,7 @@
 
 把文本内容写入 Data Server 的虚拟工作区。目标路径不存在时，服务器会自动创建文件节点和中间目录。
 
-注册名：`workspace.write`
+注册名：workspace_write
 
 ## 参数
 

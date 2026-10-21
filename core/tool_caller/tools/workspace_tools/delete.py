@@ -7,7 +7,7 @@ class WorkspaceDelete(ToolPackage):
     class Params(BaseModel):
         path: str = Field(..., description="The path of the file or empty directory to delete.")
 
-    name = "workspace.delete"
+    name = "workspace_delete"
     description = "Delete a file or an empty directory from the workspace. Non-empty directories are rejected."
 
     async def call(self, args: Params, runtime: RuntimePackage):

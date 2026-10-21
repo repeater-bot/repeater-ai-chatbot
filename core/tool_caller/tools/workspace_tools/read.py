@@ -9,7 +9,7 @@ class WorkspaceRead(ToolPackage):
         path: str = Field(..., description="The path of the file to read.")
         base64_encode: bool = Field(False, description="Whether to encode the file content as base64.")
 
-    name = "workspace.read"
+    name = "workspace_read"
     description = "Read a file from the workspace."
 
     async def call(self, args: Params, runtime: RuntimePackage):

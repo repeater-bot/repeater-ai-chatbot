@@ -41,7 +41,7 @@ class DeepseekSearch(ToolPackage):
         static_code: int = Field(..., description="The status code of the response")
         data: Any = Field(..., description="The data returned by the server")
     
-    name = "deepseek_api.search"
+    name = "deepseek_api_search"
     description = "Search the web for a query and return a ranked list of structured results. See the Search & Fetch guide for supported query operators, error handling, and billing. (using DeepSeek API)"
 
     def headers(self, env: Env):

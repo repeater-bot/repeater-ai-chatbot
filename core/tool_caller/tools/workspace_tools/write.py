@@ -8,7 +8,7 @@ class WorkspaceWrite(ToolPackage):
         path: str = Field(..., description="The path of the file to write.")
         content: str = Field(..., description="The content to write to the file.")    
 
-    name = "workspace.write"
+    name = "workspace_write"
     description = "Write text to a workspace file, creating it if missing. Returns the number of bytes written."
 
     async def call(self, args: Params, runtime: RuntimePackage):

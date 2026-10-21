@@ -2,7 +2,7 @@
 
 从 Data Server 的虚拟工作区读取文件内容。
 
-注册名：`workspace.read`
+注册名：workspace_read
 
 ## 参数
 

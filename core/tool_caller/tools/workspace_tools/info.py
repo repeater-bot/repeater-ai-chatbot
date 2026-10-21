@@ -7,7 +7,7 @@ class WorkspaceInfo(ToolPackage):
     class Params(BaseModel):
         path: str = Field(..., description="The destination path to get metadata from.")
 
-    name = "workspace.info"
+    name = "workspace_info"
     description = "Info about the workspace item."
 
     async def call(self, args: Params, runtime: RuntimePackage):

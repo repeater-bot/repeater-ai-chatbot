@@ -3,7 +3,7 @@
 Deepseek Fetch API 适配
 使用它你需要配置环境变量 `DEEPSEEK_API_KEY`
 
-注册名：`deeseek_api.fetch`
+注册名：deeseek_api_fetch
 
 接受一个参数：
 ``` json

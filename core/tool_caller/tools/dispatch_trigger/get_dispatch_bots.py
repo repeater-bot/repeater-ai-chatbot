@@ -8,7 +8,7 @@ class GetDispatchBots(ToolPackage):
     class Params(BaseModel):
         timeout: int = Field(60, description="Request timeout")
     
-    name = "dispatch_trigger.get_bots"
+    name = "dispatch_trigger_get_bots"
     description = "Get the list of Bots supported in the client based on the Repeater client communication protocol."
 
     async def call(self, args: Params, runtime: RuntimePackage):

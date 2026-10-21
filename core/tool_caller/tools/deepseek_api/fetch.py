@@ -23,7 +23,7 @@ class DeepseekFetch(ToolPackage):
         static_code: int = Field(..., description="The status code of the response")
         data: Any = Field(..., description="The data returned by the server")
     
-    name = "deepseek_api.fetch"
+    name = "deepseek_api_fetch"
     description = "Fetch a web page and return its title and content as Markdown. See the Search & Fetch guide for error handling and billing. (using DeepSeek API)"
 
     def headers(self, env: Env):

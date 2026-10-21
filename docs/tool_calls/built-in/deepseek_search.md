@@ -3,7 +3,7 @@
 Deepseek Search API 适配
 使用它你需要配置环境变量 `DEEPSEEK_API_KEY`
 
-注册名：`deeseek_api.search`
+注册名：deeseek_api_search
 
 接受五个参数：
 ``` json

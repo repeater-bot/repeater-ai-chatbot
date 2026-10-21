@@ -2,7 +2,7 @@
 
 横向发起对其他实例的聊天请求
 
-注册名：`horizontal_access.chat`
+注册名：horizontal_access_chat
 
 接受四个参数
 ``` json

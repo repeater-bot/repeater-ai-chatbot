@@ -14,7 +14,7 @@ class HorizontalAccess(ToolPackage):
         thinking: bool | None = Field(default=None, description="Whether to show thinking indicator.")
         timeout: int | float | None = Field(default=600, description="The timeout for the request.")
     
-    name = "horizontal_access.chat"
+    name = "horizontal_access_chat"
     description = "Chats to the specified Repeater instance."
 
     async def call(self, args: Params, runtime: RuntimePackage):

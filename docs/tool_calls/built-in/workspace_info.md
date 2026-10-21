@@ -2,7 +2,7 @@
 
 获取 Data Server 虚拟工作区中一个文件的元信息。
 
-注册名：`workspace.info`
+注册名：workspace_info
 
 ## 参数
 
