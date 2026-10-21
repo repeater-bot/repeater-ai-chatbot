@@ -30,6 +30,8 @@
 24. [Workspace Delete](./built-in/workspace_delete.md)
 25. [Workspace List](./built-in/workspace_list.md)
 26. [Workspace Info](./built-in/workspace_info.md)
+27. [Deeseek Search](./built-in/deepseek_search.md)
+28. [Deeseek Fetch](./built-in/deepseek_fetch.md)
 
 > Workspace 系列工具通过 Data Server 访问虚拟工作区。使用前需要：
 > 在 `configs/project_configs/config.json` 里把 `data_server.base_url` 指向运行中的

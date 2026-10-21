@@ -3,7 +3,7 @@
 按 Repeater 客户端通信协议向客户端发起触发请求
 需在 `tool_calls.tools_configs.dispatch_trigger` 中配置客户端地址
 
-注册名：`dispatch_trigger`
+注册名：`dispatch_trigger.execute`
 
 接受六个参数
 ``` json

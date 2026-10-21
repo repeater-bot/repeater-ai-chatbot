@@ -14,7 +14,7 @@ class DispatchTrigger(ToolPackage):
         message_id: int = Field(default=0, description="Message ID, which identifies the ID of the current message.")
         timeout: int = Field(default=2400, description="Timeout for the request.")
     
-    name = "dispatch_trigger"
+    name = "dispatch_trigger.execute"
     description = (
         "Make a request to the client based on the Repeater client communication protocol. \n"
         "The returned text may be incomplete: the client's handler can deliver messages \n"

@@ -12,7 +12,7 @@ class DispatchAskQuestions(ToolPackage):
         ask_prompt: str = Field(default=..., description="The question to ask the user.")
         timeout: int = Field(default=2400, description="Timeout for the request.")
     
-    name = "dispatch_ask_questions"
+    name = "dispatch_trigger.ask_questions"
     description = (
         "Pose a question to the user and get the user's answer."
     )

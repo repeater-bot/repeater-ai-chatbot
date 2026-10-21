@@ -2,7 +2,7 @@
 
 从 Data Server 的虚拟工作区读取文件内容。
 
-注册名：`workspace_read`
+注册名：`workspace.read`
 
 ## 参数
 
@@ -28,7 +28,7 @@
 文件不存在、路径是目录、Data Server 未启动或请求超时等情况，工具会返回文本：
 
 ```text
-Tool workspace_read error: ...
+Tool workspace.read error: ...
 ```
 
 读取非 UTF-8 的二进制文件时请设置 `base64_encode = true`；否则 UTF-8 解码失败也会走上面的错误路径。
@@ -36,5 +36,5 @@ Tool workspace_read error: ...
 ## 前置条件
 
 `configs/project_configs/config.json` 中的 `data_server.base_url` 指向运行中的 Data Server，
-并且 `tool_calls.registed` 包含 `workspace_read`。详见
+并且 `tool_calls.registed` 包含 `workspace.read`。详见
 [Tool Calls 索引](../index.md)。

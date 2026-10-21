@@ -9,7 +9,7 @@ class DeleteHorizontalContext(ToolPackage):
     class Params(BaseModel):
         instance_id: str = Field(default="", description="The instance ID to access.")
     
-    name = "delete_horizontal_context"
+    name = "horizontal_access.delete_context"
     description = "Delete the chat context for specified instance with the local instance."
 
     async def call(self, args: Params, runtime: RuntimePackage):

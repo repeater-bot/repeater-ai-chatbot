@@ -2,7 +2,7 @@
 
 删除与其他实例对话后对方的聊天记录
 
-注册名：`delete_horizontal_context`
+注册名：`horizontal_access.delete_context`
 
 接受一个参数
 ``` json

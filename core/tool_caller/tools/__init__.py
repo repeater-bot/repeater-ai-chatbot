@@ -33,6 +33,10 @@ from .workspace_tools import (
     WorkspaceList,
     WorkspaceInfo
 )
+from .deepseek_api import (
+    DeepseekSearch,
+    DeepseekFetch,
+)
 
 __all__ = [
     "Demo",
@@ -63,5 +67,7 @@ __all__ = [
     "WorkspaceWrite",
     "WorkspaceDelete",
     "WorkspaceList",
-    "WorkspaceInfo"
+    "WorkspaceInfo",
+    "DeepseekSearch",
+    "DeepseekFetch",
 ]

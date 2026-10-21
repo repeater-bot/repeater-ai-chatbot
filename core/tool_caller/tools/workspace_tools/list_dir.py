@@ -7,7 +7,7 @@ class WorkspaceList(ToolPackage):
     class Params(BaseModel):
         path: str = Field(..., description="The path of the directory to list (an empty string lists the root).")
 
-    name = "workspace_list"
+    name = "workspace.list"
     description = "List all items in a directory in the workspace."
 
     async def call(self, args: Params, runtime: RuntimePackage):

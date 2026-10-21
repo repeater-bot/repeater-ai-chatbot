@@ -26,8 +26,8 @@ class Metaso(ToolPackage):
     description = "Metaso Internet AI Search"
 
     async def call(self, args: Params, runtime: RuntimePackage):
-        runtime = RuntimeContainer.get_runtime()
-        env = runtime.env
+        global_runtime = RuntimeContainer.get_runtime()
+        env = global_runtime.env
 
         if self.client is None:
             self.client = httpx.AsyncClient(

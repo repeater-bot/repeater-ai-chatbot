@@ -2,7 +2,7 @@
 
 列出 Data Server 虚拟工作区中某个目录的直接子项名称。
 
-注册名：`workspace_list`
+注册名：`workspace.list`
 
 ## 参数
 
@@ -42,11 +42,11 @@
 路径不存在、路径是文件、Data Server 未启动或请求超时等情况，工具会返回文本：
 
 ```text
-Tool workspace_list error: ...
+Tool workspace.list error: ...
 ```
 
 ## 前置条件
 
 `configs/project_configs/config.json` 中的 `data_server.base_url` 指向运行中的 Data Server，
-并且 `tool_calls.registed` 包含 `workspace_list`。详见
+并且 `tool_calls.registed` 包含 `workspace.list`。详见
 [Tool Calls 索引](../index.md)。
