@@ -37,6 +37,15 @@ from .deepseek_api import (
     DeepseekSearch,
     DeepseekFetch,
 )
+from .variables import (
+    VariablesList,
+    VariableExists,
+    GetVariable,
+    SetVariable,
+    RemoveVariable,
+    LoadVariables,
+    DumpVariables
+)
 
 __all__ = [
     "Demo",
@@ -49,25 +58,40 @@ __all__ = [
     "TokenCount",
     "SystemInfo",
     "Starlark",
+
     "GetHorizontalIds",
     "HorizontalAccess",
     "DeleteHorizontalContext",
+
     "GenerateImage",
+
     "DispatchTrigger",
     "GetDispatchBots",
     "DispatchAskQuestions",
+
     "URLToImage",
+
     "ListTask",
     "Bypass",
     "WaitTask",
     "InjectionInput",
     "ConsumptionOutput",
     "GetResult",
+
     "WorkspaceRead",
     "WorkspaceWrite",
     "WorkspaceDelete",
     "WorkspaceList",
     "WorkspaceInfo",
+
     "DeepseekSearch",
     "DeepseekFetch",
+
+    "VariablesList",
+    "VariableExists",
+    "GetVariable",
+    "SetVariable",
+    "RemoveVariable",
+    "LoadVariables",
+    "DumpVariables"
 ]

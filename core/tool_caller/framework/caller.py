@@ -54,6 +54,9 @@ class ToolsCaller:
     result_map: dict[str, set[uuid.UUID]] = {}
     result_lock = asyncio.Lock()
 
+    variables: dict[str, dict[str, Any]] = {}
+    variable_lock = asyncio.Lock()
+
     forward_call_index: dict[uuid.UUID, set[uuid.UUID]] = {}
     reverse_call_index: dict[uuid.UUID, uuid.UUID] = {}
     call_index_lock = asyncio.Lock()
@@ -231,6 +234,91 @@ class ToolsCaller:
             user_results = cls.result_map.pop(user_id, set())
             for result in user_results:
                 cls.results.pop(result)
+
+    @classmethod
+    async def set_variable(
+        cls,
+        user_id: str,
+        variable_name: str,
+        variable_value: Any,
+    ) -> None:
+        async with cls.variable_lock:
+            user_variables = cls.variables.setdefault(user_id, {})
+            user_variables[variable_name] = variable_value
+
+    @classmethod
+    async def get_variable(
+        cls,
+        user_id: str,
+        variable_name: str,
+    ) -> Any:
+        async with cls.variable_lock:
+            user_variables = cls.variables.get(user_id, None)
+            # A variable whose value is None does exist; only a missing key is
+            # an error, otherwise `get_variable` disagrees with `variable_exists`.
+            if user_variables is None or variable_name not in user_variables:
+                raise KeyError(f"Variable {variable_name} not found")
+            return user_variables[variable_name]
+
+    @classmethod
+    async def remove_variable(
+        cls,
+        user_id: str,
+        variable_name: str,
+    ) -> None:
+        async with cls.variable_lock:
+            user_variables = cls.variables.get(user_id)
+            if user_variables is not None:
+                user_variables.pop(variable_name, None)
+                if not user_variables:
+                    cls.variables.pop(user_id, None)
+
+    @classmethod
+    async def variable_exists(
+        cls,
+        user_id: str,
+        variable_name: str,
+    ) -> bool:
+        async with cls.variable_lock:
+            user_variables = cls.variables.get(user_id, None)
+            if user_variables is None:
+                return False
+            return variable_name in user_variables
+        return False
+
+    @classmethod
+    async def variables_list(
+        cls,
+        user_id: str,
+    ) -> list[str]:
+        async with cls.variable_lock:
+            user_variables = cls.variables.get(user_id, None)
+            if user_variables is None:
+                return []
+            return list(user_variables.keys())
+
+    @classmethod
+    async def variable_types(
+        cls,
+        user_id: str,
+    ) -> list[tuple[str, str]]:
+        async with cls.variable_lock:
+            user_variables = cls.variables.get(user_id, None)
+            if user_variables is None:
+                return []
+            return [(k, (v.__class__.__name__)) for k, v in user_variables.items()]
+
+    @classmethod
+    async def user_variables(
+        cls,
+        user_id: str,
+    ) -> dict[str, Any]:
+        async with cls.variable_lock:
+            if user_id in cls.variables:
+                return cls.variables[user_id].copy()
+            else:
+                return {}
+                
 
     @classmethod
     async def call_tool(
