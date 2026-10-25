@@ -1,5 +1,4 @@
 from pydantic import BaseModel
 
 class ProgramData(BaseModel):
-    # TODO: Data storage links reserved for the future.
-    pass
+    variables: str = "" # Implement format resolution in tools.
