@@ -2,7 +2,7 @@
 
 删除 Data Server 虚拟工作区中的文件或空目录。
 
-注册名：workspace_delete
+注册名：`workspace_delete`
 
 ## 参数
 

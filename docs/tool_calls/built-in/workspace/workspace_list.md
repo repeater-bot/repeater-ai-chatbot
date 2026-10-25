@@ -2,7 +2,7 @@
 
 列出 Data Server 虚拟工作区中某个目录的直接子项名称。
 
-注册名：workspace_list
+注册名：`workspace_list`
 
 ## 参数
 
