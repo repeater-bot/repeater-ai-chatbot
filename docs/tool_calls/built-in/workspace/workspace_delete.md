@@ -12,7 +12,8 @@
 
 ```json
 {
-  "path": "docs/readme.md"
+  "path": "docs/readme.md",
+  "recursive": false
 }
 ```
 

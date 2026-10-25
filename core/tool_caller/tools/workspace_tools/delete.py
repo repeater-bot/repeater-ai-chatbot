@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 class WorkspaceDelete(ToolPackage):
     class Params(BaseModel):
         path: str = Field(..., description="The path of the file or empty directory to delete.")
+        recursive: bool = Field(default=False, description="Whether to recursively delete the directory and its contents.")
 
     name = "workspace_delete"
     description = "Delete a file or an empty directory from the workspace. Non-empty directories are rejected."
@@ -14,4 +15,7 @@ class WorkspaceDelete(ToolPackage):
         global_runtime = RuntimeContainer.get_runtime()
         data_client = global_runtime.data_client
 
-        return await data_client.delete(args.path)
+        return await data_client.delete(
+            args.path,
+            recursive = args.recursive
+        )
