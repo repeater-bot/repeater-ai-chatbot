@@ -1,6 +1,6 @@
 # ==== 模块信息 ==== #
 
-__version__ = "4.10.5.0"
+__version__ = "4.10.6.0"
 
 __author__ = "Qeggs"
 __license__ = "MIT"
