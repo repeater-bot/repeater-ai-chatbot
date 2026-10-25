@@ -43,11 +43,11 @@
 路径不存在、路径是目录、Data Server 未启动或请求超时等情况，工具会返回文本：
 
 ```text
-Tool workspace.info error: ...
+Tool workspace_info error: ...
 ```
 
 ## 前置条件
 
 `configs/project_configs/config.json` 中的 `data_server.base_url` 指向运行中的 Data Server，
-并且 `tool_calls.registed` 包含 `workspace.info`。详见
+并且 `tool_calls.registed` 包含 `workspace_info`。详见
 [Tool Calls 索引](../index.md)。

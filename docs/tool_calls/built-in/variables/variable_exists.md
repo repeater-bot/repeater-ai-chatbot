@@ -36,6 +36,7 @@ Variable 'reply' does not exist.
 
 ## 前置条件
 
-`configs/project_configs/config.json` 的 `tool_calls.registed` 必须包含 `variable_exists`，
-用户侧还要在 `allowed_tool_calls`（或 `tool_calls.allowed_by_default`）中允许。详见
-[Tool Calls 索引](../index.md)。
+本工具**默认不开启**。启用时需要在目标环境的 `configs/project_configs/config.json` 里，
+把 `variable_exists` 加入 `tool_calls.registed`，并在 `allowed_tool_calls`
+（或 `tool_calls.allowed_by_default`）中允许。开发环境和用户环境各有一份自己的配置，
+以目标环境的实际配置为准。详见 [Tool Calls 索引](../index.md)。

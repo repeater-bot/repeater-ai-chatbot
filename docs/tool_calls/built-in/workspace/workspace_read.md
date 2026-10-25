@@ -76,7 +76,7 @@ Written to variable readme(str).
 文件不存在、路径是目录、Data Server 未启动或请求超时等情况，工具会返回文本：
 
 ```text
-Tool workspace.read error: ...
+Tool workspace_read error: ...
 ```
 
 读取非 UTF-8 的二进制文件时，用 `base64_encode = true`（得到可落盘的 Base64 文本），
@@ -86,5 +86,5 @@ Tool workspace.read error: ...
 ## 前置条件
 
 `configs/project_configs/config.json` 中的 `data_server.base_url` 指向运行中的 Data Server，
-并且 `tool_calls.registed` 包含 `workspace.read`。详见
+并且 `tool_calls.registed` 包含 `workspace_read`。详见
 [Tool Calls 索引](../index.md)。

@@ -48,5 +48,7 @@
 > Variables 系列工具维护每个用户自己的变量表，按 `user_id` 隔离。变量只存在进程内存里，
 > 必须显式调用 `dump_variable` 才写入 `ProgramData.variables`，重启后用 `load_variable`
 > 读回；值为 `bytes` 的变量会让 `dump_variable` 整份失败，用 `variable_list` 的类型列定位。
-> 这 7 个注册名目前不在默认 `tool_calls.registed` 中，启用时同样要加进 `registed`，
-> 并在 `allowed_tool_calls`（或 `tool_calls.allowed_by_default`）中允许。
+> 这 7 个注册名**默认不开启**：需要在目标环境的 `configs/project_configs/config.json` 里
+> 把工具名加入 `tool_calls.registed`，并在 `allowed_tool_calls`（或
+> `tool_calls.allowed_by_default`）中允许。开发环境和用户环境各有一份自己的配置，
+> 不要假定某一份里已经加好。

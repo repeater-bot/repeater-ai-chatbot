@@ -35,7 +35,7 @@
 以下情况会返回文本：
 
 ```text
-Tool workspace.delete error: ...
+Tool workspace_delete error: ...
 ```
 
 - 路径不存在（服务器 404）；
@@ -52,5 +52,5 @@ Tool workspace.delete error: ...
 ## 前置条件
 
 `configs/project_configs/config.json` 中的 `data_server.base_url` 指向运行中的 Data Server，
-并且 `tool_calls.registed` 包含 `workspace.delete`。详见
+并且 `tool_calls.registed` 包含 `workspace_delete`。详见
 [Tool Calls 索引](../index.md)。
