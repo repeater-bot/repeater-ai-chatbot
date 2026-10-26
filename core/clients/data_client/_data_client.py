@@ -109,6 +109,67 @@ class DataClient:
             )
         return [str(item) for item in payload]
 
+    @staticmethod
+    def _path_list(response: httpx.Response) -> list[str]:
+        payload = response.json()
+        if not isinstance(payload, list):
+            raise HTTPException(
+                detail = "Invalid Data Server path list response",
+                status_code = 502
+            )
+        return [str(item) for item in payload]
+
+    async def glob(self, path: str, pattern: str) -> list[str]:
+        """Match ``pattern`` below ``path``, returning full virtual paths."""
+        response = await self._request(
+            "GET",
+            self.operation_url("glob", path),
+            "Glob",
+            params = {
+                "pattern": pattern,
+            }
+        )
+        return self._path_list(response)
+
+    async def rglob(self, path: str, pattern: str) -> list[str]:
+        """Recursively match ``pattern`` below ``path``."""
+        response = await self._request(
+            "GET",
+            self.operation_url("rglob", path),
+            "Rglob",
+            params = {
+                "pattern": pattern,
+            }
+        )
+        return self._path_list(response)
+
+    async def rematch(self, path: str, pattern: str) -> bool:
+        """Return whether ``path`` matches the regular expression ``pattern``."""
+        response = await self._request(
+            "GET",
+            self.operation_url("rematch", path),
+            "Rematch",
+            params = {
+                "pattern": pattern,
+            }
+        )
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise HTTPException(
+                detail = "Invalid Data Server rematch response",
+                status_code = 502
+            )
+        return bool(payload.get("matched", False))
+
+    async def rlist(self, path: str = "") -> list[str]:
+        """Return all descendant virtual paths below ``path``."""
+        response = await self._request(
+            "GET",
+            self.operation_url("rlist", path),
+            "Rlist"
+        )
+        return self._path_list(response)
+
     async def get_info(self, path: str) -> FileInfo:
         """Fetch file metadata."""
         response = await self._request(
@@ -117,6 +178,21 @@ class DataClient:
             "Get Info"
         )
         return FileInfo.model_validate(response.json())
+
+    async def exists(self, path: str) -> bool:
+        """Return whether a virtual path exists."""
+        response = await self._request(
+            "GET",
+            self.operation_url("exists", path),
+            "Check"
+        )
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise HTTPException(
+                detail = "Invalid Data Server exists response",
+                status_code = 502
+            )
+        return bool(payload.get("exists", False))
 
     async def write_file(
             self,

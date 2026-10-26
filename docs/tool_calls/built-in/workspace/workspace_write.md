@@ -97,4 +97,4 @@ Tool workspace_write error: ...
 
 `configs/project_configs/config.json` 中的 `data_server.base_url` 指向运行中的 Data Server，
 并且 `tool_calls.registed` 包含 `workspace_write`。详见
-[Tool Calls 索引](../index.md)。
+[Tool Calls 索引](../../index.md)。

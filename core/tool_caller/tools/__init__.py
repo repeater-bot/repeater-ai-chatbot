@@ -30,6 +30,11 @@ from .workspace_tools import (
     WorkspaceRead,
     WorkspaceWrite,
     WorkspaceDelete,
+    WorkspaceExists,
+    WorkspaceGlob,
+    WorkspaceRglob,
+    WorkspaceRematch,
+    WorkspaceRlist,
     WorkspaceList,
     WorkspaceInfo
 )
@@ -81,6 +86,11 @@ __all__ = [
     "WorkspaceRead",
     "WorkspaceWrite",
     "WorkspaceDelete",
+    "WorkspaceExists",
+    "WorkspaceGlob",
+    "WorkspaceRglob",
+    "WorkspaceRematch",
+    "WorkspaceRlist",
     "WorkspaceList",
     "WorkspaceInfo",
 
