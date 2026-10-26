@@ -3,8 +3,6 @@ from .write import WorkspaceWrite
 from .delete import WorkspaceDelete
 from .exists import WorkspaceExists
 from .glob import WorkspaceGlob
-from .rglob import WorkspaceRglob
 from .rematch import WorkspaceRematch
-from .rlist import WorkspaceRlist
 from .list_dir import WorkspaceList
 from .info import WorkspaceInfo

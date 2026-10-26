@@ -94,20 +94,21 @@ class DataClient:
         )
         return response.text
 
-    async def list_dir(self, path: str = "") -> list[str]:
-        """List direct child names; use ``""`` for the root directory."""
+    async def list_dir(
+        self,
+        path: str = "",
+        recursive: bool = False
+    ) -> list[str]:
+        """List child paths; ``recursive=True`` returns all descendants."""
         response = await self._request(
             "GET",
             self.operation_url("list", path),
-            "List"
+            "List",
+            params = {
+                "recursive": recursive,
+            }
         )
-        payload = response.json()
-        if not isinstance(payload, list):
-            raise HTTPException(
-                detail = "Invalid Data Server list response",
-                status_code = 502
-            )
-        return [str(item) for item in payload]
+        return self._path_list(response)
 
     @staticmethod
     def _path_list(response: httpx.Response) -> list[str]:
@@ -119,26 +120,23 @@ class DataClient:
             )
         return [str(item) for item in payload]
 
-    async def glob(self, path: str, pattern: str) -> list[str]:
-        """Match ``pattern`` below ``path``, returning full virtual paths."""
+    async def glob(
+        self,
+        path: str,
+        pattern: str,
+        recursive: bool = False
+    ) -> list[str]:
+        """Match ``pattern`` below ``path``, returning full virtual paths.
+
+        With ``recursive=True`` the pattern is applied at any depth.
+        """
         response = await self._request(
             "GET",
             self.operation_url("glob", path),
             "Glob",
             params = {
                 "pattern": pattern,
-            }
-        )
-        return self._path_list(response)
-
-    async def rglob(self, path: str, pattern: str) -> list[str]:
-        """Recursively match ``pattern`` below ``path``."""
-        response = await self._request(
-            "GET",
-            self.operation_url("rglob", path),
-            "Rglob",
-            params = {
-                "pattern": pattern,
+                "recursive": recursive,
             }
         )
         return self._path_list(response)
@@ -160,15 +158,6 @@ class DataClient:
                 status_code = 502
             )
         return bool(payload.get("matched", False))
-
-    async def rlist(self, path: str = "") -> list[str]:
-        """Return all descendant virtual paths below ``path``."""
-        response = await self._request(
-            "GET",
-            self.operation_url("rlist", path),
-            "Rlist"
-        )
-        return self._path_list(response)
 
     async def get_info(self, path: str) -> FileInfo:
         """Fetch file metadata."""

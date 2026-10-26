@@ -32,9 +32,7 @@ from .workspace_tools import (
     WorkspaceDelete,
     WorkspaceExists,
     WorkspaceGlob,
-    WorkspaceRglob,
     WorkspaceRematch,
-    WorkspaceRlist,
     WorkspaceList,
     WorkspaceInfo
 )
@@ -88,9 +86,7 @@ __all__ = [
     "WorkspaceDelete",
     "WorkspaceExists",
     "WorkspaceGlob",
-    "WorkspaceRglob",
     "WorkspaceRematch",
-    "WorkspaceRlist",
     "WorkspaceList",
     "WorkspaceInfo",
 

@@ -1,6 +1,6 @@
 # Workspace List
 
-列出 Data Server 虚拟工作区中某个目录的直接子项名称。
+列出 Data Server 虚拟工作区中某个目录的子项路径。
 
 注册名：`workspace_list`
 
@@ -9,37 +9,50 @@
 | 参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `path` | string | 必填 | 虚拟目录路径；根目录传空字符串 `""` |
+| `recursive` | boolean | `false` | 为 `true` 时递归列出所有后代路径，否则只列直接子项 |
+
+直接子项：
 
 ```json
 {
-  "path": "docs"
+  "path": "docs",
+  "recursive": false
 }
 ```
 
-根目录：
+递归：
 
 ```json
 {
-  "path": ""
+  "path": "docs",
+  "recursive": true
 }
 ```
 
 ## 返回
 
-子项名称的 JSON 数组，按索引中的顺序返回：
+完整虚拟路径的 JSON 数组，文件和目录都包含：
 
 ```json
 [
-  "readme.md",
-  "images"
+  "docs/a.md",
+  "docs/sub"
 ]
 ```
 
-返回值只包含直接子项，不会递归展开。
+`recursive = true` 时会展开到所有后代：
+
+```json
+[
+  "docs/a.md",
+  "docs/sub",
+  "docs/sub/c.md"
+]
+```
 
 ## 错误
 
-路径不存在、路径是文件、Data Server 未启动或请求超时等情况，工具会返回文本：
+路径不存在、路径是文件、Data Server 无法连接或请求超时等情况，工具会返回文本：
 
 ```text
 Tool workspace_list error: ...

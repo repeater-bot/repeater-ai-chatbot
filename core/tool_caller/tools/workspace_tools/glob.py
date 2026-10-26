@@ -14,6 +14,10 @@ class WorkspaceGlob(ToolPackage):
             ...,
             description="Glob pattern, for example '*.md', 'sub/*.md' or '**/*.md'."
         )
+        recursive: bool = Field(
+            default=False,
+            description="Whether to match the pattern at any depth below the directory."
+        )
 
     name = "workspace_glob"
     description = "List workspace paths matching a glob pattern below a directory."
@@ -22,4 +26,8 @@ class WorkspaceGlob(ToolPackage):
         global_runtime = RuntimeContainer.get_runtime()
         data_client = global_runtime.data_client
 
-        return await data_client.glob(args.path, args.pattern)
+        return await data_client.glob(
+            args.path,
+            args.pattern,
+            recursive = args.recursive
+        )
