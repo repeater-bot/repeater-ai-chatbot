@@ -1,0 +1,21 @@
+from fastapi import Query
+
+from .....clients.data_client import DeleteResult
+
+from .._client import get_data_client
+from .._router import workspace_router
+
+
+@workspace_router.delete(
+    "/delete/{path:path}",
+    name = "workspace.delete"
+)
+async def delete(
+    path: str,
+    recursive: bool = Query(False)
+) -> DeleteResult:
+    """Delete a workspace file or directory."""
+    return await get_data_client().delete(
+        path = path,
+        recursive = recursive
+    )

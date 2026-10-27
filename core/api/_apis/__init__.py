@@ -1,5 +1,6 @@
 from ._generate_api import *
 from ._files_router import *
+from ._workspace_api import *
 from ._render_api import *
 from ._template_api import *
 from ._user_data_api import *
