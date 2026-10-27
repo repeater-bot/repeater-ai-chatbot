@@ -1,5 +1,7 @@
 from fastapi import File, UploadFile
 
+from .....special_exception import HTTPException
+
 from .._client import get_data_client
 from .._router import workspace_router
 
@@ -13,6 +15,12 @@ async def write_file(
     file: UploadFile = File(...)
 ):
     """Write an uploaded file into the workspace."""
+    if not path.strip("/"):
+        raise HTTPException(
+            status_code = 400,
+            detail = "path cannot be empty"
+        )
+
     data = await file.read()
     return await get_data_client().write_file(
         path = path,

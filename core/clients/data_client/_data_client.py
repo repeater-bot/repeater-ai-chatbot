@@ -70,7 +70,22 @@ class DataClient:
         except httpx.RequestError as e:
             raise HTTPException(detail = f"{action} Data Resource Failed: {e}") from e
 
-        response.raise_for_status()
+        if response.is_error:
+            try:
+                payload = response.json()
+            except ValueError:
+                detail = response.text
+            else:
+                if isinstance(payload, dict):
+                    detail = payload.get("detail", response.text)
+                else:
+                    detail = response.text
+
+            raise HTTPException(
+                detail = str(detail) if detail else response.reason_phrase,
+                status_code = response.status_code
+            )
+
         return response
 
     async def get_file(self, path: str) -> bytes:
