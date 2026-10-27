@@ -6,7 +6,7 @@ class GetHorizontalIds(ToolPackage):
     class Params(BaseModel):
         pass
     
-    name = "get_horizontal_ids"
+    name = "horizontal_access_get_ids"
     description = "Gets a list of additional repeater instance ids that are horizontally accessible."
 
     async def call(self, args: Params, runtime: RuntimePackage):

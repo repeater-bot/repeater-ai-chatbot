@@ -29,13 +29,16 @@ async def get_userdata_file(user_id: str):
     context = await context_loader.load_context(user_id = user_id)
     prompt = await server.runtime.prompt_manager.load(user_id = user_id, default = "")
     config = await server.runtime.user_config_manager.load(user_id = user_id)
+    program_data_manager = server.runtime.program_data_manager
+    program_data = await program_data_manager.load(user_id = user_id)
     
     await asyncio.to_thread(
         make_user_file,
         file = buffer,
         context = context,
         prompt = prompt,
-        user_configs = config
+        user_configs = config,
+        program_data = program_data
     )
 
     logger.info(

@@ -27,6 +27,9 @@ Repeater 提供了许多接口，
 ## Watermark API
   - [Watermark API](./watermark_api/index.md)
 
+## Workspace API
+  - [Workspace API](./workspace_api/index.md)
+
 ## Web API
   - [Web API](./web.md)
   - [Docs API](./docs_api.md)
@@ -38,11 +41,11 @@ Repeater 提供了许多接口，
   - [Model API](./model_api/index.md)
 
 ## Server Info API
-  - [License API](./license_api.md)
+  - [License API](./license_api/index.md)
   - [Version API](./version_api.md)
 
 ## Status API
-  - [Status API](./status_api.md)
+  - [Status API](./status_api/core_task_status.md)
 
 ## Alived API
   - [Alived API](./alived_api/alived.md)

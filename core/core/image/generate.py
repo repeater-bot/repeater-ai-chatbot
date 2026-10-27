@@ -57,6 +57,24 @@ async def generate_image(
     if timeout is None:
         timeout = model.timeout
 
+    logger.info(
+        "Prompt:\n{prompt}",
+        prompt = request.prompt
+    )
+
+    if request.images:
+        logger.info(
+            "Images: {images_count}",
+            images_count = len(request.images)
+        )
+    
+    logger.info(
+        "Model: {model_id}({parent}/{model_name})",
+        model_id = model.uid,
+        model_name = model.name,
+        parent = model.parent
+    )
+
     openai_pool = runtime.openai_pool
     image_generate_client = ImageGenerateClient(
         max_concurrency = 1000,

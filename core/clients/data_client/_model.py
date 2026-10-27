@@ -25,3 +25,17 @@ class DeleteResult(BaseModel):
 
     deleted_files: int
     deleted_dirs: int
+
+
+class MoveResult(BaseModel):
+    """Result returned by ``POST /operations/move/{path}``."""
+
+    source: str
+    destination: str
+
+
+class CopyResult(MoveResult):
+    """Result returned by ``POST /operations/copy/{path}``."""
+
+    copied_files: int
+    copied_dirs: int

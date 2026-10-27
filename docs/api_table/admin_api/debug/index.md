@@ -13,4 +13,4 @@
   - [Raise Warning API](./raise_warning/raise_warning.md)
 
 # 获取配置信息 API
-  - [Get Config API](./get_config/get_config.md)
+  - [Get Config API](./get_configs/get_configs.md)

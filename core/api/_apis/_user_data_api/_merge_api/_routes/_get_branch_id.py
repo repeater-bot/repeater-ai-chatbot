@@ -5,10 +5,10 @@ from fastapi.responses import (
 from loguru import logger
 from ..._user_data_type import UserDataType, get_manager
 
-@merged_user_data_router.get("/{user_data_type}/now_branch/{user_id}")
-async def get_now_branch_id(user_data_type: UserDataType, user_id: str):
+@merged_user_data_router.get("/{user_data_type}/active/{user_id}")
+async def get_active_branch_id(user_data_type: UserDataType, user_id: str):
     """
-    Endpoint for getting branch ID
+    Endpoint for getting active branch ID
 
     Args:
         user_id (str): User ID

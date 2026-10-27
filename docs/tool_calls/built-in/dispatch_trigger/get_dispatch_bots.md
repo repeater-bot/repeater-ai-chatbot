@@ -2,7 +2,7 @@
 
 获取客户端支持的 Bot 列表
 
-注册名：`get_dispatch_bots`
+注册名：`dispatch_trigger_get_bots`
 
 用来在调用 `dispatch_trigger` 之前发现可用的 `bot_id`。
 

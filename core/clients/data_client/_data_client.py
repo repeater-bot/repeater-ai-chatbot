@@ -5,7 +5,7 @@ import httpx
 from urllib.parse import quote
 from yarl import URL
 from ...special_exception import HTTPException
-from ._model import DeleteResult, FileInfo
+from ._model import CopyResult, DeleteResult, FileInfo, MoveResult
 
 
 class DataClient:
@@ -70,7 +70,22 @@ class DataClient:
         except httpx.RequestError as e:
             raise HTTPException(detail = f"{action} Data Resource Failed: {e}") from e
 
-        response.raise_for_status()
+        if response.is_error:
+            try:
+                payload = response.json()
+            except ValueError:
+                detail = response.text
+            else:
+                if isinstance(payload, dict):
+                    detail = payload.get("detail", response.text)
+                else:
+                    detail = response.text
+
+            raise HTTPException(
+                detail = str(detail) if detail else response.reason_phrase,
+                status_code = response.status_code
+            )
+
         return response
 
     async def get_file(self, path: str) -> bytes:
@@ -94,20 +109,70 @@ class DataClient:
         )
         return response.text
 
-    async def list_dir(self, path: str = "") -> list[str]:
-        """List direct child names; use ``""`` for the root directory."""
+    async def list_dir(
+        self,
+        path: str = "",
+        recursive: bool = False
+    ) -> list[str]:
+        """List child paths; ``recursive=True`` returns all descendants."""
         response = await self._request(
             "GET",
             self.operation_url("list", path),
-            "List"
+            "List",
+            params = {
+                "recursive": recursive,
+            }
         )
+        return self._path_list(response)
+
+    @staticmethod
+    def _path_list(response: httpx.Response) -> list[str]:
         payload = response.json()
         if not isinstance(payload, list):
             raise HTTPException(
-                detail = "Invalid Data Server list response",
+                detail = "Invalid Data Server path list response",
                 status_code = 502
             )
         return [str(item) for item in payload]
+
+    async def glob(
+        self,
+        path: str,
+        pattern: str,
+        recursive: bool = False
+    ) -> list[str]:
+        """Match ``pattern`` below ``path``, returning full virtual paths.
+
+        With ``recursive=True`` the pattern is applied at any depth.
+        """
+        response = await self._request(
+            "GET",
+            self.operation_url("glob", path),
+            "Glob",
+            params = {
+                "pattern": pattern,
+                "recursive": recursive,
+            }
+        )
+        return self._path_list(response)
+
+    async def rematch(self, path: str, pattern: str) -> bool:
+        """Return whether ``path`` matches the regular expression ``pattern``."""
+        response = await self._request(
+            "GET",
+            self.operation_url("rematch", path),
+            "Rematch",
+            params = {
+                "pattern": pattern,
+            }
+        )
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise HTTPException(
+                detail = "Invalid Data Server rematch response",
+                status_code = 502
+            )
+        return bool(payload.get("matched", False))
 
     async def get_info(self, path: str) -> FileInfo:
         """Fetch file metadata."""
@@ -117,6 +182,21 @@ class DataClient:
             "Get Info"
         )
         return FileInfo.model_validate(response.json())
+
+    async def exists(self, path: str) -> bool:
+        """Return whether a virtual path exists."""
+        response = await self._request(
+            "GET",
+            self.operation_url("exists", path),
+            "Check"
+        )
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise HTTPException(
+                detail = "Invalid Data Server exists response",
+                status_code = 502
+            )
+        return bool(payload.get("exists", False))
 
     async def write_file(
             self,
@@ -168,6 +248,48 @@ class DataClient:
             }
         )
         return DeleteResult.model_validate(response.json())
+
+    async def mkdir(self, path: str) -> str:
+        """Create a directory, including missing parents."""
+        if not path.strip("/"):
+            raise ValueError("path cannot be empty")
+
+        response = await self._request(
+            "POST",
+            self.operation_url("mkdir", path),
+            "Mkdir"
+        )
+        payload = response.json()
+        if not isinstance(payload, dict) or "path" not in payload:
+            raise HTTPException(
+                detail = "Invalid Data Server mkdir response",
+                status_code = 502
+            )
+        return str(payload["path"])
+
+    async def move(self, path: str, destination: str) -> MoveResult:
+        """Move a file or directory without changing file ids or payloads."""
+        response = await self._request(
+            "POST",
+            self.operation_url("move", path),
+            "Move",
+            json = {
+                "destination": destination,
+            }
+        )
+        return MoveResult.model_validate(response.json())
+
+    async def copy(self, path: str, destination: str) -> CopyResult:
+        """Copy a file or directory with fresh file ids and payloads."""
+        response = await self._request(
+            "POST",
+            self.operation_url("copy", path),
+            "Copy",
+            json = {
+                "destination": destination,
+            }
+        )
+        return CopyResult.model_validate(response.json())
 
     async def close(self) -> None:
         await self.client.aclose()

@@ -12,6 +12,10 @@ from ......user_data_managers.context import (
     ContextLoader,
     Context
 )
+from ......user_data_managers.program_data_manager import (
+    ProgramDataManager,
+    ProgramData
+)
 from ......data_manager import (
     PromptManager
 )
@@ -21,7 +25,8 @@ def package_to_zip(
     file: BinaryIO,
     contexts: dict[str, Context],
     prompts: dict[str, str],
-    user_configs: dict[str, UserConfigs]
+    user_configs: dict[str, UserConfigs],
+    program_datas: dict[str, ProgramData]
 ):
     with zipfile.ZipFile(file, "w") as zipf:
         for branch_id, context in contexts.items():
@@ -64,6 +69,19 @@ def package_to_zip(
                     allow_unicode = True
                 )
             )
+        for branch_id, program_data in program_datas.items():
+            zipf.writestr(
+                f"raw/program_data/{branch_id}.json",
+                orjson.dumps(
+                    program_data
+                )
+            )
+            zipf.writestr(
+                f"readable/program_data/{branch_id}.yaml",
+                yaml.safe_dump(
+                    program_data
+                )
+            )
     file.seek(0)
 
 async def package_user_space(
@@ -71,6 +89,7 @@ async def package_user_space(
     context_loader: ContextLoader,
     prompt_manager: PromptManager,
     config_manager: ConfigManager,
+    program_data_manager: ProgramDataManager,
     file: BinaryIO
 ):
     contexts: dict[str, Context] = {}
@@ -99,11 +118,21 @@ async def package_user_space(
             branch_id = config_branch
         )
         configs[config_branch] = config
+
+    program_datas: dict[str, ProgramData] = {}
+    program_data_branchs = await program_data_manager.get_all_branch_id(user_id)
+    for program_data_branch in program_data_branchs:
+        program_data = await program_data_manager.load(
+            user_id = user_id,
+            branch_id = program_data_branch
+        )
+        program_datas[program_data_branch] = program_data
     
     await asyncio.to_thread(
         package_to_zip,
         file,
         contexts,
         prompts,
-        configs
+        configs,
+        program_datas
     )

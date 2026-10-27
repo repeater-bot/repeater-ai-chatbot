@@ -56,14 +56,14 @@
           - `context_list` (list[ContentUnit]): 上下文列表，包含所有新生成的上下文内容
         - `user_raw_input` (str): 用户发送的原始消息
         - `user_input` (str | list[ContentBlock]): 用户发送的消息经过格式化后处理后的内容，使用[OpenAI Chat Completion User Message Content](https://platform.openai.com/docs/api-reference/chat/create#chat_create-messages-user_message-content)格式
-        - `model_group` (str): 模型组，由[API_Info文件](../configs/api_info.md)决定
+        - `model_group` (str): 模型组，由 `API_Info` 文件决定
         - `model_name` (str): 模型名称，通常是该模型的可读名称
         - `model_uid` (str): 模型唯一标识，用于锁定当前请求使用的模型
         - `create_time` (int): 提交请求到API时API厂商报告的请求创建时间戳
         - `id` (str): 请求ID，通常是一个随机的字符串，由API厂商生成，通常可以被作为唯一标识使用
         - `finish_reason_code` (str): 模型结束生成的原因，由API厂商提供
         - `finish_reason_cause` (str): 模型结束生成的原因，该字段为可读版本，由程序自动生成
-        - `request_log` (RequestLogObject): [Request Log Object](./../request_log/request_log_object.md)
+        - `request_log` (RequestLogObject): [Request Log Object](../../request_log/request_log_object.md)
         - `request_statistics` (str): 请求统计信息，由程序自动生成
         - `status` (int): 状态码，这里和http状态码一致，只是为了报告而写，通常应该优先选择检查 http 报告的状态码而不是这个字段
       - `JSON STREAM`:
@@ -114,7 +114,7 @@
 它只是在占位
 
 你可以在 `message` 中编写模板
-参考 [模板展开器](./../template_engine/main.md)
+参考 [模板展开器](../../../template_engine/main.md)
 同时模型返回的数据也会被模板展开器处理并保存下来
 (仅限非流式输出，流式输出时客户端无法收到展开的数据
 但是它们仍然会在保存时展开一次，以确保数据正确)
