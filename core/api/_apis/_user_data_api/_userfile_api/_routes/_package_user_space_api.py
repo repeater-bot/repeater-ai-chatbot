@@ -26,12 +26,14 @@ async def get_userdata_file(user_id: str):
     context_loader = server.core.get_context_loader()
     prompt_manager = server.runtime.prompt_manager
     config_manager = server.runtime.user_config_manager
+    program_data_manager = server.runtime.program_data_manager
     
     await package_user_space(
         user_id = user_id,
         context_loader = context_loader,
         prompt_manager = prompt_manager,
         config_manager = config_manager,
+        program_data_manager = program_data_manager,
         file = buffer
     )
 
