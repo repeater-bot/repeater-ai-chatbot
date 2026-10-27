@@ -11,4 +11,4 @@
 }
 ```
 
-返回值参考 [删除上下文](./../../api_table/userdata_api/context/delete/delete.md)
+返回值参考 [删除上下文](../../../api_table/userdata_api/context/delete/delete.md)

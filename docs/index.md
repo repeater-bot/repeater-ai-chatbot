@@ -14,7 +14,7 @@
 
 - [Main Config](./configs/main.md)
 - [Blacklist](./configs/blacklist.md)
-- [User_Nickname_Mapping](./configs/uer_nickname_mapping.md)
+- [User_Nickname_Mapping](./configs/user_nickname_mapping.md)
 
 用于管理程序的运行行为
 以及模型资源等内容

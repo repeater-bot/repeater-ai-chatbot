@@ -13,5 +13,5 @@
     - **Content:**
       - *\*Config 内容*
 
-这相当于[Set Config API](./set_key.md)中的
+这相当于[Set Config API](../set/set_key.md)中的
 `value`参数为`null`或`type`设为`"null"`的情况
