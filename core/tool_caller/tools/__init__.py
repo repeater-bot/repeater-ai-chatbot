@@ -34,7 +34,10 @@ from .workspace_tools import (
     WorkspaceGlob,
     WorkspaceRematch,
     WorkspaceList,
-    WorkspaceInfo
+    WorkspaceInfo,
+    WorkspaceMkdir,
+    WorkspaceMove,
+    WorkspaceCopy
 )
 from .deepseek_api import (
     DeepseekSearch,
@@ -89,6 +92,9 @@ __all__ = [
     "WorkspaceRematch",
     "WorkspaceList",
     "WorkspaceInfo",
+    "WorkspaceMkdir",
+    "WorkspaceMove",
+    "WorkspaceCopy",
 
     "DeepseekSearch",
     "DeepseekFetch",

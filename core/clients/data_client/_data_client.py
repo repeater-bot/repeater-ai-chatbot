@@ -5,7 +5,7 @@ import httpx
 from urllib.parse import quote
 from yarl import URL
 from ...special_exception import HTTPException
-from ._model import DeleteResult, FileInfo
+from ._model import CopyResult, DeleteResult, FileInfo, MoveResult
 
 
 class DataClient:
@@ -248,6 +248,48 @@ class DataClient:
             }
         )
         return DeleteResult.model_validate(response.json())
+
+    async def mkdir(self, path: str) -> str:
+        """Create a directory, including missing parents."""
+        if not path.strip("/"):
+            raise ValueError("path cannot be empty")
+
+        response = await self._request(
+            "POST",
+            self.operation_url("mkdir", path),
+            "Mkdir"
+        )
+        payload = response.json()
+        if not isinstance(payload, dict) or "path" not in payload:
+            raise HTTPException(
+                detail = "Invalid Data Server mkdir response",
+                status_code = 502
+            )
+        return str(payload["path"])
+
+    async def move(self, path: str, destination: str) -> MoveResult:
+        """Move a file or directory without changing file ids or payloads."""
+        response = await self._request(
+            "POST",
+            self.operation_url("move", path),
+            "Move",
+            json = {
+                "destination": destination,
+            }
+        )
+        return MoveResult.model_validate(response.json())
+
+    async def copy(self, path: str, destination: str) -> CopyResult:
+        """Copy a file or directory with fresh file ids and payloads."""
+        response = await self._request(
+            "POST",
+            self.operation_url("copy", path),
+            "Copy",
+            json = {
+                "destination": destination,
+            }
+        )
+        return CopyResult.model_validate(response.json())
 
     async def close(self) -> None:
         await self.client.aclose()

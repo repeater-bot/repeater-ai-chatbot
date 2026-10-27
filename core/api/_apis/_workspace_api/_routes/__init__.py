@@ -6,6 +6,9 @@ from ._rematch import rematch
 from ._get_info import get_info
 from ._exists import exists
 from ._write_file import write_file
+from ._mkdir import mkdir
+from ._move import move
+from ._copy import copy
 from ._delete import delete
 
 __all__ = [
@@ -17,5 +20,8 @@ __all__ = [
     "get_info",
     "exists",
     "write_file",
+    "mkdir",
+    "move",
+    "copy",
     "delete",
 ]

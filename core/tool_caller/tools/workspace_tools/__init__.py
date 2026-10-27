@@ -6,3 +6,6 @@ from .glob import WorkspaceGlob
 from .rematch import WorkspaceRematch
 from .list_dir import WorkspaceList
 from .info import WorkspaceInfo
+from .mkdir import WorkspaceMkdir
+from .move import WorkspaceMove
+from .copy import WorkspaceCopy

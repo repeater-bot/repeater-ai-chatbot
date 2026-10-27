@@ -7,6 +7,9 @@ from ._routes import (
     get_info,
     exists,
     write_file,
+    mkdir,
+    move,
+    copy,
     delete,
 )
 from ._include_router import workspace_router
@@ -20,6 +23,9 @@ __all__ = [
     "get_info",
     "exists",
     "write_file",
+    "mkdir",
+    "move",
+    "copy",
     "delete",
     "workspace_router",
 ]
