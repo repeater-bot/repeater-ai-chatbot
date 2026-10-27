@@ -6,10 +6,12 @@
 
 ## 参数
 
-无参数，调用时传空对象：
+一个参数，用于筛选变量名：
 
 ```json
-{}
+{
+  "pattern": "^[\\s\\S]*$" // The pattern to match variable names.
+}
 ```
 
 ## 返回
@@ -17,16 +19,10 @@
 对象数组，按插入顺序返回，`type` 是该值的 Python 类型名：
 
 ```json
-[
-  {
-    "name": "readme",
-    "type": "str"
-  },
-  {
-    "name": "blob",
-    "type": "bytes"
-  }
-]
+{
+  "readme": "str",
+  "blob": "bytes"
+}
 ```
 
 没有变量时返回空数组 `[]`。类型名取自 `type(value).__name__`，所以会出现
