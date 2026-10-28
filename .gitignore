@@ -1,8 +1,8 @@
 *.env
 __pycache__/
 .venv/
-.vscode/
-userdata/
+*.vscode/
+/userdata/
 /workspace/
-logs/
-web/
+/logs/
+/web/
