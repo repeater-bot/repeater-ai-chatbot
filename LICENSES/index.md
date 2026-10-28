@@ -37,6 +37,7 @@ This project includes the following third-party software components, licensed un
 | starlark                | Apache-2.0                      | [starlark](https://github.com/dbohdan/starlark-python)                         | `core.model_requester.tools`        | Starlark is a language for configuration.          |
 | sloves_starter          | MIT License                     | [sloves_starter](https://github.com/qeggs-dev/Sloves_Starter)                  | `run.py`                            | Starter for Repeater                               |
 | puremagic               | MIT License                     | [puremagic](https://github.com/cdgriffith/puremagic)                           | `core.model_requester.tools`        | Identify the MIME file type of a file.             |
+| psutil                  | BSD-3-Clause license            | [psutil](https://github.com/giampaolo/psutil)                                  | `core.model_requester.tools`        | Process and system monitoring.                     |
 
 ---
 
@@ -67,3 +68,4 @@ This project includes the following third-party software components, licensed un
 - [Starlark](./starlark/index.md)
 - [Sloves_Starter](./sloves_starter/index.md)
 - [Puremagic](./puremagic/index.md)
+- [Psutil](./psutil/index.md)

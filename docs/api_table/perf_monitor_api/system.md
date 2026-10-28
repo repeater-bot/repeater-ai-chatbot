@@ -1,0 +1,116 @@
+# Monitor System Info API
+
+获取当前系统与运行时信息。
+
+- **`/perf_monitor/system`**
+  - **Method:** `GET`
+  - **Response:**
+    - `name` (str): 主程序名称 (默认为 `Repeater AI System`)
+    - `version` (str): 主程序版本 (格式为 `x.x.x.x`)
+    - `author` (str): 主程序作者
+    - `license` (str): 主程序许可证
+    - `copyright` (str): 主程序版权
+    - `github` (list[str]): Repeater 所有 Github 仓库地址
+    - `system_identificationConfig` (dict): 系统标识配置
+      - `system_name` (str): 系统名称
+      - `system_ua` (str): 默认情况下，系统使用的 UA 标识
+      - `crawler_name` (str): 当使用 http_requests 工具时，系统使用的爬虫名称
+    - `platform` (dict): 系统平台信息
+      - `os` (str): 操作系统名称 (`os.name`)
+      - `system` (str): 系统类型 (`sys.platform`)
+      - `platform` (str): 平台类型 (`sysconfig.get_platform()`)
+      - `name` (str): 系统名称 (`platform.system()`)
+      - `release` (str): 系统发行版 (`platform.release()`)
+      - `version` (str): 系统版本 (`platform.version()`)
+      - `architecture` (str): 系统架构 (`platform.machine()`)
+      - `processor` (str): 系统处理器 (`platform.processor()`)
+    - `interpreter` (dict): 解释器信息
+      - `version` (str): 解释器版本 (`sys.version`)
+      - `version_info` (list[int]): 解释器版本信息 (`sys.version_info`)
+        - `major` (int): 主版本号
+        - `minor` (int): 次版本号
+        - `micro` (int): 微版本号
+        - `releaselevel` (str): 发布级别
+        - `serial` (int): 序列号
+      - `hexversion` (int): 解释器版本十六进制表示 (`sys.hexversion`)
+      - `api_version` (str): 解释器 API 版本 (`sys.api_version`)
+      - `executable` (str): 解释器可执行文件路径 (`sys.executable`)
+      - `prefix` (str): 解释器安装目录 (`sys.prefix`)
+      - `base_prefix` (str): 解释器基础安装目录 (`sys.base_prefix`)
+      - `exec_prefix` (str): 解释器可执行文件目录 (`sys.exec_prefix`)
+      - `base_exec_prefix` (str): 解释器基础可执行文件目录 (`sys.base_exec_prefix`)
+      - `byteorder` (str): 字节序 (`sys.byteorder`)
+      - `copyright` (str): 版权信息 (`sys.copyright`)
+      - `path` (list[str]): 系统路径 (`sys.path`)
+      - `flags` (dict): 解释器标志 (`sys.flags`)
+        - `debug` (int): 是否为调试模式 (`sys.flags.debug`)
+        - `dev_mode` (int): 是否为开发模式 (`sys.flags.dev_mode`)
+        - `bytes_warning` (int): 是否显示字节警告 (`sys.flags.bytes_warning`)
+        - `division_warning` (int): 是否显示除法警告 (`sys.flags.division_warning`)
+        - `hash_randomization` (int): 是否随机化哈希 (`sys.flags.hash_randomization`)
+        - `ignore_environment` (int): 是否忽略环境变量 (`sys.flags.ignore_environment`)
+        - `inspect` (int): 是否启动调试器 (`sys.flags.inspect`)
+        - `int_max_str_digits` (int): 最大整数字符串长度 (`sys.flags.int_max_str_digits`)
+        - `interactive` (int): 是否为交互模式 (`sys.flags.interactive`)
+        - `isolated` (int): 是否为隔离模式 (`sys.flags.isolated`)
+        - `no_site` (int): 是否禁用 `site` 模块 (`sys.flags.no_site`)
+        - `no_user_site` (int): 是否禁用用户 `site` 目录 (`sys.flags.no_user_site`)
+        - `optimize` (int): 是否优化代码 (`sys.flags.optimize`)
+        - `quiet` (int): 是否静默启动 (`sys.flags.quiet`)
+        - `safe_path` (bool): 是否安全路径 (`sys.flags.safe_path`)
+        - `utf8_mode` (int): 是否启用 UTF-8 模式 (`sys.flags.utf8_mode`)
+        - `verbose` (int): 是否显示详细错误信息 (`sys.flags.verbose`)
+        - `warn_default_encoding` (int): 是否警告默认编码 (`sys.flags.warn_default_encoding`)
+      - `int_info` (dict): 整数信息 (`sys.int_info`)
+        - `bits_per_digit` (int): 每个数字的位数 (`sys.int_info.bits_per_digit`)
+        - `sizeof_digit` (int): 每个数字的大小 (`sys.int_info.sizeof_digit`)
+        - `default_max_str_digits` (int): 默认最大字符串长度 (`sys.int_info.default_max_str_digits`)
+        - `str_digits_check_threshold` (int): 字符串长度检查阈值 (`sys.int_info.str_digits_check_threshold`)
+      - `float_info` (dict): 浮点数信息 (`sys.float_info`)
+        - `max` (float): 最大浮点数 (`sys.float_info.max`)
+        - `max_exp` (int): 最大指数 (`sys.float_info.max_exp`)
+        - `max_10_exp` (int): 最大10的指数 (`sys.float_info.max_10_exp`)
+        - `min` (float): 最小浮点数 (`sys.float_info.min`)
+        - `min_exp` (int): 最小指数 (`sys.float_info.min_exp`)
+        - `min_10_exp` (int): 最小10的指数 (`sys.float_info.min_10_exp`)
+        - `dig` (int): 有效数字 (`sys.float_info.dig`)
+        - `mant_dig` (int): 尾数位数 (`sys.float_info.mant_dig`)
+        - `epsilon` (float): 最小非零差值 (`sys.float_info.epsilon`)
+        - `radix` (int): 基数 (`sys.float_info.radix`)
+        - `rounds` (int): 舍入方式 (`sys.float_info.rounds`)
+      - `hash_info` (dict): 哈希信息 (`sys.hash_info`)
+        - `width` (int): 哈希宽度 (`sys.hash_info.width`)
+        - `modulus` (int): 哈希模数 (`sys.hash_info.modulus`)
+        - `inf` (int): 无穷大哈希值 (`sys.hash_info.inf`)
+        - `nan` (int): NaN 哈希值 (`sys.hash_info.nan`)
+        - `imag` (int): 虚数哈希值 (`sys.hash_info.imag`)
+        - `algorithm` (int): 哈希算法 (`sys.hash_info.algorithm`)
+        - `hash_bits` (int): 哈希位数 (`sys.hash_info.hash_bits`)
+        - `seed_bits` (int): 哈希种子位数 (`sys.hash_info.seed_bits`)
+      - `pid` (int): 进程ID (`os.getpid()`)
+      - `ppid` (int): 父进程ID (`os.getppid()`)
+      - `cwd` (str): 当前工作目录 (`os.getcwd()`)
+      - `user` (str): 用户名 (`getpass.getuser()`)
+      - `net_connections` (list[dict]): 网络连接信息 (`psutil.Process.net_connections()`)
+        - *\*For each connection*
+          - `fd` (int): 文件描述符
+          - `pid` (int): 进程ID
+          - `family` (str): 地址族
+          - `laddr_ip` (str): 本地IP地址
+          - `laddr_port` (int): 本地端口
+          - `raddr_ip` (str): 远程IP地址
+          - `raddr_port` (int): 远程端口
+          - `type` (str): 连接类型
+          - `status` (str): 连接状态
+      - `getrecursionlimit` (int): 最大递归深度 (`sys.getrecursionlimit()`)
+      - `maxsize` (int): 最大内存大小 (`sys.maxsize`)
+      - `fsencoding` (str): 文件系统编码 (`sys.getfilesystemencoding()`)
+      - `architecture` (list[str]): 架构 (`platform.architecture()`)
+        - `0` (str): bits
+        - `1` (str): linkage
+      - `implementation` (str): 实现类型 (`platform.python_implementation()`)
+      - `version` (str): Python版本 (`platform.python_version()`)
+      - `compiler` (str): 编译器 (`platform.python_compiler()`)
+      - `build` (str): 构建信息 (`platform.python_build()`)
+      - `branch` (str): 分支 (`platform.python_branch()`)
+      - `revision` (str): 提交 (`platform.python_revision()`)
