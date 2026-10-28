@@ -13,6 +13,7 @@ class DispatchTrigger(ToolPackage):
         args: str | None = Field(default=None, description="Optionally, the message data will be overwritten when args is present.")
         message_id: int = Field(default=0, description="Message ID, which identifies the ID of the current message.")
         timeout: int = Field(default=2400, description="Timeout for the request.")
+        output: bool = Field(default=True, description="Output the execution results synchronously to the real environment. (If False, it executes silently.)")
     
     name = "dispatch_trigger_execute"
     description = (
@@ -39,7 +40,8 @@ class DispatchTrigger(ToolPackage):
                 namespace = runtime.user_id,
                 message = args.message,
                 args = args.args,
-                message_id = args.message_id
+                message_id = args.message_id,
+                output = args.output,
             ).model_dump(exclude_none = True),
             timeout = args.timeout
         )

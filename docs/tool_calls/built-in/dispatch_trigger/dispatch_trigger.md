@@ -13,7 +13,8 @@
   "message": "", // The cq.code message that needs to be sent.
   "args": null, // Optionally, the message data will be overwritten when args is present.
   "message_id": 0, // Message ID, which identifies the ID of the current message.
-  "timeout": 2400 // Timeout for the request.
+  "timeout": 2400, // Timeout for the request.
+  "output": true // Output the execution results synchronously to the real environment. (If False, it executes silently.)
 }
 ```
 
