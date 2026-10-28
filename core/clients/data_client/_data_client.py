@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import httpx
 
+from collections.abc import Mapping
 from urllib.parse import quote
 from yarl import URL
 from ...special_exception import HTTPException
@@ -63,6 +64,8 @@ class DataClient:
             method: str,
             url: str,
             action: str,
+            *,
+            allowed_statuses: tuple[int, ...] = (),
             **kwargs
         ) -> httpx.Response:
         try:
@@ -70,7 +73,7 @@ class DataClient:
         except httpx.RequestError as e:
             raise HTTPException(detail = f"{action} Data Resource Failed: {e}") from e
 
-        if response.is_error:
+        if response.is_error and response.status_code not in allowed_statuses:
             try:
                 payload = response.json()
             except ValueError:
@@ -88,24 +91,85 @@ class DataClient:
 
         return response
 
-    async def get_file(self, path: str) -> bytes:
-        """Read a file as raw bytes."""
-        response = await self._request(
+    async def get_file_response(
+        self,
+        path: str,
+        headers: Mapping[str, str] | None = None
+    ) -> httpx.Response:
+        """Read a file and return the raw response, preserving range headers.
+
+        A 416 response is returned instead of raised so callers can forward its
+        ``Content-Range`` header.
+        """
+        return await self._request(
             "GET",
             self.operation_url("read", path),
-            "Get"
+            "Get",
+            headers = dict(headers) if headers else None,
+            allowed_statuses = (416,)
         )
+
+    async def get_file(
+        self,
+        path: str,
+        start: int | None = None,
+        length: int | None = None,
+        headers: Mapping[str, str] | None = None
+    ) -> bytes:
+        """Read a file as raw bytes, optionally a byte range.
+
+        ``start`` is zero-based; ``length=None`` reads to EOF.  A range is sent
+        as the standard ``Range`` request header.
+        """
+        request_headers = dict(headers or {})
+        if start is None and length is not None:
+            start = 0
+        if start is not None:
+            if start < 0:
+                raise ValueError("start must not be negative")
+            if length is not None and length < 0:
+                raise ValueError("length must not be negative")
+            end = "" if length is None else str(start + length - 1)
+            request_headers["Range"] = f"bytes={start}-{end}"
+
+        response = await self.get_file_response(path, request_headers)
+        if response.status_code == 416:
+            raise HTTPException(
+                detail = "Range Not Satisfiable",
+                status_code = 416
+            )
         return response.content
 
-    async def get_text(self, path: str, text_encoding: str = "utf-8") -> str:
-        """Read a file as text."""
+    async def get_text(
+        self,
+        path: str,
+        text_encoding: str = "utf-8",
+        start: int | None = None,
+        length: int | None = None,
+        headers: Mapping[str, str] | None = None
+    ) -> str:
+        """Read a file as text, optionally a byte range."""
+        if start is not None:
+            if start < 0:
+                raise ValueError("start must not be negative")
+            if length is not None and length < 0:
+                raise ValueError("length must not be negative")
+
+        request_headers = dict(headers or {})
+        if start is None and length is not None:
+            start = 0
+        if start is not None:
+            end = "" if length is None else str(start + length - 1)
+            request_headers["Range"] = f"bytes={start}-{end}"
+
         response = await self._request(
             "GET",
             self.operation_url("read", path),
             "Get",
             params = {
                 "text_encoding": text_encoding,
-            }
+            },
+            headers = request_headers
         )
         return response.text
 
