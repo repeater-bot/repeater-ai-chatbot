@@ -102,7 +102,7 @@ class ConfigManager:
                 base_config.merge_update(config)
             
             merge_config = base_config.to_dict()
-            cls._configs = GlobalConfigs(**merge_config)
+            cls._configs = GlobalConfigs.model_validate(merge_config)
             return cls._configs
         except Exception as e:
             if create_if_missing:

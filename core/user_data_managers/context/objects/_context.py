@@ -493,7 +493,7 @@ class Context(BaseModel):
         for content in context:
             if not isinstance(content, dict):
                 raise TypeError("context must be list of dict")
-            context_obj.context_list.append(ContentUnit(**content))
+            context_obj.context_list.append(ContentUnit.model_validate(content))
         return context_obj
     
     def remove_reasoning_content(self) -> Context:

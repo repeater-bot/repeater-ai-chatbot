@@ -41,14 +41,14 @@ class HorizontalAccess(ToolPackage):
                 message = args.message,
                 thinking = args.thinking,
                 role_name = configs.role_name,
-                user_info = RequestUserInfo(
-                    **configs.user_info.model_dump(exclude_none = True)
+                user_info = RequestUserInfo.model_validate(
+                    obj=configs.user_info.model_dump(exclude_none = True)
                 )
             ).model_dump(exclude_none = True),
             timeout = args.timeout
         )
 
-        response = Response(**raw_response.json())
+        response = Response.model_validate(raw_response.json())
         if response.context:
             return response.context.model_dump(exclude_none = True)
         else:

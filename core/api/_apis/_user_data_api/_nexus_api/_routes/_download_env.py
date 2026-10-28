@@ -48,7 +48,7 @@ async def download_env_from_nexus(user_id: str, request: DownloadRequest):
             ).model_dump(),
         )
     
-    env_data = EnvironmentModel(**data.data)
+    env_data = EnvironmentModel.model_validate(data.data)
     await context_manager.save(
         user_id = user_id,
         data = env_data.context

@@ -10,7 +10,7 @@ class ProgramDataManager(DataManager):
             branch_id = branch_id
         )
         try:
-            user_configs = ProgramData(**user_configs)
+            user_configs = ProgramData.model_validate(user_configs)
         except ValidationError as e:
             logger.error(
                 "Invalid user configs for user {user_id}: {error}",
