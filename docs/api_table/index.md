@@ -56,3 +56,7 @@ Repeater 提供了许多接口，
 
 ## Ping Provider API
   - [Ping Provider API](./ping_provider_api/ping_provider.md)
+
+## Perf Monitor API
+
+  - [Perf Monitor API](./perf_monitor_api/index.md)
