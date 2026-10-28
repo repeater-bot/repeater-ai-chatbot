@@ -20,15 +20,21 @@ class WorkspaceRead(ToolPackage):
     class Params(BaseModel):
         path: str = Field(..., description="The path of the file to read.")
         content: Content | VarContent = Field(default=..., description="How to return the content: inline, or into a variable.")
+        offset: int | None = Field(default=None, description="Zero-based byte offset for a partial read.")
+        length: int | None = Field(default=None, description="Number of bytes to read; null reads to EOF.")
 
     name = "workspace_read"
-    description = "Read a file from the workspace."
+    description = "Read a file from the workspace, optionally a byte range."
 
     async def call(self, args: Params, runtime: RuntimePackage):
         global_runtime = RuntimeContainer.get_runtime()
         data_client = global_runtime.data_client
 
-        result = await data_client.get_file(args.path)
+        result = await data_client.get_file(
+            args.path,
+            start = args.offset,
+            length = args.length
+        )
         if isinstance(args.content, Content):
             if args.content.base64_encode:
                 encoded_result = base64.b64encode(result).decode(args.content.encoding)

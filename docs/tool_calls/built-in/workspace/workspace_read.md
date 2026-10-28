@@ -10,6 +10,24 @@
 | --- | --- | --- | --- |
 | `path` | string | 必填 | 虚拟文件路径，相对于 Data Server 的 `base_path`，例如 `docs/readme.md` |
 | `content` | object | 必填 | 取回方式，二选一：`content`（直接返回文本）或 `var_content`（存进变量） |
+| `offset` | integer \| null | `null` | 可选，从 0 开始的字节偏移；`null` 从文件开头读 |
+| `length` | integer \| null | `null` | 可选，读取字节数；`null` 读到 EOF |
+
+`offset` / `length` 作用于**原始字节**，在解码或 Base64 编码之前完成。
+例如只读取前 1 KiB：
+
+```json
+{
+  "path": "docs/big.bin",
+  "offset": 0,
+  "length": 1024,
+  "content": {
+    "type": "content",
+    "base64_encode": true,
+    "encoding": "utf-8"
+  }
+}
+```
 
 `content` 分支：
 
