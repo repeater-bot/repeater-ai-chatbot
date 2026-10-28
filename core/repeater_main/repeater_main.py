@@ -4,7 +4,8 @@ import time
 import asyncio
 
 from typing import (
-    ClassVar
+    ClassVar,
+    Callable
 )
 from environs import Env
 from ..global_config_manager import (
@@ -166,7 +167,11 @@ class RepeaterMain:
         finally:
             RepeaterMain._now_server = None
 
-    def run(self, debug: bool | None = None) -> int:
+    def run(
+            self,
+            debug: bool | None = None,
+            loop_factory: Callable[[], asyncio.AbstractEventLoop] | None = None
+        ) -> int:
         """
         Run the server.
         """
@@ -176,14 +181,17 @@ class RepeaterMain:
         if asyncio_debug is None:
             asyncio_debug = configs.server.asyncio_debug
         
+        if loop_factory is None:
+            loop_factory = self.server.server_config.get_loop_factory()
+        
         try:
             runner = asyncio.Runner(
                 debug = asyncio_debug,
-                loop_factory = self.server.server_config.get_loop_factory(),
+                loop_factory = loop_factory,
             )
             logger.info(
                 "Usage of asyncio loop: {loop}",
-                loop = repr(runner.get_loop())
+                loop = runner.get_loop().__class__.__name__
             )
             runner.run(
                 coro = self.run_server()
