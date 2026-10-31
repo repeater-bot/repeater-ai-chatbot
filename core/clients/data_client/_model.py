@@ -39,3 +39,40 @@ class CopyResult(MoveResult):
 
     copied_files: int
     copied_dirs: int
+
+
+class HashResult(BaseModel):
+    """Result returned by ``GET /operations/hash/{path}``."""
+
+    model_config = ConfigDict(
+        validate_assignment = True
+    )
+
+    algorithm: str
+    digest: str
+    size: int
+
+
+class DiskUsage(BaseModel):
+    """Result returned by ``GET /operations/du/{path}``."""
+
+    model_config = ConfigDict(
+        validate_assignment = True
+    )
+
+    path: str
+    size: int
+    files: int
+    dirs: int
+
+
+class CopyRangeResult(BaseModel):
+    """Result returned by ``POST /operations/copy_range/{path}``."""
+
+    model_config = ConfigDict(
+        validate_assignment = True
+    )
+
+    source: str
+    destination: str
+    size: int

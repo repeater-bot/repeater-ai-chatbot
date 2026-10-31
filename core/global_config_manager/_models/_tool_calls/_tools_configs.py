@@ -4,7 +4,8 @@ from .tools_configs import (
     SystemInfo,
     HorizontalToolConfig,
     StarlarkToolConfig,
-    DispatchTriggerConfig
+    DispatchTriggerConfig,
+    RealspaceConfigs,
 )
 
 class ToolsConfigs(BaseModel):
@@ -13,3 +14,4 @@ class ToolsConfigs(BaseModel):
     horizontal: HorizontalToolConfig = Field(default_factory=HorizontalToolConfig)
     starlark: StarlarkToolConfig = Field(default_factory=StarlarkToolConfig)
     dispatch_trigger: DispatchTriggerConfig = Field(default_factory=DispatchTriggerConfig)
+    realspace: RealspaceConfigs = Field(default_factory=RealspaceConfigs)
