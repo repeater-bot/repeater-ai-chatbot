@@ -10,6 +10,7 @@
     - **Content:**
       - `message` (str | null): 用户发送的消息，允许为空，但这时模型的行为可能是未定义的
       - `task_id` (str | null): 任务 ID，如果客户端需要管理任务，可以由客户端生成，否则服务端自行生成
+      - `context_branch_id` (str | null): 上下文分支 ID，如果客户端需要指定上下文分支，可以由客户端生成，否则服务端自行生成，不同上下文分支之间是独立且可并行的
       - `suffix` (str | null): 消息后缀，需要保证 `fim_mode` = `true` 才可使用，允许为空
       - `echo` (bool): 是否回显用户消息，默认为 True，需要 `fim_mode` = `true` 才可使用
       - `fim_mode` (bool): 是否使用 FIM 模式，默认为 False
@@ -102,6 +103,7 @@
 这保证了用户在频繁发起请求时数据的线性处理
 `user_id` 不同时RUL不会阻碍它们并行处理
 当 `save_context` 为 `false` 时，RUL 不会生效
+*相同 `user_id` 但不同上下文分支的请求也会让 RUL 失效*
 
 在请求时，Repeater 并不会立刻保存当前用户的输入
 而是先放在内存中，并在生成完全结束后与生成的部分一起保存
