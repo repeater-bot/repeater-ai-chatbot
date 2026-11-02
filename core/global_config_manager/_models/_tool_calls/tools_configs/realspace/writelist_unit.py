@@ -5,11 +5,16 @@ class RealspaceWritelistUnit(BaseModel):
 
     path: str
     read: bool = False
+    read_text: bool = False
     write: bool = False
     append: bool = False
     truncate: bool = False
     touch: bool = False
     edit: bool = False
+    edit_text: bool = False
+    edit_text_by_char: bool = False
+    edit_text_by_line: bool = False
+    edit_text_regex: bool = False
     delete: bool = False
     exists: bool = False
     is_file: bool = False
