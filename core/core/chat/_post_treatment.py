@@ -42,6 +42,7 @@ from ...request_log import (
 
 async def post_treatment(
     user_id: str,
+    active_context_branch_id: str,
     template_parser: TemplateParser,
     responses: MultiResponse,
     context_loader: ContextLoader,
@@ -126,6 +127,7 @@ async def post_treatment(
                     )
                 await context_loader.save(
                     user_id = saved_user_id,
+                    branch_id = active_context_branch_id,
                     context = saved_context,
                     reduce_to_text = save_only_text,
                 )
