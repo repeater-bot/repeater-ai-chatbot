@@ -7,6 +7,7 @@ from typing import Any
 class ChatRequest(BaseModel):
     message: str | None = ""
     task_id: uuid.UUID | None = None
+    context_branch_id: str | None = None
     suffix: str | None = None
     echo: bool = False
     fim_mode: bool = False
