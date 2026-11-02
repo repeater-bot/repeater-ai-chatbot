@@ -6,6 +6,8 @@
 - **`/userdata/prompt/get/{user_id:str}.md`**
   - **Requset**
     - **method:** `GET`
+    - **Query:**
+      - `branch_id` (str): 分支ID，如果为空则使用活动分支
   - **Response**
     - **type:** `Text`
     - **Content:**

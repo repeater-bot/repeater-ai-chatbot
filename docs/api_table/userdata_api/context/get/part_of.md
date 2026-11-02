@@ -6,6 +6,8 @@
 - **`/userdata/context/part_of/{user_id}-{begin}-{end}.json`**
   - **Requset**
     - **method:** `GET`
+    - **Query:**
+      - `branch_id` (str): 分支ID，如果为空则使用活动分支
   - **Response**
     - **type:** `JSON列表`
     - **Content:**
