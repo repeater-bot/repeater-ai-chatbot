@@ -266,6 +266,7 @@ class Core:
             fastapi_request: FastAPI_Request,
             message: str | None,
             user_id: str,
+            context_branch_id: str | None = None,
             task_id: str | uuid.UUID | None = None,
             suffix: str | None = None,
             echo: bool | None = None,
@@ -336,13 +337,14 @@ class Core:
 
             # region [Getting Context Loader]
             context_loader = self.get_context_loader()
-            active_context_id = await context_loader.get_active_branch_id(user_id)
+            if context_branch_id is None:
+                context_branch_id = await context_loader.get_active_branch_id(user_id)
             # endregion
 
             # 获取用户锁对象
             lock = await self._get_rul(
                 user_id,
-                active_context_id
+                context_branch_id
             )
 
             enable_rul = check_rul(
@@ -447,7 +449,7 @@ class Core:
                                 message = message,
                                 configs = configs,
                                 context_loader = context_loader,
-                                active_context_id = active_context_id,
+                                active_context_id = context_branch_id,
                                 template_parser = template_parser,
                                 static_resources_client = self.runtime.static_resources_client,
                                 history_messages = history_messages if not fim_mode else [],
@@ -611,7 +613,7 @@ class Core:
                                 
                                 output = await post_treatment(
                                     user_id = user_id,
-                                    active_context_branch_id = active_context_id,
+                                    active_context_branch_id = context_branch_id,
                                     output = output,
                                     responses = model_responses,
                                     template_parser = template_parser,
