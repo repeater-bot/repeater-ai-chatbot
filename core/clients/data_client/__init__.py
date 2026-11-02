@@ -7,6 +7,12 @@ from ._model import (
     FileInfo,
     HashResult,
     MoveResult,
+    TextEditResult,
+    TextFile,
+    TextLine,
+    TextMetadata,
+    TextRegexEditResult,
+    TextRegexMatch,
 )
 
 __all__ = [
@@ -18,4 +24,10 @@ __all__ = [
     "FileInfo",
     "HashResult",
     "MoveResult",
+    "TextEditResult",
+    "TextFile",
+    "TextLine",
+    "TextMetadata",
+    "TextRegexEditResult",
+    "TextRegexMatch",
 ]
