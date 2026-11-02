@@ -1,9 +1,9 @@
 from __future__ import annotations
 import asyncio
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Hashable
 from loguru import logger
 
-T_KEY = TypeVar("T_KEY")
+T_KEY = TypeVar("T_KEY", bound = Hashable)
 
 class LockPool(Generic[T_KEY]):
     def __init__(self):
