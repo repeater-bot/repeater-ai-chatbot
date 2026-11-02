@@ -1,9 +1,14 @@
 from .read import WorkspaceRead
+from .read_text import WorkspaceReadText
 from .write import WorkspaceWrite
 from .append import WorkspaceAppend
 from .truncate import WorkspaceTruncate
 from .touch import WorkspaceTouch
 from .edit import WorkspaceEdit
+from .edit_text import WorkspaceEditText
+from .edit_text_by_char import WorkspaceEditTextByChar
+from .edit_text_by_line import WorkspaceEditTextByLine
+from .edit_text_regex import WorkspaceEditTextRegex
 from .delete import WorkspaceDelete
 from .exists import WorkspaceExists
 from .is_file import WorkspaceIsFile
@@ -23,11 +28,16 @@ from .copy_range import WorkspaceCopyRange
 
 __all__ = [
     "WorkspaceRead",
+    "WorkspaceReadText",
     "WorkspaceWrite",
     "WorkspaceAppend",
     "WorkspaceTruncate",
     "WorkspaceTouch",
     "WorkspaceEdit",
+    "WorkspaceEditText",
+    "WorkspaceEditTextByChar",
+    "WorkspaceEditTextByLine",
+    "WorkspaceEditTextRegex",
     "WorkspaceDelete",
     "WorkspaceExists",
     "WorkspaceIsFile",

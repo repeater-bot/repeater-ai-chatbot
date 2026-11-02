@@ -21,6 +21,11 @@ from .du import RealspaceDiskUsage
 from .tree import RealspaceTree
 from .copy_range import RealspaceCopyRange
 from .get_writelist import RealspaceGetWritelist
+from .read_text import RealspaceReadText
+from .edit_text import RealspaceEditText
+from .edit_text_by_char import RealspaceEditTextByChar
+from .edit_text_by_line import RealspaceEditTextByLine
+from .edit_text_regex import RealspaceEditTextRegex
 
 __all__ = [
     "RealspaceRead",
@@ -46,4 +51,9 @@ __all__ = [
     "RealspaceTree",
     "RealspaceCopyRange",
     "RealspaceGetWritelist",
+    "RealspaceReadText",
+    "RealspaceEditText",
+    "RealspaceEditTextByChar",
+    "RealspaceEditTextByLine",
+    "RealspaceEditTextRegex",
 ]
