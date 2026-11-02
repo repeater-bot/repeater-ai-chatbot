@@ -1,8 +1,7 @@
 from ......repeater_main import RepeaterMain
 from .._router import context_router
 from ......user_data_managers.context import (
-    ContentUnit,
-    ContentRole
+    ContentUnit
 )
 from fastapi.responses import (
     ORJSONResponse

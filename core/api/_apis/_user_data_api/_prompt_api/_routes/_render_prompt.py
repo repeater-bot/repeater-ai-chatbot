@@ -12,6 +12,7 @@ from loguru import logger
 @prompt_router.get("/render/{user_id}.md")
 async def render_prompt(
     user_id: str,
+    branch_id: str | None = Query(None),
     model_id: str | list[str] | None = Query(None),
     username: str | None = Query(None),
     nickname: str | None = Query(None),
@@ -23,10 +24,17 @@ async def render_prompt(
 
     Args:
         user_id (str): User ID
+        branch_id (str, optional): the branch id of the prompt. Defaults to None.
+        model_id (str | list[str], optional): Model ID
+        username (str, optional): Username. Defaults to None.
+        nickname (str, optional): Nickname. Defaults to None.
+        age (int | float, optional): Age. Defaults to None.
+        gender (str, optional): Gender. Defaults to None.
     
     Returns:
         PlainTextResponse: Rendered prompt
     """
+    
     server = RepeaterMain.get_now_server()
     runtime = server.runtime
     context_loader = server.core.get_context_loader()
@@ -39,6 +47,7 @@ async def render_prompt(
     model = await runtime.model_info_client.get_random_model(model_id)
     prompt = await context_loader.load_prompt(
         user_id = user_id,
+        branch_id = branch_id,
         static_resources_client = runtime.static_resources_client,
         template_parser = await server.core.get_template_parser(
             user_config = user_config,
@@ -53,7 +62,10 @@ async def render_prompt(
         )
     )
 
-    logger.info("Get prompt", user_id=user_id)
+    if branch_id is None:
+        logger.info("Get render active prompt", user_id=user_id)
+    else:
+        logger.info("Get render prompt {branch_id}", user_id=user_id, branch_id=branch_id)
 
     # 返回提示词内容
     return PlainTextResponse(prompt.content)

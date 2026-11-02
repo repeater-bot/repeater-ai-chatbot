@@ -34,7 +34,10 @@ async def check_role_structure(user_id: str):
     role_rule = [
         [
             ContentRole.USER,
-            ContentRole.TOOL
+            ContentRole.TOOL,
+            ContentRole.FUNCTION,
+            ContentRole.SYSTEM,
+            ContentRole.DEVELOPER,
         ],
         [
             ContentRole.ASSISTANT
@@ -48,7 +51,7 @@ async def check_role_structure(user_id: str):
                 content = RoleStructureCheckerResponse(
                     message = f"At index {index}, expected role is ({' or '.join(role.value for role in expected_role)}), but got {content.role.value}",
                     index = index,
-                    role = content.role.value,
+                    role = content.role,
                     expected_role = expected_role,
                 ).model_dump(exclude_none=True)
             )

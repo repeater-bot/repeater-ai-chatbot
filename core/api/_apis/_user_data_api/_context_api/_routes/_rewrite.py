@@ -34,7 +34,7 @@ async def rewrite_context(user_id: str, rewrite_context: RewriteContext):
         context.rewrite(rewrite_context.content, rewrite_context.index)
         await context_loader.save(user_id, context)
     else:
-        raise HTTPException(400, "Index out of range")
+        raise HTTPException(detail="Index out of range", status_code=400)
     
     logger.info(
         "Rewrite {count} Context",

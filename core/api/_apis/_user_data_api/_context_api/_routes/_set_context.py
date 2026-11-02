@@ -7,7 +7,10 @@ from ......user_data_managers.context import ContentUnit, Context
 from loguru import logger
 
 @context_router.put("/set/{user_id}")
-async def set_context(user_id: str, context: list[ContentUnit]):
+async def set_context(
+    user_id: str,
+    context: list[ContentUnit]
+):
     """
     Endpoint for setting context
 
