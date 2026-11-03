@@ -1,5 +1,6 @@
 import random
 from ...framework import ToolsCaller, ToolPackage, RuntimePackage
+from ....runtime_container import RuntimeContainer
 from pydantic import BaseModel, Field
 from .request import DispatchTriggerRequest
 from .client import dispatch_trigger_client
@@ -20,6 +21,7 @@ class DispatchAskQuestions(ToolPackage):
     async def call(self, args: Params, runtime: RuntimePackage):
         configs = runtime.global_configs.tool_calls.tools_configs.dispatch_trigger
         base_url = configs.server_base_url
+        global_runtime = RuntimeContainer.get_runtime()
 
         if not base_url:
             raise ValueError("Invalid base URL")
@@ -31,6 +33,9 @@ class DispatchAskQuestions(ToolPackage):
                     base = base_url,
                     url = "/repeater/api/external_trigger/call"
                 ),
+                headers = {
+                    "Authorization": "Bearer " + global_runtime.env.str("DISPATCH_TRIGGER_TOKEN")
+                },
                 json = DispatchTriggerRequest(
                     bot_id = args.bot_id,
                     handler = "/echo",
@@ -51,6 +56,9 @@ class DispatchAskQuestions(ToolPackage):
                 base = base_url,
                 url = "/repeater/api/external_trigger/call"
             ),
+            headers = {
+                "Authorization": "Bearer " + global_runtime.env.str("DISPATCH_TRIGGER_TOKEN")
+            },
             json = DispatchTriggerRequest(
                 bot_id = args.bot_id,
                 handler = "/npecho",

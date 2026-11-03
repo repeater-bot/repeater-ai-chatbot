@@ -1,4 +1,5 @@
 from ...framework import ToolsCaller, ToolPackage, RuntimePackage
+from ....runtime_container import RuntimeContainer
 from pydantic import BaseModel, Field
 from .client import dispatch_trigger_client
 from urllib.parse import urljoin
@@ -14,6 +15,7 @@ class GetDispatchBots(ToolPackage):
     async def call(self, args: Params, runtime: RuntimePackage):
         configs = runtime.global_configs.tool_calls.tools_configs.dispatch_trigger
         base_url = configs.server_base_url
+        global_runtime = RuntimeContainer.get_runtime()
 
         if not base_url:
             raise ValueError("Invalid base URL")
@@ -23,6 +25,9 @@ class GetDispatchBots(ToolPackage):
                 base = base_url,
                 url = f"/repeater/api/external_trigger/bots_list"
             ),
+            headers = {
+                "Authorization": "Bearer " + global_runtime.env.str("DISPATCH_TRIGGER_TOKEN")
+            },
             timeout = args.timeout
         )
 
