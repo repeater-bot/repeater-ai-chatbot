@@ -42,7 +42,7 @@ class ToolPackage(ABC):
 
     def parse_params(self, args: str) -> Params:
         data = orjson.loads(args)
-        return self.Params(**data)
+        return self.Params.model_validate(data)
     
     def on_error(self, error: BaseException) -> Any:
         return f"Tool {self.name} error: {error}"

@@ -50,9 +50,21 @@ class ContextLoader:
             prompt: PromptManager,
             config: ConfigManager,
         ):
-        self._context_manager: ContextManager = context
-        self._prompt_manager: PromptManager = prompt
-        self._config_manager: ConfigManager = config
+        self.context_manager: ContextManager = context
+        self.prompt_manager: PromptManager = prompt
+        self.config_manager: ConfigManager = config
+
+    async def get_active_branch_id(self, user_id: str) -> str:
+        """
+        获取当前激活的分支ID
+
+        :param user_id: 用户ID
+        :return: 分支ID
+        """
+        branch_id = await self.context_manager.get_active_branch_id(
+            user_id = user_id
+        )
+        return branch_id
     
     async def load_prompt(
             self,
@@ -72,7 +84,7 @@ class ContextLoader:
         :param branch_id: 分支ID
         :return: 提示词
         """
-        user_prompt:str = await self._prompt_manager.load(
+        user_prompt:str = await self.prompt_manager.load(
             user_id = user_id,
             branch_id = branch_id,
             default = ""
@@ -96,7 +108,7 @@ class ContextLoader:
             # 加载默认提示词
             default_prompt_base_path = URL(GlobalConfigManager.get_configs().prompt.base_path)
             # 如果存在默认提示词文件，则加载默认提示词文件
-            config = await self._config_manager.load(
+            config = await self.config_manager.load(
                 user_id = user_id,
             )
             
@@ -158,7 +170,7 @@ class ContextLoader:
             user_id = user_id,
         )
         try:
-            context_data = await self._context_manager.load(
+            context_data = await self.context_manager.load(
                 user_id = user_id,
                 branch_id = branch_id,
                 default = []
@@ -398,7 +410,7 @@ class ContextLoader:
         :param context: 上下文对象
         :param reduce_to_text: 是否将上下文对象转换为纯文本
         """
-        await self._context_manager.save(
+        await self.context_manager.save(
             user_id = user_id,
             data = context.to_context(reduce_to_text = reduce_to_text),
             branch_id = branch_id
@@ -415,4 +427,4 @@ class ContextLoader:
 
         :param user_id: 用户ID
         """
-        return await self._context_manager.get_all_branch_id(user_id)
+        return await self.context_manager.get_all_branch_id(user_id)

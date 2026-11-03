@@ -1,4 +1,5 @@
 from ...framework import ToolsCaller, ToolPackage, RuntimePackage
+from ....runtime_container import RuntimeContainer
 from pydantic import BaseModel, Field
 from .request import DispatchTriggerRequest
 from .client import dispatch_trigger_client
@@ -13,6 +14,7 @@ class DispatchTrigger(ToolPackage):
         args: str | None = Field(default=None, description="Optionally, the message data will be overwritten when args is present.")
         message_id: int = Field(default=0, description="Message ID, which identifies the ID of the current message.")
         timeout: int = Field(default=2400, description="Timeout for the request.")
+        output: bool = Field(default=True, description="Output the execution results synchronously to the real environment. (If False, it executes silently.)")
     
     name = "dispatch_trigger_execute"
     description = (
@@ -24,6 +26,7 @@ class DispatchTrigger(ToolPackage):
     async def call(self, args: Params, runtime: RuntimePackage):
         configs = runtime.global_configs.tool_calls.tools_configs.dispatch_trigger
         base_url = configs.server_base_url
+        global_runtime = RuntimeContainer.get_runtime()
 
         if not base_url:
             raise ValueError("Invalid base URL")
@@ -33,13 +36,17 @@ class DispatchTrigger(ToolPackage):
                 base = base_url,
                 url = f"/repeater/api/external_trigger/call"
             ),
+            headers = {
+                "Authorization": "Bearer " + global_runtime.env.str("DISPATCH_TRIGGER_TOKEN")
+            },
             json = DispatchTriggerRequest(
                 bot_id = args.bot_id,
                 handler = args.handler,
                 namespace = runtime.user_id,
                 message = args.message,
                 args = args.args,
-                message_id = args.message_id
+                message_id = args.message_id,
+                output = args.output,
             ).model_dump(exclude_none = True),
             timeout = args.timeout
         )

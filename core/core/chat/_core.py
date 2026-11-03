@@ -73,7 +73,7 @@ class Core:
         self.lock = asyncio.Lock()
 
         # 初始化锁池
-        self.namespace_locks: AsyncLockPool = AsyncLockPool()
+        self.namespace_locks: AsyncLockPool[tuple[str, str]] = AsyncLockPool()
 
         self.runtime = runtime
 
@@ -93,7 +93,11 @@ class Core:
     # endregion
 
     # region > get namespace lock
-    async def _get_namespace_lock(self, user_id: str) -> asyncio.Lock:
+    async def _get_rul(
+            self,
+            user_id: str,
+            branch_id: str
+        ) -> asyncio.Lock:
         """
         获取指定用户的命名空间锁
 
@@ -101,7 +105,9 @@ class Core:
         :return:该命名空间的锁
         """
         
-        return await self.namespace_locks.get_lock(user_id)
+        return await self.namespace_locks.get_lock(
+            (user_id, branch_id)
+        )
     # endregion
     
     # region > nickname mapping
@@ -143,14 +149,17 @@ class Core:
     # endregion
 
     # region > get config
-    async def get_config(self, user_id: str) -> UserConfigs:
+    async def get_config(self, user_id: str, branch_id: str | None = None) -> UserConfigs:
         """
         加载用户配置
 
         :param user_id: 用户ID
         :return: 用户配置
         """
-        config: UserConfigs = await self.runtime.user_config_manager.load(user_id = user_id)
+        config: UserConfigs = await self.runtime.user_config_manager.load(
+            user_id = user_id,
+            branch_id = branch_id
+        )
         return config
     # endregion
 
@@ -260,6 +269,7 @@ class Core:
             fastapi_request: FastAPI_Request,
             message: str | None,
             user_id: str,
+            context_branch_id: str | None = None,
             task_id: str | uuid.UUID | None = None,
             suffix: str | None = None,
             echo: bool | None = None,
@@ -323,13 +333,22 @@ class Core:
                 task_id = task_id,
             )
 
-            # 获取用户锁对象
-            lock = await self._get_namespace_lock(user_id)
-
             # region [Getting Config]
             global_configs = ConfigManager.get_configs()
             configs = await self.get_config(user_id)
             # endregion
+
+            # region [Getting Context Loader]
+            context_loader = self.get_context_loader()
+            if context_branch_id is None:
+                context_branch_id = await context_loader.get_active_branch_id(user_id)
+            # endregion
+
+            # 获取用户锁对象
+            lock = await self._get_rul(
+                user_id,
+                context_branch_id
+            )
 
             enable_rul = check_rul(
                 fim_mode = fim_mode,
@@ -428,12 +447,12 @@ class Core:
 
                         # region [Processing context]
                         with task_status_stack.enter("Processing context"):
-                            context_loader = self.get_context_loader()
                             submit_context, user_input = await make_context(
                                 user_id = user_id,
                                 message = message,
                                 configs = configs,
                                 context_loader = context_loader,
+                                active_context_id = context_branch_id,
                                 template_parser = template_parser,
                                 static_resources_client = self.runtime.static_resources_client,
                                 history_messages = history_messages if not fim_mode else [],
@@ -597,6 +616,7 @@ class Core:
                                 
                                 output = await post_treatment(
                                     user_id = user_id,
+                                    active_context_branch_id = context_branch_id,
                                     output = output,
                                     responses = model_responses,
                                     template_parser = template_parser,

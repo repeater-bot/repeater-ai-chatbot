@@ -9,7 +9,10 @@ from fastapi.responses import (
 from loguru import logger
 
 @context_router.post("/role_mapping/{user_id}")
-async def role_mapping(user_id: str, role_map: dict[ContentRole, ContentRole | None]):
+async def role_mapping(
+    user_id: str,
+    role_map: dict[ContentRole, ContentRole | None]
+):
     """
     Context role mapping endpoint.
 

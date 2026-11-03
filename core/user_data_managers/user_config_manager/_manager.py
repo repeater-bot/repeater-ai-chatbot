@@ -11,7 +11,7 @@ class ConfigManager(UserConfigManager):
     async def load(self, user_id: str, branch_id: str | None = None):
         user_configs = await super().load(user_id = user_id, branch_id = branch_id)
         try:
-            user_configs = UserConfigs(**user_configs)
+            user_configs = UserConfigs.model_validate(user_configs)
         except ValidationError as e:
             logger.error(
                 "Invalid user configs for user {user_id}: {error}",

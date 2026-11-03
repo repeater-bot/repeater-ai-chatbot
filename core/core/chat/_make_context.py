@@ -36,6 +36,7 @@ async def make_context(
     message: str | None,
     configs: UserConfigs,
     context_loader: ContextLoader,
+    active_context_id: str | None,
     template_parser: TemplateParser,
     static_resources_client: StaticResourcesClient,
     task_status_stack: StatusStack[str],
@@ -49,7 +50,6 @@ async def make_context(
     additional_data: AdditionalData | None = None,
     load_prompt: bool | None = None,
 ) -> tuple[Context, ContentUnit | None]:
-
     with task_status_stack.enter("Getting history context"):
         if load_prompt is None:
             if configs.load_prompt is None:

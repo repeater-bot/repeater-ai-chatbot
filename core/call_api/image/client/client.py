@@ -181,12 +181,12 @@ class ImageGenerateClient:
     async def _parse_stream_response(self, response: AsyncStream[OpenAIImageGenStreamEvent]) -> AsyncGenerator[PartialImageEvent | CompletedImageEvent, None]:
         async for event in response:
             if isinstance(event, ImageGenPartialImageEvent):
-                yield PartialImageEvent(
-                    **event.model_dump()
+                yield PartialImageEvent.model_validate(
+                    obj=event.model_dump()
                 )
             elif isinstance(event, ImageGenCompletedEvent):
-                yield CompletedImageEvent(
-                    **event.model_dump()
+                yield CompletedImageEvent.model_validate(
+                    obj=event.model_dump()
                 )
             else:
                 raise Exception(f"Unknown event type: {event}")

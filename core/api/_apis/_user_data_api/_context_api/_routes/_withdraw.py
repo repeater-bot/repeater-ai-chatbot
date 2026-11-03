@@ -2,7 +2,8 @@ from ......special_exception import HTTPException
 from ......repeater_main import RepeaterMain
 from .._router import context_router
 from ......user_data_managers.context import (
-    Context
+    Context,
+    ContentUnit
 )
 from fastapi import Form
 from fastapi.responses import (
@@ -11,7 +12,11 @@ from fastapi.responses import (
 from loguru import logger
 
 @context_router.post("/withdraw/{user_id}")
-async def withdraw_context(user_id: str, context_pair_num: int = Form(1, gt=0), paired: bool = Form(True)):
+async def withdraw_context(
+    user_id: str,
+    context_pair_num: int = Form(1, gt=0),
+    paired: bool = Form(True)
+):
     """
     Endpoint for withdrawing context
 
@@ -27,7 +32,7 @@ async def withdraw_context(user_id: str, context_pair_num: int = Form(1, gt=0), 
     # 从context_loader中加载用户ID为user_id的上下文
     context_loader = server.core.get_context_loader()
     context = await context_loader.load_context(user_id)
-    pop_items: list[Context] = []
+    pop_items: list[Context | list[ContentUnit]] = []
 
     if paired:
         try:
@@ -36,13 +41,18 @@ async def withdraw_context(user_id: str, context_pair_num: int = Form(1, gt=0), 
                     context.withdraw()
                 )
         except (ValueError, IndexError) as e:
-            raise HTTPException(400, str(e)) from e
+            raise HTTPException(detail=str(e), status_code=400) from e
         
         pop_context = Context()
         for item in pop_items[::-1]:
-            pop_context.context_list.extend(
-                item.context_list
-            )
+            if isinstance(item, Context):
+                pop_context.context_list.extend(
+                    item.context_list
+                )
+            else:
+                pop_context.context_list.extend(
+                    item
+                )
     else:
         try:
             pop_context_list = context.pop_last_n(context_pair_num)

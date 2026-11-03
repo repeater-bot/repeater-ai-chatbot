@@ -11,7 +11,7 @@ from ._model_api import *
 from ._nexus import *
 from ._text_template import *
 from ._tool_calls import *
-from ._prompt._prompt import *
+from ._prompt import *
 from ._render import *
 from ._request_log import *
 from ._server import *

@@ -644,6 +644,63 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
 
                 // 调度触发器服务的 URL
                 "server_base_url": "http://localhost:5000",
+            },
+
+            // 现实路径（realspace）工具配置
+            "realspace": {
+
+                // 每个条目是一个允许访问的根路径
+                // 以及该路径上允许执行的操作
+                //
+                // 路径按 expanduser().resolve() 规范化
+                // 目标路径必须等于 path，或位于 path 之下
+                //
+                // 空白名单表示拒绝所有 realspace 操作
+                "writelist": [
+                    {
+                        // 允许访问的根路径
+                        "path": "./AgentWorkspace",
+
+                        // 基础读写
+                        "read": false,
+                        "read_text": false,
+                        "write": false,
+
+                        // 原地修改
+                        "append": false,
+                        "truncate": false,
+                        "touch": false,
+                        "edit": false,
+
+                        // 文本模式编辑
+                        "edit_text": false,
+                        "edit_text_by_char": false,
+                        "edit_text_by_line": false,
+                        "edit_text_regex": false,
+
+                        // 删除与查询
+                        "delete": false,
+                        "exists": false,
+                        "is_file": false,
+                        "is_dir": false,
+                        "glob": false,
+                        "rematch": false,
+                        "list": false,
+                        "info": false,
+
+                        // 目录与复制
+                        "mkdir": false,
+                        "move": false,
+                        "copy": false,
+                        "copy_range": false,
+                        "get_url": false,
+
+                        // 统计与校验
+                        "hash": false,
+                        "du": false,
+                        "tree": false
+                    }
+                ]
             }
         }
     },

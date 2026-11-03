@@ -7,6 +7,10 @@ from .horizontal import (
 )
 from .starlark import StarlarkToolConfig
 from .dispatch_trigger import DispatchTriggerConfig
+from .realspace import (
+    RealspaceConfigs,
+    RealspaceWritelistUnit,
+)
 
 __all__ = [
     "HTTPRequests",
@@ -16,4 +20,6 @@ __all__ = [
     "UserInfo",
     "StarlarkToolConfig",
     "DispatchTriggerConfig",
+    "RealspaceConfigs",
+    "RealspaceWritelistUnit",
 ]

@@ -13,10 +13,10 @@ async def is_public_url(url: str) -> bool:
     port = u.port or (443 if u.scheme == "https" else 80)
     
     try:
-        ip = ip_address(u.hostname)
-        if not ip.is_global:
-            return True
-    except socket.gaierror:
+        # ipaddress raises ValueError when the host is not an ip literal,
+        # which means "this is a domain name, go resolve it below".
+        return ip_address(host).is_global
+    except ValueError:
             # is not an ip address
             # try to DNS resolve
             loop = asyncio.get_event_loop()
@@ -25,8 +25,8 @@ async def is_public_url(url: str) -> bool:
                 port,
                 type = socket.SOCK_STREAM
             )
-            for addr in addrs:
-                addr_info = AddrInfo.from_addr(addr)
-                if not addr_info.ip_address.is_global:
-                    return True
-    return False
+            # only public when every resolved address is global
+            return all(
+                AddrInfo.from_addr(addr).ip_address.is_global
+                for addr in addrs
+            )

@@ -10,7 +10,8 @@ from typing import (
     Any,
     Type,
     Coroutine,
-    Literal
+    Literal,
+    Iterable,
 )
 
 from pydantic import BaseModel
@@ -126,7 +127,7 @@ class ToolsCaller:
         return list(cls.tool_names.keys())
 
     @classmethod
-    def allowed_tool_ids(cls, allowed: set[str]) -> set[str]:
+    def allowed_tool_ids(cls, allowed: Iterable[str]) -> set[str]:
         return set(cls.tool_names.keys()).intersection(allowed)
     
     @classmethod

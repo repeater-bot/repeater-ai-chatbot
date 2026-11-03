@@ -48,8 +48,8 @@ class Response(Generic[T]):
         if self._model is None:
             raise ValueError("Model is not set")
         try:
-            return self._model(
-                **self._response.json()
+            return self._model.model_validate(
+                self._response.json()
             )
         except ValidationError as e:
             errors = e.errors()

@@ -42,6 +42,7 @@ async def chat_endpoint(
         fastapi_request = fastapi_request,
         user_id = user_id,
         task_id = task_id,
+        context_branch_id = request.context_branch_id,
         message = request.message,
         suffix = request.suffix,
         echo = request.echo,
