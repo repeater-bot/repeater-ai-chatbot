@@ -149,14 +149,17 @@ class Core:
     # endregion
 
     # region > get config
-    async def get_config(self, user_id: str) -> UserConfigs:
+    async def get_config(self, user_id: str, branch_id: str | None = None) -> UserConfigs:
         """
         加载用户配置
 
         :param user_id: 用户ID
         :return: 用户配置
         """
-        config: UserConfigs = await self.runtime.user_config_manager.load(user_id = user_id)
+        config: UserConfigs = await self.runtime.user_config_manager.load(
+            user_id = user_id,
+            branch_id = branch_id
+        )
         return config
     # endregion
 
