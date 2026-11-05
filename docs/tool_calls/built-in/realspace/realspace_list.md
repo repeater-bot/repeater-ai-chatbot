@@ -1,29 +1,59 @@
-# Realspace 列出目录
+# Realspace List
+
+List direct child paths, or all descendants with recursive=true.
 
 注册名：`realspace_list`
 
 ## 参数
 
-path: 目录路径；recursive: 是否递归
-
-## 返回
-
-完整路径列表
-
-## 白名单
-
-需要 `writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `list` 为 `true`。
-`list` 是去掉 `realspace_` 前缀后的工具名；`copy` 在 Python 字段中写作 `copy_`，配置里仍是 `copy`。
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `path` | string | 必填 | The path of the directory to list (an empty string lists the root). |
+| `recursive` | boolean | `false` | Whether to list all descendants recursively. |
 
 ```json
 {
-  "realspace": {
-    "writelist": [
-      {
-        "path": "D:\\Allowed",
-        "list": true
+  "path": "D:\\Allowed\\example.txt",
+  "recursive": false
+}
+```
+
+## 返回
+
+完整路径列表。
+
+## 错误
+
+失败时工具会返回文本：
+
+```text
+Tool realspace_list error: ...
+```
+
+常见原因包括路径不在白名单、路径为空、目标不存在、目标已存在、区间非法，或本地文件系统拒绝访问。
+
+## 白名单
+
+需要 `tool_calls.tools_configs.realspace.writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `list` 为 `true`。
+
+```json
+{
+  "tool_calls": {
+    "tools_configs": {
+      "realspace": {
+        "writelist": [
+          {
+            "path": "D:\\Allowed",
+            "list": true
+          }
+        ]
       }
-    ]
+    }
   }
 }
 ```
+
+## 前置条件
+
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_list`；`tool_calls.tools_configs.realspace.writelist` 中至少有一个条目覆盖目标路径。详见
+[Tool Calls 索引](../../index.md)。

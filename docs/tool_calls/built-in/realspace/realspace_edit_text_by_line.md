@@ -1,17 +1,69 @@
-# Realspace 按行列编辑文本
+# Realspace Edit Text By Line
+
+Replace a text range by line/column, reading and writing the whole file.
 
 注册名：`realspace_edit_text_by_line`
 
 ## 参数
 
-path、replacement、start_line、start_column、end_line、end_column、encoding
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `path` | string | 必填 | The real text file path to edit. |
+| `replacement` | string | 必填 | Replacement text; empty string deletes the range. |
+| `start_line` | integer | `1` | 1-based start line. |
+| `start_column` | integer | `1` | 1-based start column. |
+| `end_line` | `int | None` | `null` | 1-based end line; null means start_line. |
+| `end_column` | `int | None` | `null` | 1-based end column (exclusive); null means start_column. |
+| `encoding` | string | `utf-8` | Text encoding used to read and write the file. |
+
+```json
+{
+  "path": "D:\\Allowed\\example.txt",
+  "replacement": "new",
+  "start_line": 1,
+  "start_column": 1,
+  "end_line": 1,
+  "end_column": 5,
+  "encoding": "utf-8"
+}
+```
 
 ## 返回
 
-mode=\"line\" 的编辑结果
+`TextEditResult` JSON，`mode = "line"`。
+
+## 错误
+
+失败时工具会返回文本：
+
+```text
+Tool realspace_edit_text_by_line error: ...
+```
+
+常见原因包括路径不在白名单、路径为空、目标不存在、目标已存在、区间非法，或本地文件系统拒绝访问。
 
 ## 白名单
 
-需要 `writelist` 中某个条目的 `path` 覆盖目标路径，且 `edit_text_by_line` 为 `true`。
+需要 `tool_calls.tools_configs.realspace.writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `edit_text_by_line` 为 `true`。
 
-文本定位全部在客户端完成：读取全文后在 `str` 上分行/切片/替换，最后整体写回。字符偏移是 0 开始，行列是 1 开始；字符按 Unicode 码点计数，不按字节。
+```json
+{
+  "tool_calls": {
+    "tools_configs": {
+      "realspace": {
+        "writelist": [
+          {
+            "path": "D:\\Allowed",
+            "edit_text_by_line": true
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+## 前置条件
+
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_edit_text_by_line`；`tool_calls.tools_configs.realspace.writelist` 中至少有一个条目覆盖目标路径。详见
+[Tool Calls 索引](../../index.md)。

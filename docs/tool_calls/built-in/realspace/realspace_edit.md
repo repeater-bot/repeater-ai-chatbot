@@ -1,29 +1,63 @@
-# Realspace 替换字节区间
+# Realspace Edit
+
+Replace a byte range in a realspace file with Base64-encoded bytes.
 
 注册名：`realspace_edit`
 
 ## 参数
 
-path: 文件路径；data: Base64 文本；start/end: 半开区间
-
-## 返回
-
-编辑后的文件大小
-
-## 白名单
-
-需要 `writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `edit` 为 `true`。
-`edit` 是去掉 `realspace_` 前缀后的工具名；`copy` 在 Python 字段中写作 `copy_`，配置里仍是 `copy`。
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `path` | string | 必填 | The file path to edit. |
+| `data` | string | 必填 | Base64-encoded replacement bytes. |
+| `start` | integer | 必填 | Start offset of the replaced range. |
+| `end` | integer | 必填 | End offset (exclusive) of the replaced range. |
 
 ```json
 {
-  "realspace": {
-    "writelist": [
-      {
-        "path": "D:\\Allowed",
-        "edit": true
+  "path": "D:\\Allowed\\example.txt",
+  "data": "aGVsbG8=",
+  "start": 0,
+  "end": 5
+}
+```
+
+## 返回
+
+编辑后的文件大小。
+
+## 错误
+
+失败时工具会返回文本：
+
+```text
+Tool realspace_edit error: ...
+```
+
+常见原因包括路径不在白名单、路径为空、目标不存在、目标已存在、区间非法，或本地文件系统拒绝访问。
+
+## 白名单
+
+需要 `tool_calls.tools_configs.realspace.writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `edit` 为 `true`。
+
+```json
+{
+  "tool_calls": {
+    "tools_configs": {
+      "realspace": {
+        "writelist": [
+          {
+            "path": "D:\\Allowed",
+            "edit": true
+          }
+        ]
       }
-    ]
+    }
   }
 }
 ```
+
+## 前置条件
+
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_edit`；`tool_calls.tools_configs.realspace.writelist` 中至少有一个条目覆盖目标路径。详见
+[Tool Calls 索引](../../index.md)。

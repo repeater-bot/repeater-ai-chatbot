@@ -1,29 +1,57 @@
-# Realspace 判断是否目录
+# Realspace Is Dir
+
+Check whether a virtual path is a directory in the realspace.
 
 注册名：`realspace_is_dir`
 
 ## 参数
 
-path: 路径
-
-## 返回
-
-bool
-
-## 白名单
-
-需要 `writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `is_dir` 为 `true`。
-`is_dir` 是去掉 `realspace_` 前缀后的工具名；`copy` 在 Python 字段中写作 `copy_`，配置里仍是 `copy`。
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `path` | string | 必填 | The virtual path to check. |
 
 ```json
 {
-  "realspace": {
-    "writelist": [
-      {
-        "path": "D:\\Allowed",
-        "is_dir": true
+  "path": "D:\\Allowed\\example.txt"
+}
+```
+
+## 返回
+
+布尔值。
+
+## 错误
+
+失败时工具会返回文本：
+
+```text
+Tool realspace_is_dir error: ...
+```
+
+常见原因包括路径不在白名单、路径为空、目标不存在、目标已存在、区间非法，或本地文件系统拒绝访问。
+
+## 白名单
+
+需要 `tool_calls.tools_configs.realspace.writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `is_dir` 为 `true`。
+
+```json
+{
+  "tool_calls": {
+    "tools_configs": {
+      "realspace": {
+        "writelist": [
+          {
+            "path": "D:\\Allowed",
+            "is_dir": true
+          }
+        ]
       }
-    ]
+    }
   }
 }
 ```
+
+## 前置条件
+
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_is_dir`；`tool_calls.tools_configs.realspace.writelist` 中至少有一个条目覆盖目标路径。详见
+[Tool Calls 索引](../../index.md)。
