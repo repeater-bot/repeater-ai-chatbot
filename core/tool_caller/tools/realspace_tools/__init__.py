@@ -1,6 +1,7 @@
 from .read import RealspaceRead
 from .write import RealspaceWrite
 from .append import RealspaceAppend
+from .append_text import RealspaceAppendText
 from .truncate import RealspaceTruncate
 from .touch import RealspaceTouch
 from .edit import RealspaceEdit
@@ -31,6 +32,7 @@ __all__ = [
     "RealspaceRead",
     "RealspaceWrite",
     "RealspaceAppend",
+    "RealspaceAppendText",
     "RealspaceTruncate",
     "RealspaceTouch",
     "RealspaceEdit",
