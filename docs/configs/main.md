@@ -656,7 +656,7 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
                 // 目标路径必须等于 path，或位于 path 之下
                 //
                 // 空白名单表示拒绝所有 realspace 操作
-                "writelist": [
+                "whitelist": [
                     {
                         // 允许访问的根路径
                         "path": "./AgentWorkspace",
@@ -668,6 +668,7 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
 
                         // 原地修改
                         "append": false,
+                        "append_text": false,
                         "truncate": false,
                         "touch": false,
                         "edit": false,

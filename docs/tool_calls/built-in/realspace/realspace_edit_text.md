@@ -48,14 +48,14 @@ Tool realspace_edit_text error: ...
 
 ## 白名单
 
-需要 `tool_calls.tools_configs.realspace.writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `edit_text` 为 `true`。
+需要 `tool_calls.tools_configs.realspace.whitelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `edit_text` 为 `true`。
 
 ```json
 {
   "tool_calls": {
     "tools_configs": {
       "realspace": {
-        "writelist": [
+        "whitelist": [
           {
             "path": "D:\\Allowed",
             "edit_text": true
@@ -69,5 +69,5 @@ Tool realspace_edit_text error: ...
 
 ## 前置条件
 
-`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_edit_text`；`tool_calls.tools_configs.realspace.writelist` 中至少有一个条目覆盖目标路径。详见
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_edit_text`；`tool_calls.tools_configs.realspace.whitelist` 中至少有一个条目覆盖目标路径。详见
 [Tool Calls 索引](../../index.md)。

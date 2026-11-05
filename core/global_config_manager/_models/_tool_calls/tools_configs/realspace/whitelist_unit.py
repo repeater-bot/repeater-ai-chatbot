@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, Field
 
-class RealspaceWritelistUnit(BaseModel):
+class RealspaceWhitelistUnit(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     path: str
@@ -8,6 +8,7 @@ class RealspaceWritelistUnit(BaseModel):
     read_text: bool = False
     write: bool = False
     append: bool = False
+    append_text: bool = False
     truncate: bool = False
     touch: bool = False
     edit: bool = False
@@ -31,3 +32,4 @@ class RealspaceWritelistUnit(BaseModel):
     du: bool = False
     tree: bool = False
     copy_range: bool = False
+

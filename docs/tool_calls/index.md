@@ -75,7 +75,7 @@
 69. [Realspace Du](./built-in/realspace/realspace_du.md)
 70. [Realspace Tree](./built-in/realspace/realspace_tree.md)
 71. [Realspace Copy Range](./built-in/realspace/realspace_copy_range.md)
-72. [Realspace Get Writelist](./built-in/realspace/realspace_get_writelist.md)
+72. [Realspace Get Whitelist](./built-in/realspace/realspace_get_whitelist.md)
 73. [Realspace Read Text](./built-in/realspace/realspace_read_text.md)
 74. [Realspace Edit Text](./built-in/realspace/realspace_edit_text.md)
 75. [Realspace Edit Text By Char](./built-in/realspace/realspace_edit_text_by_char.md)

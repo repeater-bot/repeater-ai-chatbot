@@ -27,7 +27,7 @@ def resolve(path: str, tool_name: str) -> Path:
     target = Path(path).expanduser().resolve()
     config = ConfigManager.get_configs().tool_calls.tools_configs.realspace
 
-    for unit in config.writelist:
+    for unit in config.whitelist:
         if not unit.path or not unit.path.strip():
             continue
         root = Path(unit.path).expanduser().resolve()
@@ -127,6 +127,14 @@ class RealspaceClient:
         target.parent.mkdir(parents=True, exist_ok=True)
         with target.open("ab") as file:
             file.write(data)
+        return target.stat().st_size
+
+
+    async def append_text(self, path: str, text: str, text_encoding: str = "utf-8") -> int:
+        target = self._resolve(path)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("a", encoding=text_encoding) as file:
+            file.write(text)
         return target.stat().st_size
 
 

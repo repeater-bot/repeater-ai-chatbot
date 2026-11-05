@@ -9,7 +9,7 @@ from .starlark import StarlarkToolConfig
 from .dispatch_trigger import DispatchTriggerConfig
 from .realspace import (
     RealspaceConfigs,
-    RealspaceWritelistUnit,
+    RealspaceWhitelistUnit,
 )
 
 __all__ = [
@@ -21,5 +21,5 @@ __all__ = [
     "StarlarkToolConfig",
     "DispatchTriggerConfig",
     "RealspaceConfigs",
-    "RealspaceWritelistUnit",
+    "RealspaceWhitelistUnit",
 ]

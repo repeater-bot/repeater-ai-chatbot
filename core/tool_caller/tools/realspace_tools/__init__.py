@@ -21,7 +21,7 @@ from .hash import RealspaceHash
 from .du import RealspaceDiskUsage
 from .tree import RealspaceTree
 from .copy_range import RealspaceCopyRange
-from .get_writelist import RealspaceGetWritelist
+from .get_whitelist import RealspaceGetWhitelist
 from .read_text import RealspaceReadText
 from .edit_text import RealspaceEditText
 from .edit_text_by_char import RealspaceEditTextByChar
@@ -52,7 +52,7 @@ __all__ = [
     "RealspaceDiskUsage",
     "RealspaceTree",
     "RealspaceCopyRange",
-    "RealspaceGetWritelist",
+    "RealspaceGetWhitelist",
     "RealspaceReadText",
     "RealspaceEditText",
     "RealspaceEditTextByChar",
