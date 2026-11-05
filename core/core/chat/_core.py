@@ -62,6 +62,7 @@ from ._post_treatment import post_treatment
 from ._check_rul import check_rul
 from ._task_lifespan import TaskLifespan
 from ._get_model import get_model
+from ._merge_configs import merge_configs
 
 class Core:
     # region > init
@@ -274,6 +275,7 @@ class Core:
             suffix: str | None = None,
             echo: bool | None = None,
             fim_mode: bool = False,
+            user_configs: UserConfigs | None = None,
             history_messages: list[ContentUnit] | None = None,
             history_msg_role_map: dict[ContentRole, ContentRole | None] | None = None,
             user_info: RequestUserInfo = RequestUserInfo(),
@@ -336,6 +338,8 @@ class Core:
             # region [Getting Config]
             global_configs = ConfigManager.get_configs()
             configs = await self.get_config(user_id)
+            if user_configs is not None:
+                configs = merge_configs(configs, user_configs)
             # endregion
 
             # region [Getting Context Loader]

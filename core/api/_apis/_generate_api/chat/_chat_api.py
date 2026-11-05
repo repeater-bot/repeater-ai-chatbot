@@ -47,6 +47,7 @@ async def chat_endpoint(
         suffix = request.suffix,
         echo = request.echo,
         fim_mode = request.fim_mode,
+        user_configs = request.user_configs,
         history_messages = request.history_messages,
         history_msg_role_map = request.history_msg_role_map,
         user_info = request.user_info,
