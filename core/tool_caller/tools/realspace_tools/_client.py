@@ -21,6 +21,7 @@ from ....clients.data_client import (
 READ_OPERATIONS = {
     "read", "read_text", "exists", "is_file", "is_dir", "glob",
     "rematch", "list", "info", "get_url", "hash", "du", "tree",
+    "upload_to_workspace",
 }
 
 
