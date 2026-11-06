@@ -14,21 +14,18 @@
 
 ## 返回
 
-白名单条目列表。每个条目包含 `path` 和全部操作 bool，例如：
+白名单条目字典。每个条目包含 `path`、`read`、`write`、`shell_level`：
 
 ```json
-[
-  {
+{
+  "agent": {
     "path": "D:\\Allowed",
     "read": true,
-    "read_text": true,
     "write": false,
-    "copy": false
+    "shell_level": "off"
   }
-]
+}
 ```
-
-`copy` 在 Python 模型里是 `copy_`，这里按配置名输出。
 
 ## 错误
 
@@ -36,19 +33,20 @@
 
 ## 白名单
 
-`realspace_get_whitelist` 本身不需要白名单字段，它用于让 AI 先确认当前有哪些路径、每个操作是否开放。
+`realspace_get_whitelist` 不需要自己的白名单字段；它返回以键为索引的白名单字典。
 
 ```json
 {
   "tool_calls": {
     "tools_configs": {
       "realspace": {
-        "whitelist": [
-          {
+        "whitelist": {
+          "agent": {
             "path": "D:\\Allowed",
-            "read": true
+            "read": true,
+            "write": false
           }
-        ]
+        }
       }
     }
   }
@@ -56,6 +54,7 @@
 ```
 
 ## 前置条件
+
 
 `configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_get_whitelist`。详见
 [Tool Calls 索引](../../index.md)。

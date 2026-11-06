@@ -32,19 +32,20 @@ Tool realspace_mkdir error: ...
 
 ## 白名单
 
-需要 `tool_calls.tools_configs.realspace.whitelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `mkdir` 为 `true`。
+白名单位于 `tool_calls.tools_configs.realspace.whitelist`，键是白名单索引，Shell 沙箱也会用这个键选根路径。需要该条目的 `write` 为 `true`。
 
 ```json
 {
   "tool_calls": {
     "tools_configs": {
       "realspace": {
-        "whitelist": [
-          {
+        "whitelist": {
+          "agent": {
             "path": "D:\\Allowed",
-            "mkdir": true
+            "read": false,
+            "write": true
           }
-        ]
+        }
       }
     }
   }
@@ -52,6 +53,7 @@ Tool realspace_mkdir error: ...
 ```
 
 ## 前置条件
+
 
 `configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_mkdir`；`tool_calls.tools_configs.realspace.whitelist` 中至少有一个条目覆盖目标路径。详见
 [Tool Calls 索引](../../index.md)。

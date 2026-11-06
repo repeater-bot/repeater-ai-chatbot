@@ -36,19 +36,20 @@ Tool realspace_glob error: ...
 
 ## 白名单
 
-需要 `tool_calls.tools_configs.realspace.whitelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `glob` 为 `true`。
+白名单位于 `tool_calls.tools_configs.realspace.whitelist`，键是白名单索引，Shell 沙箱也会用这个键选根路径。需要该条目的 `read` 为 `true`。
 
 ```json
 {
   "tool_calls": {
     "tools_configs": {
       "realspace": {
-        "whitelist": [
-          {
+        "whitelist": {
+          "agent": {
             "path": "D:\\Allowed",
-            "glob": true
+            "read": true,
+            "write": false
           }
-        ]
+        }
       }
     }
   }
@@ -56,6 +57,7 @@ Tool realspace_glob error: ...
 ```
 
 ## 前置条件
+
 
 `configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_glob`；`tool_calls.tools_configs.realspace.whitelist` 中至少有一个条目覆盖目标路径。详见
 [Tool Calls 索引](../../index.md)。
