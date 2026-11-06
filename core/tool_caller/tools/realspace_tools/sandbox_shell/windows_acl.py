@@ -8,6 +8,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from loguru import logger
+
 from .base import SandboxMode, SandboxUnavailable, ShellRequest, ShellResult
 
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -90,6 +92,28 @@ kernel32.LocalFree.restype = ctypes.c_void_p
 
 def _fail(name: str) -> None:
     raise SandboxUnavailable(f"{name} failed: {ctypes.get_last_error()}")
+
+
+def lower_integrity(path: str) -> None:
+    """Lower a directory tree to Low integrity for the confined shell."""
+    logger.info("Lowering integrity level for realspace shell root: %s", path)
+    result = subprocess.run(
+        ["icacls", path, "/setintegritylevel", "(OI)(CI)L"],
+        capture_output = True,
+        text = True,
+        encoding = "utf-8",
+        errors = "replace",
+    )
+    if result.returncode != 0:
+        logger.error(
+            "Failed to lower integrity level for %s: %s",
+            path,
+            result.stderr or result.stdout,
+        )
+        raise SandboxUnavailable(
+            f"failed to lower integrity level for {path}: {result.stderr or result.stdout}"
+        )
+    logger.info("Integrity level lowered for realspace shell root: %s", path)
 
 
 def _logon_sid() -> str:

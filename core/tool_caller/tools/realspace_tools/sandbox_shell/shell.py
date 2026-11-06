@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from ....framework import ToolsCaller, ToolPackage, RuntimePackage
 from .base import SandboxMode, SandboxUnavailable, ShellRequest
 from .local import run_shell
+from .prepare import prepare_shell_root
 
 
 @ToolsCaller.register
@@ -50,6 +51,9 @@ class SandboxShell(ToolPackage):
             raise PermissionError(f"shell is disabled for whitelist {args.path_key!r}")
         if level not in {"read_only", "path_write", "full_access"}:
             raise SandboxUnavailable(f"unknown shell_level {level!r} for {args.path_key!r}")
+
+        if realspace.dir_auto_sandbox and level != "full_access":
+            await prepare_shell_root(root, True)
 
         result = await run_shell(
             ShellRequest(

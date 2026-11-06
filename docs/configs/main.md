@@ -649,6 +649,11 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
             // 现实路径（realspace）工具配置
             "realspace": {
 
+                // 启用 Shell 沙箱时，是否自动准备主路径
+                // Windows 降为 Low integrity；Linux/macOS 由 bwrap/Seatbelt 的 path grant 处理
+                // 默认开启；准备操作在后台线程执行，并记录英文日志
+                "dir_auto_sandbox": true,
+
                 // 每个条目是一个允许访问的根路径
                 // 以及该路径上允许的读取/写入
                 //

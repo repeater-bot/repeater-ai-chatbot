@@ -54,6 +54,8 @@
 
 `path_key` 必须存在；`cwd` 必须是该条目 `path` 的根目录或子目录。
 
+`realspace.dir_auto_sandbox`（默认 `true`）会在启动沙箱 Shell 前执行路径准备：Windows 把主路径降为 Low integrity；Linux/macOS 没有 integrity level，由 bwrap / Seatbelt 的 path grant 完成等价操作。准备在后台线程执行并记录英文日志。关闭它时由外部提前准备好路径权限。
+
 ## 返回
 
 ```json
