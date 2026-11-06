@@ -7,6 +7,7 @@ import orjson
 
 from box import Box
 from pathlib import Path
+from loguru import logger
 from typing import ClassVar, Generator, Iterable
 
 from ._base_model import GlobalConfigs
@@ -105,6 +106,9 @@ class ConfigManager:
             cls._configs = GlobalConfigs.model_validate(merge_config)
             return cls._configs
         except Exception as e:
+            logger.error(
+                "Failed to load configs: {e}"
+            )
             if create_if_missing:
                 cls.save(cls._configs)
                 return cls._configs

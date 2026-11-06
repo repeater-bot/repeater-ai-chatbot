@@ -10,6 +10,7 @@ from .dispatch_trigger import DispatchTriggerConfig
 from .realspace import (
     RealspaceConfigs,
     RealspaceWhitelistUnit,
+    ShellLevel,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "DispatchTriggerConfig",
     "RealspaceConfigs",
     "RealspaceWhitelistUnit",
+    "ShellLevel",
 ]

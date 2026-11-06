@@ -18,35 +18,38 @@ from ....clients.data_client import (
 )
 
 
-def resolve(path: str, tool_name: str) -> Path:
+READ_OPERATIONS = {
+    "read", "read_text", "exists", "is_file", "is_dir", "glob",
+    "rematch", "list", "info", "get_url", "hash", "du", "tree",
+}
+
+
+def resolve(path: str, tool_name: str, permission: str | None = None) -> Path:
     if not path or not path.strip():
         raise HTTPException(detail="path cannot be empty", status_code=400)
 
     operation = tool_name.removeprefix("realspace_")
-    field_name = "copy_" if operation == "copy" else operation
+    access = permission or ("read" if operation in READ_OPERATIONS else "write")
     target = Path(path).expanduser().resolve()
     config = ConfigManager.get_configs().tool_calls.tools_configs.realspace
 
-    for unit in config.whitelist:
+    for key, unit in config.whitelist.items():
         if not unit.path or not unit.path.strip():
             continue
         root = Path(unit.path).expanduser().resolve()
         if not (target == root or root in target.parents):
             continue
-        if not getattr(unit, field_name, False):
+        if not getattr(unit, access, False):
             continue
-        if target == root and operation not in {
-            "read", "exists", "is_file", "is_dir", "glob", "rematch",
-            "list", "info", "get_url", "hash", "du", "tree",
-        }:
+        if access == "write" and target == root:
             raise HTTPException(
-                detail=f"cannot modify a {tool_name} whitelist root: {target}",
+                detail=f"cannot modify a {tool_name} whitelist root ({key}): {target}",
                 status_code=403
             )
         return target
 
     raise HTTPException(
-        detail=f"path is outside the {tool_name} whitelist: {target}",
+        detail=f"path is outside the {access} whitelist for {tool_name}: {target}",
         status_code=403
     )
 
@@ -55,8 +58,8 @@ class RealspaceClient:
     def __init__(self, tool_name: str):
         self.tool_name = tool_name
 
-    def _resolve(self, path: str) -> Path:
-        return resolve(path, self.tool_name)
+    def _resolve(self, path: str, permission: str | None = None) -> Path:
+        return resolve(path, self.tool_name, permission)
 
     async def get_file(self, path: str, start: int | None = None, length: int | None = None, headers=None) -> bytes:
         data = self._resolve(path).read_bytes()
@@ -197,7 +200,7 @@ class RealspaceClient:
 
 
     async def copy(self, path: str, destination: str) -> dict:
-        source = self._resolve(path)
+        source = self._resolve(path, "read")
         target = self._resolve(destination)
         if target.exists():
             raise HTTPException(detail=f"{target} already exists", status_code=409)
@@ -213,7 +216,7 @@ class RealspaceClient:
 
 
     async def copy_range(self, path: str, destination: str, start: int, end: int) -> dict:
-        source = self._resolve(path)
+        source = self._resolve(path, "read")
         target = self._resolve(destination)
         if target.exists():
             raise HTTPException(detail=f"{target} already exists", status_code=409)

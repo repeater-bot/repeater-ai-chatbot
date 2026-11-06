@@ -13,7 +13,7 @@ class RealspaceGetWhitelist(ToolPackage):
 
     async def call(self, args: Params, runtime: RuntimePackage):
         units = ConfigManager.get_configs().tool_calls.tools_configs.realspace.whitelist
-        return [
-            unit.model_dump(by_alias = True)
-            for unit in units
-        ]
+        return {
+            key: unit.model_dump(by_alias = True)
+            for key, unit in units.items()
+        }
