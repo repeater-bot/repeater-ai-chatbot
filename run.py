@@ -14,7 +14,6 @@ import json
 import shlex
 import ctypes
 import atexit
-import platform
 import traceback
 import subprocess
 from enum import Enum
@@ -34,13 +33,14 @@ from typing import (
     Optional,
     Iterable,
     Generator,
+    LiteralString,
 )
 # endregion
 
-# region Constants
-SYSTEM: str = platform.system()
-
 T_CPV = TypeVar("T_CPV")
+
+SYSTEM_NAME: LiteralString = os.name
+PLATFORM_NAME: LiteralString = sys.platform
 
 class ExitCode(Enum):
     ONLY_PAUSE = -1
@@ -61,6 +61,21 @@ class ExitCode(Enum):
     UNKNOWN_ERROR = 255
 # endregion
 
+# region Auto New Line Input
+def anl_input(prompt: object = "") -> str:
+    """
+    Auto new line input
+
+    :param prompt: Prompt
+    :return: Input
+    """
+
+    try:
+        return input(prompt)
+    except BaseException as e:
+        sys.stdout.write("\n")
+        raise
+
 # region SetTitle
 def set_title(title: str):
     """
@@ -68,7 +83,7 @@ def set_title(title: str):
 
     :param title: Title
     """
-    if SYSTEM == "Windows":
+    if SYSTEM_NAME == "nt":
         try:
             # Win API
             ctypes.windll.kernel32.SetConsoleTitleW(title)
@@ -106,137 +121,46 @@ class CrossPlatformValue(Generic[T_CPV]):
     
     def __init__(
         self,
-        windows: Optional[T_CPV] = None,
-        linux: Optional[T_CPV] = None,
-        macos: Optional[T_CPV] = None,
-        jvm: Optional[T_CPV] = None,
-        default: Optional[T_CPV] = None
+        values: dict[str, T_CPV],
+        default: T_CPV | None = None
     ):
-        self._windows_value: Optional[T_CPV] = windows
-        self._linux_value: Optional[T_CPV] = linux
-        self._macos_value: Optional[T_CPV] = macos
-        self._jvm_value: Optional[T_CPV] = jvm
-        self._default_value: Optional[T_CPV] = default
-    
-    @property
-    def windows(self) -> Optional[T_CPV]:
-        if self._windows_value is not None:
-            return self._windows_value
-        elif self._default_value is not None:
-            return self._default_value
-        else:
-            raise ValueError("No value provided for the current platform.")
-    
-    @windows.setter
-    def windows(self, value: T_CPV):
-        self._windows_value = value
-    
-    @property
-    def linux(self) -> Optional[T_CPV]:
-        if self._linux_value is not None:
-            return self._linux_value
-        elif self._default_value is not None:
-            return self._default_value
-        else:
-            raise ValueError("No value provided for the current platform.")
-    
-    @linux.setter
-    def linux(self, value: T_CPV):
-        self._linux_value = value
-    
-    @property
-    def macos(self) -> Optional[T_CPV]:
-        if self._macos_value is not None:
-            return self._macos_value
-        elif self._default_value is not None:
-            return self._default_value
-        else:
-            raise ValueError("No value provided for the current platform.")
-    
-    @macos.setter
-    def macos(self, value: T_CPV):
-        self._macos_value = value
+        self._value = values
+        self._default_value = default
 
     @property
-    def jvm(self) -> Optional[T_CPV]:
-        if self._jvm_value is not None:
-            return self._jvm_value
-        elif self._default_value is not None:
-            return self._default_value
-        else:
-            raise ValueError("No value provided for the current platform.")
-
-    @jvm.setter
-    def jvm(self, value: T_CPV):
-        self._jvm_value = value
+    def has_value(self) -> bool:
+        return PLATFORM_NAME in self._value
     
     @property
     def value(self) -> T_CPV:
         """Get the value corresponding to the current platform."""
-        if SYSTEM == "Windows" and self._windows_value is not None:
-            return self._windows_value
-        elif SYSTEM == "Linux" and self._linux_value is not None:
-            return self._linux_value
-        elif SYSTEM == "Darwin" and self._macos_value is not None:
-            return self._macos_value
-        elif SYSTEM == "Java" and self._jvm_value is not None:
-            return self._jvm_value
-        elif self._default_value is not None:
-            return self._default_value
+        if self._default_value is not None:
+            return self._value.get(PLATFORM_NAME, self._default_value)
         else:
-            raise ValueError("No value provided for the current platform.")
-    
-    def get_value_or(self, default: T_CPV) -> T_CPV:
-        """Get the value, return the provided default value if it is undefined."""
-        try:
-            return self.value
-        except ValueError:
-            return default
-    
-    def is_defined_for_current_platform(self) -> bool:
-        """Check if there are defined values in the current platform."""
-        if SYSTEM == "Windows":
-            return self._windows_value is not None
-        elif SYSTEM == "Linux":
-            return self._linux_value is not None
-        elif SYSTEM == "Darwin":
-            return self._macos_value is not None
-        elif SYSTEM == "Java":
-            return self._jvm_value is not None
-        return False
-    
-    def dump(self) -> Dict[str, T_CPV | None]:
-        """Dump the values to a dictionary."""
-        return {
-            "windows": self.windows,
-            "linux": self.linux,
-            "macos": self.macos,
-            "jvm": self.jvm,
-            "default": self._default_value
-        }
-    
-    def __str__(self) -> str:
-        return str(self.value)
-    
-    def __repr__(self) -> str:
-        return (
-            f"CrossPlatformValue("
-            f"windows={self._windows_value}, "
-            f"linux={self._linux_value}, "
-            f"macos={self._macos_value}, "
-            f"jvm={self._jvm_value}, "
-            f"default={self._default_value}"
-            f")"
+            return self._value[PLATFORM_NAME]
+
+    @classmethod
+    def from_dict(cls, dict_values: dict[str, dict[str, T_CPV] | T_CPV | None]) -> "CrossPlatformValue[T_CPV]":
+        """Update the values from a dictionary."""
+        values = dict_values.get("values", {})
+        default_value = dict_values.get("default_value")
+
+        return cls(
+            values = values,
+            default = default_value
         )
-    
-    def __eq__(self, other: Any) -> bool:
-        if not isinstance(other, CrossPlatformValue):
-            return False
-        return (self._windows_value == other._windows_value and
-                self._linux_value == other._linux_value and
-                self._macos_value == other._macos_value and
-                self._jvm_value == other._jvm_value and
-                self._default_value == other._default_value)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert the values to a dictionary."""
+        if self._default_value is None:
+            return {
+                "values": self._value
+            }
+        else:
+            return {
+                "values": self._value,
+                "default_value": self._default_value
+            }
 # endregion
 
 # region absolute_path
@@ -306,7 +230,7 @@ class Ask(BaseAsk, Generic[T_FILE]):
             self._file.write("[Y/n]" if self._default else "[y/N]")
         self._file.write(": ")
         self._file.flush()
-        answer = input().lower()
+        answer = anl_input().lower()
         if self._default:
             if answer in self._no_charset:
                 return False
@@ -360,7 +284,7 @@ class Choose(BaseAsk, Generic[T, T_FILE]):
         self._file.flush()
 
         while True:
-            choice = input(self._choose_prompt)
+            choice = anl_input(self._choose_prompt)
             if choice in self._list_values:
                 return choice
             else:
@@ -551,13 +475,48 @@ class SlovesStarter:
     # region > init
     def __init__(self):
         self.python_name: CrossPlatformValue[str] = CrossPlatformValue(
-            windows = "python",
-            linux = "python3",
+            values = {
+                "win32": "python.exe",
+                "linux": "python3",
+                "darwin": "python3",
+                "cygwin": "python.exe",
+                "msys": "python.exe",
+                "aix": "python3",
+                "android": "python3",
+                "ios": "python3",
+                "emscripten": "python3",
+                "wasi": "python3"
+            },
             default = "python3"
         )
+        self.venv_bin_path: CrossPlatformValue[str] = CrossPlatformValue(
+            values = {
+                "win32": "Scripts",
+                "linux": "bin",
+                "darwin": "bin",
+                "cygwin": "bin",
+                "msys": "bin",
+                "aix": "bin",
+                "android": "bin",
+                "ios": "bin",
+                "emscripten": "bin",
+                "wasi": "bin"
+            },
+            default = "bin"
+        )
         self.pip_name: CrossPlatformValue[str] = CrossPlatformValue(
-            windows = "pip",
-            linux = "pip3",
+            values = {
+                "win32": "pip3.exe",
+                "linux": "pip3",
+                "darwin": "pip3",
+                "cygwin": "pip3",
+                "msys": "pip3.exe",
+                "aix": "pip3.exe",
+                "android": "pip3",
+                "ios": "pip3",
+                "emscripten": "pip3",
+                "wasi": "pip3"
+            },
             default = "pip3"
         )
         self.venv_prompt: str = "venv"
@@ -572,7 +531,19 @@ class SlovesStarter:
         self.use_venv: bool = True
         self.requirements: List[str] = []
         self.requirements_file: CrossPlatformValue[str] = CrossPlatformValue(
-            default="requirements.txt"
+            values = {
+                "win32": "requirements.txt",
+                "linux": "requirements.txt",
+                "darwin": "requirements.txt",
+                "cygwin": "requirements.txt",
+                "msys": "requirements.txt",
+                "aix": "requirements.txt",
+                "android": "requirements.txt",
+                "ios": "requirements.txt",
+                "emscripten": "requirements.txt",
+                "wasi": "requirements.txt"
+            },
+            default = "requirements.txt"
         )
         self.work_directory: Path = self.cwd
         self.restart:bool = False
@@ -728,6 +699,14 @@ class SlovesStarter:
                     self.python_name = CrossPlatformValue(**data)
                 except Exception:
                     pass
+
+        if exists_and_is_designated_type("venv_bin_path", dict):
+            data = config["venv_bin_path"]
+            if check_all_dict_types(data, str, str):
+                try:
+                    self.venv_bin_path = CrossPlatformValue(**data)
+                except Exception:
+                    pass
         
         if exists_and_is_designated_type("pip_name", dict):
             data = config["pip_name"]
@@ -830,10 +809,11 @@ class SlovesStarter:
             "process_title": self.process_title,
             "process_exit_title": self.process_exit_title,
             "exit_title": self.exit_title,
-            "python_name": self.python_name.dump(),
-            "pip_name": self.pip_name.dump(),
+            "python_name": self.python_name.to_dict(),
+            "venv_bin_path": self.venv_bin_path.to_dict(),
+            "pip_name": self.pip_name.to_dict(),
             "requirements": self.requirements,
-            "requirements_file": self.requirements_file.dump(),
+            "requirements_file": self.requirements_file.to_dict(),
             "cwd": str(self.cwd),
             "work_directory": str(self.work_directory),
             "use_venv": self.use_venv,
@@ -949,33 +929,32 @@ class SlovesStarter:
                 if self.allow_print:
                     self.print_divider_line()
                 start = time.perf_counter_ns()
-                result: subprocess.CompletedProcess[bytes] = subprocess.run(
-                    cmd,
-                    cwd = cwd,
-                    env = env,
-                    capture_output = capture_output
-                )
-                if self.allow_print:
-                    self.print_divider_line()
+                try:
+                    result: subprocess.CompletedProcess[bytes] = subprocess.run(
+                        cmd,
+                        cwd = cwd,
+                        env = env,
+                        capture_output = capture_output
+                    )
+                finally:
+                    if self.allow_print:
+                        self.print_divider_line()
+                
                 if print_return_code:
                     askfile.write(f"Command returned with code {result.returncode}\n")
                     askfile.flush()
                 return result
             except FileNotFoundError as e:
-                if self.allow_print:
-                    self.print_divider_line()
                 askfile.write(f"Error: Command not found: {e}\n")
                 askfile.flush()
                 raise
             except Exception as e:
-                if self.allow_print:
-                    self.print_divider_line()
                 askfile.write(f"Error running command: {e}\n")
                 askfile.flush()
                 raise
             finally:
                 end = time.perf_counter_ns()
-                if print_runtime and callable(runtime_handler):
+                if self.allow_print and print_runtime and callable(runtime_handler):
                     askfile.write(runtime_handler(start, end))
                     askfile.write("\n")
                     askfile.flush()
@@ -1024,11 +1003,8 @@ class SlovesStarter:
 
     # region > Virtual environment path
     @property
-    def venv_bin_path(self):
-        if SYSTEM == "Windows":
-            return self.work_directory / ".venv" / "Scripts"
-        else:
-            return self.work_directory / ".venv" / "bin"
+    def venv_bin_full_path(self):
+        return self.work_directory / ".venv" / self.venv_bin_path.value
     # endregion
 
     # region > Initialize virtual environment
@@ -1054,7 +1030,7 @@ class SlovesStarter:
                                 f.write(f"{package}\n")
                 if (self.work_directory / self.requirements_file.value).exists():
                     if self.run_cmd(
-                            [str(self.venv_bin_path / self.pip_name.value), "install", "-r", self.requirements_file.value],
+                            [str(self.venv_bin_full_path / self.pip_name.value), "install", "-r", self.requirements_file.value],
                             reason="Installing requirements",
                             cwd=self.work_directory,
                             print_return_code = self.print_return_code and not self.allow_print,
@@ -1123,10 +1099,7 @@ class SlovesStarter:
             print(f"Error: Script \"{script_name}\" is not existing")
         
         if self.use_venv:
-            if SYSTEM == "Windows":
-                start = [str(self.work_directory / ".venv" / "Scripts" / self.python_name.value), *self.python_arguments, str(script_name)]
-            else:
-                start = [str(self.work_directory / ".venv" / "bin" / self.python_name.value), *self.python_arguments, str(script_name)]
+            start = [str(self.venv_bin_full_path / self.python_name.value), *self.python_arguments, str(script_name)]
         else:
             start = [self.python_name.value, *self.python_arguments, str(script_name)]
 
