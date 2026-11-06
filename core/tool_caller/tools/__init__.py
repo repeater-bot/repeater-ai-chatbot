@@ -84,6 +84,7 @@ from .realspace_tools import (
     RealspaceEditTextByChar,
     RealspaceEditTextByLine,
     RealspaceEditTextRegex,
+    SandboxShell,
 )
 from .deepseek_api import (
     DeepseekSearch,
@@ -192,7 +193,9 @@ __all__ = [
     "RealspaceEditTextByChar",
     "RealspaceEditTextByLine",
     "RealspaceEditTextRegex",
-    
+
+    "SandboxShell",
+
     "DeepseekSearch",
     "DeepseekFetch",
 

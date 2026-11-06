@@ -27,6 +27,7 @@ from .edit_text import RealspaceEditText
 from .edit_text_by_char import RealspaceEditTextByChar
 from .edit_text_by_line import RealspaceEditTextByLine
 from .edit_text_regex import RealspaceEditTextRegex
+from .sandbox_shell import SandboxShell
 
 __all__ = [
     "RealspaceRead",
@@ -58,4 +59,5 @@ __all__ = [
     "RealspaceEditTextByChar",
     "RealspaceEditTextByLine",
     "RealspaceEditTextRegex",
+    "SandboxShell",
 ]
