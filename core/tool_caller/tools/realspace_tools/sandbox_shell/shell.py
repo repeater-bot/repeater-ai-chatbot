@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import codecs
 from dataclasses import asdict
 from pathlib import Path
 
@@ -24,6 +25,10 @@ class SandboxShell(ToolPackage):
             default = None,
             ge = 0.1,
             description = "Optional per-call timeout in seconds; defaults to 30."
+        )
+        encoding: str = Field(
+            default = "utf-8",
+            description = "Encoding used to decode the command's stdout and stderr."
         )
 
     name = "sandbox_shell"
@@ -51,9 +56,13 @@ class SandboxShell(ToolPackage):
             raise PermissionError(f"shell is disabled for whitelist {args.path_key!r}")
         if level not in {"read_only", "path_write", "full_access"}:
             raise SandboxUnavailable(f"unknown shell_level {level!r} for {args.path_key!r}")
+        try:
+            codecs.lookup(args.encoding)
+        except LookupError as error:
+            raise ValueError(f"unknown output encoding: {args.encoding!r}") from error
 
         if realspace.dir_auto_sandbox and level != "full_access":
-            await prepare_shell_root(root, True)
+            await prepare_shell_root(root, True, runtime.user_id)
 
         result = await run_shell(
             ShellRequest(
@@ -61,6 +70,7 @@ class SandboxShell(ToolPackage):
                 cwd = str(cwd),
                 mode = SandboxMode(level),
                 timeout = args.timeout or 30,
+                encoding = args.encoding,
             )
         )
         return asdict(result)

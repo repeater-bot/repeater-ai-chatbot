@@ -7,13 +7,14 @@ import random
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import Any, cast
 
 from loguru import logger
 
 from .base import SandboxMode, SandboxUnavailable, ShellRequest, ShellResult
 
-kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
+kernel32: ctypes.WinDLL | None = None
+advapi32: ctypes.WinDLL | None = None
 
 TOKEN_ALL_ACCESS = 0xF01FF
 LUA_TOKEN = 0x4
@@ -64,39 +65,69 @@ class SID_AND_ATTRIBUTES(ctypes.Structure):
     _fields_ = [("Sid", ctypes.c_void_p), ("Attributes", wt.DWORD)]
 
 
-kernel32.CreateFileW.argtypes = [
-    wt.LPCWSTR, wt.DWORD, wt.DWORD, ctypes.POINTER(SECURITY_ATTRIBUTES),
-    wt.DWORD, wt.DWORD, wt.HANDLE,
-]
-kernel32.CreateFileW.restype = wt.HANDLE
-advapi32.OpenProcessToken.argtypes = [wt.HANDLE, wt.DWORD, ctypes.POINTER(wt.HANDLE)]
-advapi32.CreateRestrictedToken.argtypes = [
-    wt.HANDLE, wt.DWORD, wt.DWORD, ctypes.POINTER(SID_AND_ATTRIBUTES),
-    wt.DWORD, ctypes.c_void_p, wt.DWORD, ctypes.POINTER(SID_AND_ATTRIBUTES),
-    ctypes.POINTER(wt.HANDLE),
-]
-advapi32.ConvertStringSidToSidW.argtypes = [wt.LPCWSTR, ctypes.POINTER(ctypes.c_void_p)]
-advapi32.CreateProcessAsUserW.argtypes = [
-    wt.HANDLE, wt.LPCWSTR, wt.LPWSTR, ctypes.c_void_p, ctypes.c_void_p,
-    wt.BOOL, wt.DWORD, ctypes.c_void_p, wt.LPCWSTR,
-    ctypes.POINTER(STARTUPINFOW), ctypes.POINTER(PROCESS_INFORMATION),
-]
-kernel32.WaitForSingleObject.argtypes = [wt.HANDLE, wt.DWORD]
-kernel32.GetExitCodeProcess.argtypes = [wt.HANDLE, ctypes.POINTER(wt.DWORD)]
-kernel32.TerminateProcess.argtypes = [wt.HANDLE, ctypes.c_uint]
-kernel32.CloseHandle.argtypes = [wt.HANDLE]
-kernel32.GetCurrentProcess.restype = wt.HANDLE
-kernel32.LocalFree.argtypes = [ctypes.c_void_p]
-kernel32.LocalFree.restype = ctypes.c_void_p
+def _load_dlls() -> None:
+    """Load Windows DLLs and declare signatures on first use."""
+    global kernel32, advapi32
+    if kernel32 is not None and advapi32 is not None:
+        return
+
+    k32 = ctypes.WinDLL("kernel32", use_last_error = True)
+    a32 = ctypes.WinDLL("advapi32", use_last_error = True)
+
+    k32.CreateFileW.argtypes = [
+        wt.LPCWSTR, wt.DWORD, wt.DWORD, ctypes.POINTER(SECURITY_ATTRIBUTES),
+        wt.DWORD, wt.DWORD, wt.HANDLE,
+    ]
+    k32.CreateFileW.restype = wt.HANDLE
+    a32.OpenProcessToken.argtypes = [wt.HANDLE, wt.DWORD, ctypes.POINTER(wt.HANDLE)]
+    a32.CreateRestrictedToken.argtypes = [
+        wt.HANDLE, wt.DWORD, wt.DWORD, ctypes.POINTER(SID_AND_ATTRIBUTES),
+        wt.DWORD, ctypes.c_void_p, wt.DWORD, ctypes.POINTER(SID_AND_ATTRIBUTES),
+        ctypes.POINTER(wt.HANDLE),
+    ]
+    a32.ConvertStringSidToSidW.argtypes = [wt.LPCWSTR, ctypes.POINTER(ctypes.c_void_p)]
+    a32.CreateProcessAsUserW.argtypes = [
+        wt.HANDLE, wt.LPCWSTR, wt.LPWSTR, ctypes.c_void_p, ctypes.c_void_p,
+        wt.BOOL, wt.DWORD, ctypes.c_void_p, wt.LPCWSTR,
+        ctypes.POINTER(STARTUPINFOW), ctypes.POINTER(PROCESS_INFORMATION),
+    ]
+    k32.WaitForSingleObject.argtypes = [wt.HANDLE, wt.DWORD]
+    k32.GetExitCodeProcess.argtypes = [wt.HANDLE, ctypes.POINTER(wt.DWORD)]
+    k32.TerminateProcess.argtypes = [wt.HANDLE, ctypes.c_uint]
+    k32.CloseHandle.argtypes = [wt.HANDLE]
+    k32.GetCurrentProcess.restype = wt.HANDLE
+    k32.LocalFree.argtypes = [ctypes.c_void_p]
+    k32.LocalFree.restype = ctypes.c_void_p
+
+    kernel32 = k32
+    advapi32 = a32
+
+
+def _kernel32() -> Any:
+    _load_dlls()
+    if kernel32 is None:
+        raise SandboxUnavailable("kernel32 is unavailable")
+    return cast(Any, kernel32)
+
+
+def _advapi32() -> Any:
+    _load_dlls()
+    if advapi32 is None:
+        raise SandboxUnavailable("advapi32 is unavailable")
+    return cast(Any, advapi32)
 
 
 def _fail(name: str) -> None:
     raise SandboxUnavailable(f"{name} failed: {ctypes.get_last_error()}")
 
 
-def lower_integrity(path: str) -> None:
+def lower_integrity(path: str, user_id: str) -> None:
     """Lower a directory tree to Low integrity for the confined shell."""
-    logger.info("Lowering integrity level for realspace shell root: %s", path)
+    logger.info(
+        "Lowering integrity level for realspace shell root: {path}",
+        user_id = user_id,
+        path = path,
+    )
     result = subprocess.run(
         ["icacls", path, "/setintegritylevel", "(OI)(CI)L"],
         capture_output = True,
@@ -106,14 +137,19 @@ def lower_integrity(path: str) -> None:
     )
     if result.returncode != 0:
         logger.error(
-            "Failed to lower integrity level for %s: %s",
-            path,
-            result.stderr or result.stdout,
+            "Failed to lower integrity level: {path}: {detail}",
+            user_id = user_id,
+            path = path,
+            detail = result.stderr or result.stdout,
         )
         raise SandboxUnavailable(
             f"failed to lower integrity level for {path}: {result.stderr or result.stdout}"
         )
-    logger.info("Integrity level lowered for realspace shell root: %s", path)
+    logger.info(
+        "Integrity level lowered for realspace shell root: {path}",
+        user_id = user_id,
+        path = path,
+    )
 
 
 def _logon_sid() -> str:
@@ -133,6 +169,9 @@ def _logon_sid() -> str:
 def run_windows_acl(request: ShellRequest) -> ShellResult:
     if request.mode == SandboxMode.FULL_ACCESS:
         raise SandboxUnavailable("full_access must not use the ACL backend")
+
+    kernel32 = _kernel32()
+    advapi32 = _advapi32()
 
     tmp = Path(tempfile.mkdtemp(prefix = "dsh-shell-"))
     out_path, err_path = tmp / "out.txt", tmp / "err.txt"
@@ -207,8 +246,8 @@ def run_windows_acl(request: ShellRequest) -> ShellResult:
 
         exit_code = wt.DWORD(0)
         kernel32.GetExitCodeProcess(process_info.hProcess, ctypes.byref(exit_code))
-        stdout = out_path.read_text(encoding = "utf-8", errors = "replace")
-        stderr = err_path.read_text(encoding = "utf-8", errors = "replace")
+        stdout = out_path.read_text(encoding = request.encoding, errors = "replace")
+        stderr = err_path.read_text(encoding = request.encoding, errors = "replace")
         denied = exit_code.value != 0 and (
             "access is denied" in stderr.lower()
             or "拒绝访问" in stderr
@@ -220,6 +259,7 @@ def run_windows_acl(request: ShellRequest) -> ShellResult:
             exit_code = 124 if timed_out else exit_code.value,
             stdout = stdout, stderr = stderr, denied = denied,
             backend = "windows-acl",
+            encoding = request.encoding,
         )
     finally:
         for handle in (out_handle, err_handle, token, restricted):

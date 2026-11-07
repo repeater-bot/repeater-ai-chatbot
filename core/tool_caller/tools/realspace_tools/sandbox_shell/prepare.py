@@ -7,7 +7,7 @@ from pathlib import Path
 from loguru import logger
 
 
-async def prepare_shell_root(path: Path, enabled: bool) -> None:
+async def prepare_shell_root(path: Path, enabled: bool, user_id: str) -> None:
     """Prepare the shell root before confinement.
 
     Windows lowers the directory tree to Low integrity. Linux and macOS have no
@@ -19,11 +19,12 @@ async def prepare_shell_root(path: Path, enabled: bool) -> None:
 
     if sys.platform == "win32":
         from .windows_acl import lower_integrity
-        await asyncio.to_thread(lower_integrity, str(path))
+        await asyncio.to_thread(lower_integrity, str(path), user_id)
         return
 
     logger.info(
-        "Preparing realspace shell root on %s (integrity levels not applicable): %s",
-        sys.platform,
-        path,
+        "Preparing realspace shell root on {platform} (integrity levels not applicable): {path}",
+        user_id = user_id,
+        platform = sys.platform,
+        path = path,
     )

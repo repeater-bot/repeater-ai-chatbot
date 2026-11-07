@@ -24,6 +24,7 @@ class ShellResult:
     stderr: str
     denied: bool = False
     backend: str = "local"
+    encoding: str = "utf-8"
     extra: dict = field(default_factory = dict)
 
 
@@ -33,3 +34,4 @@ class ShellRequest:
     cwd: str
     mode: SandboxMode
     timeout: float = 30
+    encoding: str = "utf-8"

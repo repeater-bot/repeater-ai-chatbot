@@ -12,13 +12,15 @@
 | `command` | string | 必填 | 交给系统 Shell 执行的命令 |
 | `cwd` | string \| null | `null` | 工作目录；相对路径从该条目的 `path` 解析 |
 | `timeout` | number \| null | `null` | 单次超时（秒）；null 使用 30 秒 |
+| `encoding` | string | `utf-8` | 解码 stdout/stderr 的编码，例如 `gbk`、`cp936` |
 
 ```json
 {
   "path_key": "agent",
   "command": "git status --short",
   "cwd": "project",
-  "timeout": 30
+  "timeout": 30,
+  "encoding": "gbk"
 }
 ```
 
@@ -67,7 +69,8 @@
   "stdout": "",
   "stderr": "",
   "denied": false,
-  "backend": "windows-acl"
+  "backend": "windows-acl",
+  "encoding": "gbk"
 }
 ```
 

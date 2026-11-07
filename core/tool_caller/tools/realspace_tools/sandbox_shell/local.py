@@ -1,11 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-import os
 import shutil
 import sys
-import tempfile
-from pathlib import Path
 
 from .base import SandboxMode, SandboxUnavailable, ShellRequest, ShellResult
 
@@ -34,9 +31,10 @@ async def _run_local(request: ShellRequest) -> ShellResult:
         cwd = request.cwd,
         mode = request.mode.value,
         exit_code = process.returncode or 0,
-        stdout = stdout.decode("utf-8", "replace"),
-        stderr = stderr.decode("utf-8", "replace"),
+        stdout = stdout.decode(request.encoding, "replace"),
+        stderr = stderr.decode(request.encoding, "replace"),
         backend = "local",
+        encoding = request.encoding,
     )
 
 
@@ -76,9 +74,10 @@ async def _run_bwrap(request: ShellRequest) -> ShellResult:
         cwd = request.cwd,
         mode = request.mode.value,
         exit_code = process.returncode or 0,
-        stdout = stdout.decode("utf-8", "replace"),
-        stderr = stderr.decode("utf-8", "replace"),
+        stdout = stdout.decode(request.encoding, "replace"),
+        stderr = stderr.decode(request.encoding, "replace"),
         backend = "bwrap",
+        encoding = request.encoding,
     )
 
 
@@ -109,9 +108,10 @@ async def _run_seatbelt(request: ShellRequest) -> ShellResult:
         cwd = request.cwd,
         mode = request.mode.value,
         exit_code = process.returncode or 0,
-        stdout = stdout.decode("utf-8", "replace"),
-        stderr = stderr.decode("utf-8", "replace"),
+        stdout = stdout.decode(request.encoding, "replace"),
+        stderr = stderr.decode(request.encoding, "replace"),
         backend = "seatbelt",
+        encoding = request.encoding,
     )
 
 
