@@ -1,17 +1,75 @@
-# Realspace 按字符/行列/两者同时编辑文本
+# Realspace Edit Text
+
+Edit text by character offsets, line/column, or both; both must resolve to the same range.
 
 注册名：`realspace_edit_text`
 
 ## 参数
 
-path、replacement、start_char/end_char、start_line/start_column、end_line/end_column、encoding
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `path` | string | 必填 | The real text file path to edit. |
+| `replacement` | string | 必填 | Replacement text; empty string deletes the range. |
+| `start_char` | `int | None` | `null` | Zero-based start character offset. |
+| `end_char` | `int | None` | `null` | Zero-based end offset; null means start_char. |
+| `start_line` | `int | None` | `null` | 1-based start line. |
+| `start_column` | integer | `1` | 1-based start column. |
+| `end_line` | `int | None` | `null` | 1-based end line; null means start_line. |
+| `end_column` | `int | None` | `null` | 1-based end column (exclusive); null means start_column. |
+| `encoding` | string | `utf-8` | Text encoding used to read and write the file. |
+
+```json
+{
+  "path": "D:\\Allowed\\example.txt",
+  "replacement": "new",
+  "start_char": 0,
+  "end_char": 5,
+  "start_line": 1,
+  "start_column": 1,
+  "end_line": 1,
+  "end_column": 5,
+  "encoding": "utf-8"
+}
+```
 
 ## 返回
 
-mode、起止字符偏移和行列、替换结果
+`TextEditResult` JSON：`mode`、字符区间、行列区间、替换结果和元数据。
+
+## 错误
+
+失败时工具会返回文本：
+
+```text
+Tool realspace_edit_text error: ...
+```
+
+常见原因包括路径不在白名单、路径为空、目标不存在、目标已存在、区间非法，或本地文件系统拒绝访问。
 
 ## 白名单
 
-需要 `writelist` 中某个条目的 `path` 覆盖目标路径，且 `edit_text` 为 `true`。
+白名单位于 `tool_calls.tools_configs.realspace.whitelist`，键是白名单索引，Shell 沙箱也会用这个键选根路径。需要该条目的 `write` 为 `true`。
 
-文本定位全部在客户端完成：读取全文后在 `str` 上分行/切片/替换，最后整体写回。字符偏移是 0 开始，行列是 1 开始；字符按 Unicode 码点计数，不按字节。
+```json
+{
+  "tool_calls": {
+    "tools_configs": {
+      "realspace": {
+        "whitelist": {
+          "agent": {
+            "path": "D:\\Allowed",
+            "read": false,
+            "write": true
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## 前置条件
+
+
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_edit_text`；`tool_calls.tools_configs.realspace.whitelist` 中至少有一个条目覆盖目标路径。详见
+[Tool Calls 索引](../../index.md)。

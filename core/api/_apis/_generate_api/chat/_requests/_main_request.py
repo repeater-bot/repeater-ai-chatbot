@@ -2,6 +2,7 @@ import uuid
 from pydantic import BaseModel, Field
 from ......user_data_managers.context import ContentRole, ContentUnit
 from ......assist_struct import RequestUserInfo, CrossUserDataRouting, AdditionalData
+from ......user_data_managers.user_config_manager import UserConfigs
 from typing import Any
 
 class ChatRequest(BaseModel):
@@ -11,6 +12,7 @@ class ChatRequest(BaseModel):
     suffix: str | None = None
     echo: bool = False
     fim_mode: bool = False
+    user_configs: UserConfigs | None = None
     history_messages: list[ContentUnit] | None = None
     user_info: RequestUserInfo = Field(default_factory=RequestUserInfo)
     role: ContentRole = ContentRole.USER

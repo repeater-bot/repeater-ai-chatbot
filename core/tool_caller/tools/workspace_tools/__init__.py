@@ -2,6 +2,7 @@ from .read import WorkspaceRead
 from .read_text import WorkspaceReadText
 from .write import WorkspaceWrite
 from .append import WorkspaceAppend
+from .append_text import WorkspaceAppendText
 from .truncate import WorkspaceTruncate
 from .touch import WorkspaceTouch
 from .edit import WorkspaceEdit
@@ -31,6 +32,7 @@ __all__ = [
     "WorkspaceReadText",
     "WorkspaceWrite",
     "WorkspaceAppend",
+    "WorkspaceAppendText",
     "WorkspaceTruncate",
     "WorkspaceTouch",
     "WorkspaceEdit",

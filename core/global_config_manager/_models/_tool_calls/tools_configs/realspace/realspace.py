@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
-from .writelist_unit import RealspaceWritelistUnit
+from .whitelist_unit import RealspaceWhitelistUnit
 
 class RealspaceConfigs(BaseModel):
-    writelist: list[RealspaceWritelistUnit] = Field(default_factory=list)
+    dir_auto_sandbox: bool = True
+    whitelist: dict[str, RealspaceWhitelistUnit] = Field(default_factory=dict)

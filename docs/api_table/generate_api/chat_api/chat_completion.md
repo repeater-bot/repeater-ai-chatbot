@@ -14,6 +14,7 @@
       - `suffix` (str | null): 消息后缀，需要保证 `fim_mode` = `true` 才可使用，允许为空
       - `echo` (bool): 是否回显用户消息，默认为 True，需要 `fim_mode` = `true` 才可使用
       - `fim_mode` (bool): 是否使用 FIM 模式，默认为 False
+      - `user_configs` (dict): 用户配置，当传入该字段时，将使用此处传递的配置，而不是用户的默认配置，格式参考 [User Config](./../../../configs/user_config.md)
       - `history_messages` (list[dict]): 历史消息，如果填写则使用此处提供的上下文，否则使用用户保存的，格式为 `[{"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]`
       - `user_info` 用户信息，全部可选
         - `username` (str): 用户名

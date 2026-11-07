@@ -1,19 +1,19 @@
-import base64
-from ....runtime_container import RuntimeContainer
+from ....global_config_manager import ConfigManager
 from ...framework import ToolsCaller, ToolPackage, RuntimePackage
-from ._client import get_realspace_client
-from pydantic import BaseModel, Field
-from typing import Literal
+from pydantic import BaseModel
+
 
 @ToolsCaller.register
-class RealspaceGetWhigteList(ToolPackage):
+class RealspaceGetWhitelist(ToolPackage):
     class Params(BaseModel):
         pass
 
     name = "realspace_get_whitelist"
-    description = "Get the whitelist of a file in the realspace."
+    description = "Return the configured realspace whitelist entries and their allowed operations."
 
     async def call(self, args: Params, runtime: RuntimePackage):
-        data_client = get_realspace_client("realspace_get_whitelist")
-        global_runtime = RuntimeContainer.get_runtime()
-        
+        units = ConfigManager.get_configs().tool_calls.tools_configs.realspace.whitelist
+        return {
+            key: unit.model_dump(by_alias = True)
+            for key, unit in units.items()
+        }

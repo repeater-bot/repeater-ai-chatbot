@@ -1,29 +1,60 @@
-# Realspace 写入文件
+# Realspace Write
+
+Write text to a realspace file, creating it if missing. Returns the number of bytes written.
 
 注册名：`realspace_write`
 
 ## 参数
 
-path: 文件路径；content: 文本内容或变量内容
-
-## 返回
-
-写入的字节数
-
-## 白名单
-
-需要 `writelist` 中某个条目的 `path` 覆盖目标路径，并且该条目的 `write` 为 `true`。
-`write` 是去掉 `realspace_` 前缀后的工具名；`copy` 在 Python 字段中写作 `copy_`，配置里仍是 `copy`。
+| 参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `path` | string | 必填 | The path of the file to write. |
+| `content` | `core.tool_caller.tools.realspace_tools.write.Content | core.tool_caller.tools.realspace_tools.write.VarContent` | 必填 | The content to write to the file. |
 
 ```json
 {
-  "realspace": {
-    "writelist": [
-      {
-        "path": "D:\\Allowed",
-        "write": true
+  "path": "D:\\Allowed\\example.txt"
+}
+```
+
+## 返回
+
+写入的字节数。
+
+## 错误
+
+失败时工具会返回文本：
+
+```text
+Tool realspace_write error: ...
+```
+
+常见原因包括路径不在白名单、路径为空、目标不存在、目标已存在、区间非法，或本地文件系统拒绝访问。
+
+## 白名单
+
+白名单位于 `tool_calls.tools_configs.realspace.whitelist`，键是白名单索引，Shell 沙箱也会用这个键选根路径。需要该条目的 `write` 为 `true`。
+
+```json
+{
+  "tool_calls": {
+    "tools_configs": {
+      "realspace": {
+        "whitelist": {
+          "agent": {
+            "path": "D:\\Allowed",
+            "read": false,
+            "write": true
+          }
+        }
       }
-    ]
+    }
   }
 }
 ```
+
+## 前置条件
+
+
+`configs/project_configs/config.json` 中的 `tool_calls.registed` 包含 `realspace_write`；`tool_calls.tools_configs.realspace.whitelist` 中至少有一个条目覆盖目标路径。详见
+[Tool Calls 索引](../../index.md)。

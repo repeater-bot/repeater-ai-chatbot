@@ -1,3 +1,4 @@
+import asyncio
 from ....framework import ToolsCaller, ToolPackage, RuntimePackage
 from pydantic import BaseModel, Field
 from .request_body import ChatRequest
@@ -13,6 +14,7 @@ class HorizontalAccess(ToolPackage):
         message: str = Field(default="", description="The message to send to the instance.")
         thinking: bool | None = Field(default=None, description="Whether to show thinking indicator.")
         timeout: int | float | None = Field(default=600, description="The timeout for the request.")
+        wait: bool = Field(default=False, description="Whether to wait for the response.")
     
     name = "horizontal_access_chat"
     description = "Chats to the specified Repeater instance."
@@ -32,24 +34,31 @@ class HorizontalAccess(ToolPackage):
         if not url:
             raise ValueError("Invalid instance ID")
         
-        raw_response = await horizontal_client.post(
-            url = urljoin(
-                base = url,
-                url = f"/generate/chat/completion/{user_id}"
-            ),
-            json = ChatRequest(
-                message = args.message,
-                thinking = args.thinking,
-                role_name = configs.role_name,
-                user_info = RequestUserInfo.model_validate(
-                    obj=configs.user_info.model_dump(exclude_none = True)
-                )
-            ).model_dump(exclude_none = True),
-            timeout = args.timeout
+        horizontal_chat_task = asyncio.create_task(
+            horizontal_client.post(
+                url = urljoin(
+                    base = url,
+                    url = f"/generate/chat/completion/{user_id}"
+                ),
+                json = ChatRequest(
+                    message = args.message,
+                    thinking = args.thinking,
+                    role_name = configs.role_name,
+                    user_info = RequestUserInfo.model_validate(
+                        obj=configs.user_info.model_dump(exclude_none = True)
+                    )
+                ).model_dump(exclude_none = True),
+                timeout = args.timeout
+            )
         )
 
-        response = Response.model_validate(raw_response.json())
-        if response.context:
-            return response.context.model_dump(exclude_none = True)
+        if args.wait:
+            raw_response = await horizontal_chat_task
+
+            response = Response.model_validate(raw_response.json())
+            if response.context:
+                return response.context.model_dump(exclude_none = True)
+            else:
+                raise ValueError("Invalid response")
         else:
-            raise ValueError("Invalid response")
+            return "Message sent."

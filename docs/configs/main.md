@@ -649,58 +649,35 @@ PS: 配置管理器会递归扫描环境变量`CONFIG_DIR`下的所有json/yaml�
             // 现实路径（realspace）工具配置
             "realspace": {
 
+                // 启用 Shell 沙箱时，是否自动准备主路径
+                // Windows 降为 Low integrity；Linux/macOS 由 bwrap/Seatbelt 的 path grant 处理
+                // 默认开启；准备操作在后台线程执行，并记录英文日志
+                "dir_auto_sandbox": true,
+
                 // 每个条目是一个允许访问的根路径
-                // 以及该路径上允许执行的操作
+                // 以及该路径上允许的读取/写入
                 //
+                // 键是白名单索引，Shell 工具通过 id 选择路径
                 // 路径按 expanduser().resolve() 规范化
                 // 目标路径必须等于 path，或位于 path 之下
                 //
                 // 空白名单表示拒绝所有 realspace 操作
-                "writelist": [
-                    {
+                "whitelist": {
+                    "agent": {
                         // 允许访问的根路径
                         "path": "./AgentWorkspace",
 
-                        // 基础读写
+                        // 是否允许读取类工具
                         "read": false,
-                        "read_text": false,
+
+                        // 是否允许写入/修改类工具
                         "write": false,
 
-                        // 原地修改
-                        "append": false,
-                        "truncate": false,
-                        "touch": false,
-                        "edit": false,
-
-                        // 文本模式编辑
-                        "edit_text": false,
-                        "edit_text_by_char": false,
-                        "edit_text_by_line": false,
-                        "edit_text_regex": false,
-
-                        // 删除与查询
-                        "delete": false,
-                        "exists": false,
-                        "is_file": false,
-                        "is_dir": false,
-                        "glob": false,
-                        "rematch": false,
-                        "list": false,
-                        "info": false,
-
-                        // 目录与复制
-                        "mkdir": false,
-                        "move": false,
-                        "copy": false,
-                        "copy_range": false,
-                        "get_url": false,
-
-                        // 统计与校验
-                        "hash": false,
-                        "du": false,
-                        "tree": false
+                        // Shell 权限，独立于 read/write
+                        // off / read_only / path_write / full_access
+                        "shell_level": "off"
                     }
-                ]
+                }
             }
         }
     },

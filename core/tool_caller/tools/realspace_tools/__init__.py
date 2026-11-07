@@ -1,6 +1,7 @@
 from .read import RealspaceRead
 from .write import RealspaceWrite
 from .append import RealspaceAppend
+from .append_text import RealspaceAppendText
 from .truncate import RealspaceTruncate
 from .touch import RealspaceTouch
 from .edit import RealspaceEdit
@@ -20,17 +21,20 @@ from .hash import RealspaceHash
 from .du import RealspaceDiskUsage
 from .tree import RealspaceTree
 from .copy_range import RealspaceCopyRange
-from .get_writelist import RealspaceGetWritelist
+from .upload_to_workspace import RealspaceUploadToWorkspace
+from .get_whitelist import RealspaceGetWhitelist
 from .read_text import RealspaceReadText
 from .edit_text import RealspaceEditText
 from .edit_text_by_char import RealspaceEditTextByChar
 from .edit_text_by_line import RealspaceEditTextByLine
 from .edit_text_regex import RealspaceEditTextRegex
+from .sandbox_shell import SandboxShell
 
 __all__ = [
     "RealspaceRead",
     "RealspaceWrite",
     "RealspaceAppend",
+    "RealspaceAppendText",
     "RealspaceTruncate",
     "RealspaceTouch",
     "RealspaceEdit",
@@ -50,10 +54,12 @@ __all__ = [
     "RealspaceDiskUsage",
     "RealspaceTree",
     "RealspaceCopyRange",
-    "RealspaceGetWritelist",
+    "RealspaceUploadToWorkspace",
+    "RealspaceGetWhitelist",
     "RealspaceReadText",
     "RealspaceEditText",
     "RealspaceEditTextByChar",
     "RealspaceEditTextByLine",
     "RealspaceEditTextRegex",
+    "SandboxShell",
 ]

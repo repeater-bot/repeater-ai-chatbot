@@ -78,12 +78,14 @@ from .realspace_tools import (
     RealspaceDiskUsage,
     RealspaceTree,
     RealspaceCopyRange,
-    RealspaceGetWritelist,
+    RealspaceUploadToWorkspace,
+    RealspaceGetWhitelist,
     RealspaceReadText,
     RealspaceEditText,
     RealspaceEditTextByChar,
     RealspaceEditTextByLine,
     RealspaceEditTextRegex,
+    SandboxShell,
 )
 from .deepseek_api import (
     DeepseekSearch,
@@ -186,13 +188,16 @@ __all__ = [
     "RealspaceDiskUsage",
     "RealspaceTree",
     "RealspaceCopyRange",
-    "RealspaceGetWritelist",
+    "RealspaceUploadToWorkspace",
+    "RealspaceGetWhitelist",
     "RealspaceReadText",
     "RealspaceEditText",
     "RealspaceEditTextByChar",
     "RealspaceEditTextByLine",
     "RealspaceEditTextRegex",
-    
+
+    "SandboxShell",
+
     "DeepseekSearch",
     "DeepseekFetch",
 

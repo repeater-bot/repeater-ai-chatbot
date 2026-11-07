@@ -10,7 +10,8 @@
   "instance_id": "", // The instance ID to access.
   "message": "", // The message to send to the instance.
   "thinking": false, // Whether to show thinking indicator.
-  "timeout": 600 // The timeout for the request.
+  "timeout": 600, // The timeout for the request.
+  "wait": false // Whether to wait for the response.
 }
 ```
 
@@ -30,4 +31,9 @@
         }
     ]
 }
+```
+
+不等待时返回
+``` Plaintext
+Message sent.
 ```
