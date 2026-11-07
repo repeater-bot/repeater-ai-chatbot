@@ -4,7 +4,7 @@
 
 **- Only Chat, Focus Chat. -**
 
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg?logo=python)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-63b9ff.svg)](https://opensource.org/licenses/MIT) [![Model Protocol](https://img.shields.io/badge/Model%20Protocol-OpenAI%20Completions%20API-brightgreen.svg)](https://platform.openai.com/docs/overview)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg?logo=python)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-63b9ff.svg)](https://opensource.org/licenses/MIT) [![Model Protocol](https://img.shields.io/badge/Model%20Protocol-OpenAI%Like%20API-brightgreen.svg)](https://platform.openai.com/docs/overview)
 
 </div>
 
