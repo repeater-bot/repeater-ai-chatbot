@@ -64,6 +64,9 @@ class SQLiteProxy:
         )
         return data["id"], data["path"]
 
+    async def list_open(self) -> list[dict[str, str]]:
+        return await self._request("GET", "/sqlite/list", "list")
+
     async def execute(
         self,
         session_id: str,

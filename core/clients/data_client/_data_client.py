@@ -16,6 +16,7 @@ from ._model import (
     HashResult,
     MoveResult,
     SQLiteAccess,
+    SQLiteDatabaseInfo,
     SQLiteExecuteResult,
     TextEditResult,
     TextFile,
@@ -1033,6 +1034,14 @@ class DataClient:
             f"/sqlite/{quote(sqlite_id)}",
             "SQLite Close"
         )
+
+    async def list_sqlite(self) -> list[SQLiteDatabaseInfo]:
+        """List every SQLite database currently open on DataServer."""
+        response = await self._request("GET", "/sqlite/list", "SQLite List")
+        return [
+            SQLiteDatabaseInfo.model_validate(item)
+            for item in response.json()
+        ]
 
     async def close(self) -> None:
         await self.client.aclose()

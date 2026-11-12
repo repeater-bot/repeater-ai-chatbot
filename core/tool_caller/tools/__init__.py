@@ -56,6 +56,7 @@ from .workspace_tools import (
     WorkspaceCopyRange,
     SQLiteCreate,
     SQLiteOpen,
+    SQLiteList,
     SQLiteExecute,
     SQLiteClose,
 )
@@ -204,6 +205,7 @@ __all__ = [
 
     "SQLiteCreate",
     "SQLiteOpen",
+    "SQLiteList",
     "SQLiteExecute",
     "SQLiteClose",
 
