@@ -9,7 +9,7 @@
 | `path` | string | 必填 | 已有数据库文件路径 |
 
 ```json
-{"path": "D:\\data\\app.db"}
+{"path": "databases/app.db"}
 ```
 
 返回：
@@ -17,8 +17,9 @@
 ```json
 {
   "id": "64d6f2808edb44849c9ed34f2113b66e",
-  "path": "D:\\data\\app.db"
+  "path": "databases/app.db"
 }
 ```
 
 文件不存在返回 404；不是 SQLite 返回 400。
+

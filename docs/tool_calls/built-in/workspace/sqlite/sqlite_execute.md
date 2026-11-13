@@ -19,3 +19,4 @@
 ```
 
 返回 `columns`、`rows`、`rowcount`、`lastrowid`；BLOB 以 `{"$base64": "..."}` 返回。
+

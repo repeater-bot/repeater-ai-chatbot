@@ -12,10 +12,11 @@
 [
   {
     "id": "40bed5400a44493c84acd5189941d471",
-    "path": "D:\\data\\app.db",
+    "path": "databases/app.db",
     "opened_at": "2026-11-13T00:10:00.123456+00:00"
   }
 ]
 ```
 
 按 `opened_at` 升序排列；没有打开的数据库时返回空数组。
+
