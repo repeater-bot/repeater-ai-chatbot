@@ -178,3 +178,27 @@ class TextRegexEditResult(BaseModel):
     line_count: int
     size: int
     metadata: TextMetadata
+
+
+class SQLiteAccess(BaseModel):
+    model_config = ConfigDict(validate_assignment = True)
+
+    id: str
+    path: str
+
+
+class SQLiteExecuteResult(BaseModel):
+    model_config = ConfigDict(validate_assignment = True)
+
+    columns: list[str]
+    rows: list[list]
+    rowcount: int
+    lastrowid: int | None = None
+
+
+class SQLiteDatabaseInfo(BaseModel):
+    model_config = ConfigDict(validate_assignment = True)
+
+    id: str
+    path: str
+    opened_at: str

@@ -26,6 +26,7 @@ from .hash import WorkspaceHash
 from .du import WorkspaceDiskUsage
 from .tree import WorkspaceTree
 from .copy_range import WorkspaceCopyRange
+from .sqlite import SQLiteCreate, SQLiteOpen, SQLiteList, SQLiteExecute, SQLiteClose
 
 __all__ = [
     "WorkspaceRead",
@@ -56,4 +57,9 @@ __all__ = [
     "WorkspaceDiskUsage",
     "WorkspaceTree",
     "WorkspaceCopyRange",
+    "SQLiteCreate",
+    "SQLiteOpen",
+    "SQLiteList",
+    "SQLiteExecute",
+    "SQLiteClose",
 ]

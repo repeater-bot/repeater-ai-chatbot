@@ -15,6 +15,9 @@ from ._model import (
     FileInfo,
     HashResult,
     MoveResult,
+    SQLiteAccess,
+    SQLiteDatabaseInfo,
+    SQLiteExecuteResult,
     TextEditResult,
     TextFile,
     TextLine,
@@ -985,6 +988,60 @@ class DataClient:
             size = len(data),
             metadata = metadata
         )
+
+    async def create_sqlite(self, path: str) -> SQLiteAccess:
+        """Create a SQLite database on DataServer and return its access id."""
+        response = await self._request(
+            "POST",
+            "/sqlite/create",
+            "SQLite Create",
+            json = {"path": path}
+        )
+        return SQLiteAccess.model_validate(response.json())
+
+    async def open_sqlite(self, path: str) -> SQLiteAccess:
+        """Open an existing DataServer SQLite database."""
+        response = await self._request(
+            "POST",
+            "/sqlite/open",
+            "SQLite Open",
+            json = {"path": path}
+        )
+        return SQLiteAccess.model_validate(response.json())
+
+    async def execute_sqlite(
+        self,
+        sqlite_id: str,
+        sql: str,
+        params: list | dict | None = None
+    ) -> SQLiteExecuteResult:
+        """Execute one SQL statement against an opened SQLite database."""
+        response = await self._request(
+            "POST",
+            f"/sqlite/{quote(sqlite_id)}/execute",
+            "SQLite Execute",
+            json = {
+                "sql": sql,
+                "params": params,
+            }
+        )
+        return SQLiteExecuteResult.model_validate(response.json())
+
+    async def close_sqlite(self, sqlite_id: str) -> None:
+        """Close an opened SQLite database and invalidate its access id."""
+        await self._request(
+            "DELETE",
+            f"/sqlite/{quote(sqlite_id)}",
+            "SQLite Close"
+        )
+
+    async def list_sqlite(self) -> list[SQLiteDatabaseInfo]:
+        """List every SQLite database currently open on DataServer."""
+        response = await self._request("GET", "/sqlite/list", "SQLite List")
+        return [
+            SQLiteDatabaseInfo.model_validate(item)
+            for item in response.json()
+        ]
 
     async def close(self) -> None:
         await self.client.aclose()

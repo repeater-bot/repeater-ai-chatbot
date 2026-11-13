@@ -54,6 +54,11 @@ from .workspace_tools import (
     WorkspaceDiskUsage,
     WorkspaceTree,
     WorkspaceCopyRange,
+    SQLiteCreate,
+    SQLiteOpen,
+    SQLiteList,
+    SQLiteExecute,
+    SQLiteClose,
 )
 from .realspace_tools import (
     RealspaceRead,
@@ -197,6 +202,12 @@ __all__ = [
     "RealspaceEditTextRegex",
 
     "SandboxShell",
+
+    "SQLiteCreate",
+    "SQLiteOpen",
+    "SQLiteList",
+    "SQLiteExecute",
+    "SQLiteClose",
 
     "DeepseekSearch",
     "DeepseekFetch",
